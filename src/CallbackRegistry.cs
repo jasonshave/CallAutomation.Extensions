@@ -1,11 +1,11 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure.Communication.CallAutomation;
 using System.Collections.Concurrent;
 using System.Reflection;
-using Azure.Communication.CallAutomation;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions;
+namespace CallAutomation.Extensions;
 
 internal static class CallbackRegistry
 {
@@ -67,7 +67,7 @@ internal static class CallbackRegistry
         return asyncCallback;
     }
 
-    internal static (Type?, MethodInfo?) GetCallbackHandlerMethod(string callbackId, Type eventType, bool remove = default)
+    internal static (Type?, MethodInfo?) GetCallbackHandler(string callbackId, Type eventType, bool remove = default)
     {
         var found = _callbackHandlers.TryGetValue((callbackId, eventType), out (Type?, MethodInfo?) handlerTuple);
         if (found && remove) TryRemoveHandler(callbackId, eventType);

@@ -3,7 +3,7 @@
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IRejectCall
+public interface ICanChooseRecognizeOptions
 {
-    ValueTask ExecuteAsync();
+    ICanRecognizeDtmfOptions WithPrompt(string fileUri);
 }

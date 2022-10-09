@@ -3,7 +3,7 @@
 
 using Azure.Messaging;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions.Interfaces;
+namespace CallAutomation.Extensions.Interfaces;
 
 public interface ICallAutomationEventPublisher
 {

@@ -2,10 +2,11 @@
 // Licensed under the MIT License.
 
 using Azure.Communication.CallAutomation;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions;
+namespace CallAutomation.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -15,10 +16,12 @@ public static class ServiceCollectionExtensions
         return new CallAutomationConfigurationBuilder(services);
     }
 
-    public static CallAutomationConfigurationBuilder AddCallAutomationEventPublisher(
+    public static CallAutomationConfigurationBuilder AddCallAutomationEventHandling(
         this CallAutomationConfigurationBuilder builder)
     {
         builder.Services.AddSingleton<ICallAutomationEventPublisher, CallAutomationEventPublisher>();
+        builder.Services.AddSingleton<ICallAutomationEventHandler, CallAutomationEventHandler>();
+        builder.Services.AddSingleton<ICallAutomationEventDispatcher, CallAutomationEventDispatcher>();
         return builder;
     }
 

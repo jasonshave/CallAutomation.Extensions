@@ -3,9 +3,9 @@
 
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Models;
+using CallAutomation.Extensions.Models;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions.Interfaces;
+namespace CallAutomation.Extensions.Interfaces;
 
 public interface ICanAddParticipant
 {

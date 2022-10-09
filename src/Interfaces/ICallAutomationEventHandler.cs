@@ -5,7 +5,7 @@ using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IRejectCallWithReason
+internal interface ICallAutomationEventHandler
 {
-    IRejectCall WithReason(CallRejectReason reason);
+    ValueTask Handle(CallAutomationEventBase eventBase, string? requestId);
 }

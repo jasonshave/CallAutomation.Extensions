@@ -5,8 +5,8 @@ using Azure.Communication;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IRedirectCall : ICanExecuteAsync
+public interface IRecognizeDtmf
 {
-    ICanExecuteAsync ToParticipant<T>(string id)
-        where T : CommunicationUserIdentifier;
+    ICanChooseRecognizeOptions FromParticipant<T>(string id)
+        where T : CommunicationIdentifier;
 }

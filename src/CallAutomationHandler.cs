@@ -3,7 +3,7 @@
 
 using Azure.Communication.CallAutomation;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions;
+namespace CallAutomation.Extensions;
 
 public abstract class CallAutomationHandler
 {

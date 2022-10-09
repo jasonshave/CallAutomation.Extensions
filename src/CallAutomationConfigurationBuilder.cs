@@ -3,7 +3,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions;
+namespace CallAutomation.Extensions;
 
 public class CallAutomationConfigurationBuilder
 {
