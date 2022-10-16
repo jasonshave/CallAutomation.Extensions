@@ -77,11 +77,18 @@ app.MapPost("/api/call", async ([FromBody] CallRequest callRequest, CallAutomati
 });
 ```
 
-## Collecting single-digit DTMF input
+## Collecting single-digit DTMF input and IVR menus
 
 The library currently supports collecting single digit DTMF input only. Future support for this library to handle multi-tone DTMF input is coming soon. The base Call Automation SDK can be used to perform this type of recognition behavior.
 
 You can use the `OnCallConnected` method to capture the delegate you wish to invoke when this behavior occurs. Additionally, you can do the same for things like `OnPlayCompleted`, and most importantly, when a person presses a key to emit a DTMF tone on the phone.
+
+The following is a simple scenario involving the following:
+
+1. Answer an incoming call
+2. Play a greeting
+3. Invoke the recognize API to collect a single digit while playing a prompt (Press 1 for English and 2 for Spanish)
+4. Invoke the language-specific main menu prompt with DTMF collection (not shown here)
 
 ```csharp
 await client.Answer(incomingCall)
@@ -102,8 +109,8 @@ await client.Answer(incomingCall)
                         x.AllowInterruptPrompt = true;
                         x.WaitForResponseInSeconds = 5;
                     })
-                    .OnPress<One>(async () => await MainMenu(_mainMenuEnglish, incomingCall.From.RawId, callConnection, callMedia))
-                    .OnPress<Two>(async () => await MainMenu(_mainMenuSpanish, incomingCall.From.RawId, callConnection, callMedia))
+                    .OnPress<One>(async () => await MainMenu(_mainMenuEnglish))
+                    .OnPress<Two>(async () => await MainMenu(_mainMenuSpanish))
                     .ExecuteAsync();
             })
             .ExecuteAsync();
