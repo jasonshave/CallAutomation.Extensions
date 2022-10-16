@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Communication.CallAutomation" Version="1.0.0-alpha.20221007.1" />
+    <PackageReference Include="Azure.Communication.CallAutomation" Version="1.0.0-alpha.20221013.2" />
     <PackageReference Include="Azure.Messaging.EventGrid" Version="4.11.0" />
     <PackageReference Include="CallAutomation.Contracts" Version="1.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="CallAutomation.Extensions.Tests" />
+    <InternalsVisibleTo Include="CallAutomation.Extensions.UnitTests" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="\" />

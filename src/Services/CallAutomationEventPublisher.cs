@@ -6,18 +6,21 @@ using Azure.Messaging;
 using CallAutomation.Extensions.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace CallAutomation.Extensions;
+namespace CallAutomation.Extensions.Services;
 
 internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublisher
 {
     private readonly ICallAutomationEventHandler _callAutomationEventHandler;
+    private readonly ICallAutomationRecognizeDtmfHandler _callAutomationRecognizeDtmfHandler;
     private readonly ILogger<CallAutomationEventPublisher> _logger;
 
     public CallAutomationEventPublisher(
         ICallAutomationEventHandler callAutomationEventHandler,
+        ICallAutomationRecognizeDtmfHandler callAutomationRecognizeDtmfHandler,
         ILogger<CallAutomationEventPublisher> logger)
     {
         _callAutomationEventHandler = callAutomationEventHandler;
+        _callAutomationRecognizeDtmfHandler = callAutomationRecognizeDtmfHandler;
         _logger = logger;
     }
 
@@ -29,7 +32,21 @@ internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublish
 
             if (callAutomationEventBase is CallConnected or CallDisconnected)
             {
-                await _callAutomationEventHandler.Handle(callAutomationEventBase, requestId);
+                // inbound calls will have a correlationId on the base class used to correlate the callback
+                // outbound calls will have the operationContext used to correlate the callback
+                if (callAutomationEventBase.CorrelationId is not null)
+                {
+                    await _callAutomationEventHandler.Handle(callAutomationEventBase, callAutomationEventBase.CorrelationId);
+                }
+                else
+                {
+                    await _callAutomationEventHandler.Handle(callAutomationEventBase, callAutomationEventBase.OperationContext);
+                }
+            }
+
+            if (callAutomationEventBase is RecognizeCompleted or RecognizeFailed)
+            {
+                await _callAutomationRecognizeDtmfHandler.Handle(callAutomationEventBase, callAutomationEventBase.OperationContext);
             }
             else
             {

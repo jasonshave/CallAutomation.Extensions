@@ -94,7 +94,10 @@ internal sealed class CallAutomationCreateCallHelper :
             callSource.CallerId = new PhoneNumberIdentifier(_pstnParticipantOptions.SourceCallerIdNumber);
         }
 
-        var createCallOptions = new CreateCallOptions(callSource, _destinations, _callbackUri);
+        var createCallOptions = new CreateCallOptions(callSource, _destinations, _callbackUri)
+        {
+            OperationContext = _requestId,
+        };
         await _client.CreateCallAsync(createCallOptions);
     }
 }

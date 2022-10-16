@@ -22,6 +22,8 @@ public static class ServiceCollectionExtensions
         builder.Services.AddSingleton<ICallAutomationEventPublisher, CallAutomationEventPublisher>();
         builder.Services.AddSingleton<ICallAutomationEventHandler, CallAutomationEventHandler>();
         builder.Services.AddSingleton<ICallAutomationEventDispatcher, CallAutomationEventDispatcher>();
+        builder.Services.AddSingleton<ICallAutomationRecognizeEventDispatcher, CallAutomationRecognizeEventDispatcher>();
+        builder.Services.AddSingleton<ICallAutomationRecognizeDtmfHandler, CallAutomationRecognizeDtmfEventHandler>();
         return builder;
     }
 

@@ -7,11 +7,18 @@ namespace CallAutomation.Extensions.Interfaces;
 
 public interface IHandleDtmfResponse
 {
-    IHandleDtmfResponse OnPress<TTone>(Func<RecognizeCompleted, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
+    IHandleDtmfResponse OnPress<TTone>(Func<RecognizeCompleted, CallConnection, CallMedia, CallRecording, IReadOnlyList<DtmfTone>, ValueTask> callback)
         where TTone : IDtmfTone;
 
-    IHandleDtmfResponse OnPress<TTone>(Action callbackAction)
+    IHandleDtmfResponse OnPress<TTone>(Func<ValueTask> callback)
         where TTone : IDtmfTone;
+
+    IHandleDtmfResponse OnPress<TTone>(Action callback)
+        where TTone : IDtmfTone;
+
+    IHandleDtmfTimeout OnToneTimeout(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback);
+
+    IHandleDtmfTimeout OnToneTimeout(Func<ValueTask> callback);
 
     ValueTask ExecuteAsync();
 }

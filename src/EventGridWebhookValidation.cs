@@ -12,31 +12,38 @@ public class EventGridWebhookValidation
 {
     private readonly RequestDelegate _next;
 
-    public EventGridWebhookValidation(RequestDelegate next)
-    {
-        _next = next;
-    }
+    public EventGridWebhookValidation(RequestDelegate next) => _next = next;
 
     public async Task InvokeAsync(HttpContext httpContext)
     {
+        httpContext.Request.EnableBuffering();
         BinaryData events = await BinaryData.FromStreamAsync(httpContext.Request.Body);
-        EventGridEvent[] eventGridEvents = EventGridEvent.ParseMany(events);
+        httpContext.Request.Body.Position = 0;
 
-        foreach (EventGridEvent eventGridEvent in eventGridEvents)
+        try
         {
-            // Handle system events
-            if (eventGridEvent.TryGetSystemEventData(out object eventData))
+            EventGridEvent[] eventGridEvents = EventGridEvent.ParseMany(events);
+
+            foreach (EventGridEvent eventGridEvent in eventGridEvents)
             {
-                // Handle the subscription validation event
-                if (eventData is SubscriptionValidationEventData subscriptionValidationEventData)
+                // Handle system events
+                if (eventGridEvent.TryGetSystemEventData(out object eventData))
                 {
-                    var responseData = new SubscriptionValidationResponse()
+                    // Handle the subscription validation event
+                    if (eventData is SubscriptionValidationEventData subscriptionValidationEventData)
                     {
-                        ValidationResponse = subscriptionValidationEventData.ValidationCode
-                    };
-                    await httpContext.Response.WriteAsync(JsonSerializer.Serialize(responseData));
+                        var responseData = new SubscriptionValidationResponse()
+                        {
+                            ValidationResponse = subscriptionValidationEventData.ValidationCode,
+                        };
+                        await httpContext.Response.WriteAsync(JsonSerializer.Serialize(responseData));
+                    }
                 }
             }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
         }
 
         await _next(httpContext);

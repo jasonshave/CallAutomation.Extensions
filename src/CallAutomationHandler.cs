@@ -23,7 +23,7 @@ public abstract class CallAutomationHandler
 
     public virtual ValueTask OnPlayFailed(PlayFailed @event, CallConnection connection, CallMedia media, CallRecording callRecording) => ValueTask.CompletedTask;
 
-    public virtual ValueTask OnRecognizeCompleted(RecognizeCompleted @event, CallConnection connection, CallMedia media, CallRecording callRecording) => ValueTask.CompletedTask;
+    public virtual ValueTask OnRecognizeCompleted(RecognizeCompleted @event, IReadOnlyList<DtmfTone> Tones, CallConnection connection, CallMedia media, CallRecording callRecording) => ValueTask.CompletedTask;
 
     public virtual ValueTask OnRecognizeFailed(RecognizeFailed @event, CallConnection connection, CallMedia media, CallRecording callRecording) => ValueTask.CompletedTask;
 }

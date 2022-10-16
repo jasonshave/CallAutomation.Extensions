@@ -1,11 +1,10 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Diagnostics.Tracing;
-using System.Reflection;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
+using System.Reflection;
 
 namespace CallAutomation.Extensions.Services;
 

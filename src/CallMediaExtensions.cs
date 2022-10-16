@@ -17,8 +17,8 @@ public static class CallMediaExtensions
         return new CallAutomationPlayHelper(callMedia, playOptions, Guid.NewGuid().ToString());
     }
 
-    public static IRecognizeDtmf ReceiveDtmfTones(this CallMedia callMedia, int numTones)
+    public static IRecognizeDtmf ReceiveDtmfTone(this CallMedia callMedia)
     {
-        return new CallAutomationRecognizeDtmfHelper(callMedia, numTones, Guid.NewGuid().ToString());
+        return new CallAutomationDtmfHelper(callMedia, Guid.NewGuid().ToString());
     }
 }
