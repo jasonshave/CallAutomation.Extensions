@@ -122,3 +122,26 @@ await client.Answer(incomingCall)
     })
     .ExecuteAsync();
 ```
+
+## Custom event handlers
+
+Instead of writing async or non-async method delegates to respones, you can handle the callbacks with your own event handlers by inheriting from `CallAutomationHandler` as follows:
+
+```csharp
+await client.Answer(incomingCall)
+            .WithCallbackUri("https://yourwebserver.com/api/callbacks")
+            .OnCallConnected<CustomHandler>() //<--custom handler
+            .ExecuteAsync();
+```
+
+Use your custom handler as follows:
+
+```csharp
+public class CustomHandler : CallAutomationHandler
+{
+    public override ValueTask OnCallConnected(CallConnected @event, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording)
+    {
+        // do work...
+    }
+}
+```
