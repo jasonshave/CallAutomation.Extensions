@@ -1,12 +1,14 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
-using Azure.Communication;
 using Azure.Communication.CallAutomation;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Interfaces;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Models;
+using CallAutomation.Contracts;
+using CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Models;
+using CommunicationIdentifier = Azure.Communication.CommunicationIdentifier;
+using CommunicationUserIdentifier = Azure.Communication.CommunicationUserIdentifier;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions.Helpers;
+namespace CallAutomation.Extensions.Helpers;
 
 internal sealed class CallAutomationRedirectHelper : IRedirectCall
 {
@@ -24,17 +26,7 @@ internal sealed class CallAutomationRedirectHelper : IRedirectCall
     public ICanExecuteAsync ToParticipant<T>(string id)
         where T : CommunicationUserIdentifier
     {
-        _participant = CommunicationUserIdentifier.FromRawId(id);
-        return this;
-    }
-
-    public ICanExecuteAsync ToParticipant<T>(string id, Action<PstnParticipantOptions> options)
-        where T : PhoneNumberIdentifier
-    {
-        var participantOptions = new PstnParticipantOptions();
-        options(participantOptions);
-        _pstnParticipantOptions = participantOptions;
-        _participant = PhoneNumberIdentifier.FromRawId(id);
+        _participant = CommunicationIdentifier.FromRawId(id);
         return this;
     }
 

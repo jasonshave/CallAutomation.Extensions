@@ -3,11 +3,11 @@
 
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Helpers;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Interfaces;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Models;
+using CallAutomation.Extensions.Helpers;
+using CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Models;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions;
+namespace CallAutomation.Extensions;
 
 public static class CallConnectionExtensions
 {
@@ -22,7 +22,7 @@ public static class CallConnectionExtensions
         where T : CommunicationUserIdentifier
     {
         var helper =
-            new CallFromAutomationCreateCallHelper(client, new CommunicationUserIdentifier(id), Guid.NewGuid().ToString());
+            new CallAutomationCreateCallHelper(client, new CommunicationUserIdentifier(id), Guid.NewGuid().ToString());
         return helper;
     }
 
@@ -40,7 +40,7 @@ public static class CallConnectionExtensions
         var pstnParticipantOptions = new PstnParticipantOptions();
         options(pstnParticipantOptions);
         var helper =
-            new CallFromAutomationCreateCallHelper(client, new PhoneNumberIdentifier(id), pstnParticipantOptions, Guid.NewGuid().ToString());
+            new CallAutomationCreateCallHelper(client, new PhoneNumberIdentifier(id), pstnParticipantOptions, Guid.NewGuid().ToString());
         return helper;
     }
 

@@ -3,12 +3,12 @@
 
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Interfaces;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Models;
+using CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Models;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions.Helpers;
+namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallFromAutomationCreateCallHelper :
+internal sealed class CallAutomationCreateCallHelper :
     ICanCallFrom,
     ICallWithCallbackUri,
     IAnswerCallback
@@ -20,14 +20,14 @@ internal sealed class CallFromAutomationCreateCallHelper :
     private CommunicationUserIdentifier _from;
     private Uri _callbackUri;
 
-    internal CallFromAutomationCreateCallHelper(CallAutomationClient client, CommunicationIdentifier id, string requestId)
+    internal CallAutomationCreateCallHelper(CallAutomationClient client, CommunicationIdentifier id, string requestId)
     {
         _client = client;
         _destinations.Add(id);
         _requestId = requestId;
     }
 
-    internal CallFromAutomationCreateCallHelper(CallAutomationClient client, PhoneNumberIdentifier id, PstnParticipantOptions pstnParticipantOptions, string requestId)
+    internal CallAutomationCreateCallHelper(CallAutomationClient client, PhoneNumberIdentifier id, PstnParticipantOptions pstnParticipantOptions, string requestId)
     {
         _client = client;
         _pstnParticipantOptions = pstnParticipantOptions;
@@ -94,7 +94,10 @@ internal sealed class CallFromAutomationCreateCallHelper :
             callSource.CallerId = new PhoneNumberIdentifier(_pstnParticipantOptions.SourceCallerIdNumber);
         }
 
-        var createCallOptions = new CreateCallOptions(callSource, _destinations, _callbackUri);
+        var createCallOptions = new CreateCallOptions(callSource, _destinations, _callbackUri)
+        {
+            OperationContext = _requestId,
+        };
         await _client.CreateCallAsync(createCallOptions);
     }
 }

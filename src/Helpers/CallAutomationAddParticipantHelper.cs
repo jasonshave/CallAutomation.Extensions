@@ -3,10 +3,10 @@
 
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Interfaces;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Models;
+using CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Models;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions.Helpers;
+namespace CallAutomation.Extensions.Helpers;
 
 /// <inheritdoc />
 internal sealed class CallAutomationAddParticipantHelper : ICanAddParticipant
@@ -105,7 +105,7 @@ internal sealed class CallAutomationAddParticipantHelper : ICanAddParticipant
 
         if (_pstnParticipantOptions is not null)
         {
-            // set caller ID number specifically for PSTN
+            // caller ID number must be set specifically for PSTN participants
             addParticipantsOptions.SourceCallerId =
                 new PhoneNumberIdentifier(_pstnParticipantOptions.SourceCallerIdNumber);
         }

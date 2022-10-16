@@ -3,9 +3,9 @@
 
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Interfaces;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions.Helpers;
+namespace CallAutomation.Extensions.Helpers;
 
 internal sealed class CallAutomationRemoveParticipantHelper : ICanRemoveParticipant
 {

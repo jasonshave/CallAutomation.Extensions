@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>CallAutomation.Extensions</id>
+    <authors>Jason Shave</authors>
+    <owners>Jason Shave</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <icon>icon.png</icon>
+    <projectUrl>https://github.com/jasonshave/CallAutomation.Extensions</projectUrl>
+    <readme>README.md</readme>
+    <description>An extension library to the Call Automation SDK used to improve event handling and correlation.</description>
+        <copyright>Copyright 2022</copyright>
+    <version>1.0.0</version>
+    <tags>Azure-Communication-Services JasonShave ACS CallAutomation Call Automation</tags>
+  </metadata>
+  <files>
+    <file src="..\images\icon.png" target=""/>
+    <file src="..\README.md" target=""/>
+  </files>
+</package>

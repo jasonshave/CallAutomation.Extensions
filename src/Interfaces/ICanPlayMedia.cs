@@ -3,7 +3,7 @@
 
 using Azure.Communication;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions.Interfaces;
+namespace CallAutomation.Extensions.Interfaces;
 
 public interface ICanPlayMedia
 {

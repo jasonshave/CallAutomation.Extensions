@@ -2,10 +2,10 @@
 // Licensed under the MIT License.
 
 using Azure.Communication.CallAutomation;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Interfaces;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Models;
+using CallAutomation.Contracts;
+using CallAutomation.Extensions.Interfaces;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions.Helpers;
+namespace CallAutomation.Extensions.Helpers;
 
 internal sealed class CallAutomationRejectHelper : IRejectCallWithReason, IRejectCall
 {

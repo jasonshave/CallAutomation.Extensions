@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 
 using Azure.Communication.CallAutomation;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Helpers;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Interfaces;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Models;
+using CallAutomation.Extensions.Helpers;
+using CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Models;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions;
+namespace CallAutomation.Extensions;
 
 public static class CallMediaExtensions
 {
@@ -15,5 +15,10 @@ public static class CallMediaExtensions
         var playOptions = new PlayMediaOptions();
         options(playOptions);
         return new CallAutomationPlayHelper(callMedia, playOptions, Guid.NewGuid().ToString());
+    }
+
+    public static IRecognizeDtmf ReceiveDtmfTone(this CallMedia callMedia)
+    {
+        return new CallAutomationDtmfHelper(callMedia, Guid.NewGuid().ToString());
     }
 }

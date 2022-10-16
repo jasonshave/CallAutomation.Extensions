@@ -3,14 +3,12 @@
 
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Interfaces;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Models;
+using CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Models;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions.Helpers;
+namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationPlayHelper :
-    IPlayMediaCallback,
-    ICanExecuteAsync
+internal sealed class CallAutomationPlayHelper : IPlayMediaCallback
 {
     private readonly CallMedia _callMedia;
     private readonly string _requestId;

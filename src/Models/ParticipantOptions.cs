@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions.Models;
+namespace CallAutomation.Extensions.Models;
 
 public class ParticipantOptions
 {

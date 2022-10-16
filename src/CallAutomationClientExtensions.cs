@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 
 using Azure.Communication.CallAutomation;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Helpers;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Interfaces;
-using JasonShave.Azure.Communication.CallAutomation.Extensions.Models;
+using CallAutomation.Contracts;
+using CallAutomation.Extensions.Helpers;
+using CallAutomation.Extensions.Interfaces;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions
+namespace CallAutomation.Extensions
 {
     public static class CallAutomationClientExtensions
     {

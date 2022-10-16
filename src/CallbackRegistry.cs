@@ -1,17 +1,44 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure.Communication.CallAutomation;
+using CallAutomation.Extensions.Interfaces;
 using System.Collections.Concurrent;
 using System.Reflection;
-using Azure.Communication.CallAutomation;
 
-namespace JasonShave.Azure.Communication.CallAutomation.Extensions;
+namespace CallAutomation.Extensions;
 
 internal static class CallbackRegistry
 {
+    private static readonly ConcurrentDictionary<(string, Type), ICallAutomationCallback<DtmfTone>> _recognizeDtmfCallbacks = new ();
+    private static readonly ConcurrentDictionary<(string, Type), ICallAutomationCallback<Type>> _recognizeCallbacks = new ();
+
     private static readonly ConcurrentDictionary<(string, Type), Delegate> _callbackDelegates = new ();
     private static readonly ConcurrentDictionary<(string, Type), Func<ValueTask>> _asyncCallbackDelegates = new ();
     private static readonly ConcurrentDictionary<(string, Type), (Type?, MethodInfo?)> _callbackHandlers = new ();
+
+    internal static void Register<T>(ICallAutomationCallback<T> callAutomationCallback, Type eventType)
+    {
+        if (typeof(T) == typeof(DtmfTone))
+        {
+            var added = _recognizeDtmfCallbacks.TryAdd((callAutomationCallback.RequestId, eventType), (ICallAutomationCallback<DtmfTone>)callAutomationCallback);
+            if (!added)
+            {
+                throw new ApplicationException(
+                    $"Unable to add DTMF callback for request ID: {callAutomationCallback.RequestId}");
+            }
+        }
+
+        if (typeof(T) == typeof(Type))
+        {
+            var added = _recognizeCallbacks.TryAdd((callAutomationCallback.RequestId, eventType), (ICallAutomationCallback<Type>)callAutomationCallback);
+            if (!added)
+            {
+                throw new ApplicationException(
+                    $"Unable to add DTMF callback for request ID: {callAutomationCallback.RequestId}");
+            }
+        }
+    }
 
     internal static void Register<TEvent>(string callbackId, Func<TEvent, CallConnection, CallMedia, CallRecording, ValueTask> request)
         where TEvent : CallAutomationEventBase
@@ -19,7 +46,7 @@ internal static class CallbackRegistry
         var added = _callbackDelegates.TryAdd((callbackId, typeof(TEvent)), request);
         if (!added)
         {
-            throw new ApplicationException($"Unable to add delegate for callback ID:{callbackId}");
+            throw new ApplicationException($"Unable to add delegate for request ID:{callbackId}");
         }
     }
 
@@ -29,7 +56,7 @@ internal static class CallbackRegistry
         var added = _asyncCallbackDelegates.TryAdd((callbackId, typeof(TEvent)), request);
         if (!added)
         {
-            throw new ApplicationException($"Unable to add delegate for callback ID:{callbackId}");
+            throw new ApplicationException($"Unable to add delegate for request ID:{callbackId}");
         }
     }
 
@@ -48,8 +75,33 @@ internal static class CallbackRegistry
         if (!added)
         {
             throw new ApplicationException(
-                $"Unable to add callback handler {typeof(THandler).Name} with callback ID {callbackId}");
+                $"Unable to add callback handler {typeof(THandler).Name} with request ID {callbackId}");
         }
+    }
+
+    internal static ICallAutomationCallback<T>? GetDtmfCallback<T>(string requestId, Type eventType, bool remove = default)
+    {
+        if (typeof(T) == typeof(DtmfTone))
+        {
+            var found = _recognizeDtmfCallbacks.TryGetValue((requestId, eventType), out ICallAutomationCallback<DtmfTone>? callback);
+            if (found && remove)
+            {
+                _recognizeDtmfCallbacks.TryRemove((requestId, eventType), out _);
+                return (ICallAutomationCallback<T>?)callback;
+            }
+        }
+
+        if (typeof(T) == typeof(Type))
+        {
+            var found = _recognizeCallbacks.TryGetValue((requestId, eventType), out ICallAutomationCallback<Type>? callback);
+            if (found && remove)
+            {
+                _recognizeCallbacks.TryRemove((requestId, eventType), out _);
+                return (ICallAutomationCallback<T>?)callback;
+            }
+        }
+
+        return null;
     }
 
     internal static Delegate? GetCallback(string callbackId, Type eventType, bool remove = default)
@@ -67,7 +119,7 @@ internal static class CallbackRegistry
         return asyncCallback;
     }
 
-    internal static (Type?, MethodInfo?) GetCallbackHandlerMethod(string callbackId, Type eventType, bool remove = default)
+    internal static (Type?, MethodInfo?) GetCallbackHandler(string callbackId, Type eventType, bool remove = default)
     {
         var found = _callbackHandlers.TryGetValue((callbackId, eventType), out (Type?, MethodInfo?) handlerTuple);
         if (found && remove) TryRemoveHandler(callbackId, eventType);
