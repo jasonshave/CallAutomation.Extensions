@@ -60,7 +60,7 @@ await client
 The Call Automation platform currently supports playing audio file from a URI. The file must be recorded in 16Khz, mono, and a WAV file format.
 
 ```csharp
-app.MapPost("/api/call", async ([FromBody] CallRequest callRequest, CallAutomationClient client) =>
+app.MapPost("/api/call", async (CallAutomationClient client) =>
 {
     await client
         .Call<PhoneNumberIdentifier>("+14255551212", x => x.SourceCallerIdNumber = "+18005551212")
