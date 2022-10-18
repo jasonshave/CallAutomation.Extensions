@@ -11,7 +11,7 @@ namespace CallAutomation.Extensions;
 internal static class CallbackRegistry
 {
     private static readonly ConcurrentDictionary<(string, Type), ICallAutomationCallback<DtmfTone>> _recognizeDtmfCallbacks = new ();
-    private static readonly ConcurrentDictionary<(string, Type), ICallAutomationCallback<Type>> _recognizeCallbacks = new ();
+    private static readonly ConcurrentDictionary<(string, Type), ICallAutomationCallback<Type>> _genericCallbacks = new ();
 
     private static readonly ConcurrentDictionary<(string, Type), Delegate> _callbackDelegates = new ();
     private static readonly ConcurrentDictionary<(string, Type), Func<ValueTask>> _asyncCallbackDelegates = new ();
@@ -31,7 +31,7 @@ internal static class CallbackRegistry
 
         if (typeof(T) == typeof(Type))
         {
-            var added = _recognizeCallbacks.TryAdd((callAutomationCallback.RequestId, eventType), (ICallAutomationCallback<Type>)callAutomationCallback);
+            var added = _genericCallbacks.TryAdd((callAutomationCallback.RequestId, eventType), (ICallAutomationCallback<Type>)callAutomationCallback);
             if (!added)
             {
                 throw new ApplicationException(
@@ -93,10 +93,10 @@ internal static class CallbackRegistry
 
         if (typeof(T) == typeof(Type))
         {
-            var found = _recognizeCallbacks.TryGetValue((requestId, eventType), out ICallAutomationCallback<Type>? callback);
+            var found = _genericCallbacks.TryGetValue((requestId, eventType), out ICallAutomationCallback<Type>? callback);
             if (found && remove)
             {
-                _recognizeCallbacks.TryRemove((requestId, eventType), out _);
+                _genericCallbacks.TryRemove((requestId, eventType), out _);
                 return (ICallAutomationCallback<T>?)callback;
             }
         }

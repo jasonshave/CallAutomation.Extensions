@@ -22,10 +22,10 @@ internal sealed class CallAutomationPlayHelper : IPlayMediaCallback
         _requestId = requestId;
     }
 
-    public IPlayMediaCallback ToParticipant<T>(string id)
+    public IPlayMediaCallback ToParticipant<T>(string rawId)
         where T : CommunicationIdentifier
     {
-        _playToParticipants.Add(CommunicationIdentifier.FromRawId(id));
+        _playToParticipants.Add(CommunicationIdentifier.FromRawId(rawId));
         return this;
     }
 
@@ -65,7 +65,10 @@ internal sealed class CallAutomationPlayHelper : IPlayMediaCallback
     {
         if (_playToParticipants.Any())
         {
-            await _callMedia.PlayAsync(new FileSource(new Uri(_playMediaOptions.FileUrl)), _playToParticipants, new PlayOptions()
+            await _callMedia.PlayAsync(new FileSource(new Uri(_playMediaOptions.FileUrl))
+            {
+                PlaySourceId = _requestId,
+            }, _playToParticipants, new PlayOptions()
             {
                 OperationContext = _requestId,
                 Loop = _playMediaOptions.Loop,
@@ -73,7 +76,10 @@ internal sealed class CallAutomationPlayHelper : IPlayMediaCallback
         }
         else
         {
-            await _callMedia.PlayToAllAsync(new FileSource(new Uri(_playMediaOptions.FileUrl)), new PlayOptions()
+            await _callMedia.PlayToAllAsync(new FileSource(new Uri(_playMediaOptions.FileUrl))
+            {
+                PlaySourceId = _requestId,
+            }, new PlayOptions()
             {
                 OperationContext = _requestId,
                 Loop = _playMediaOptions.Loop,

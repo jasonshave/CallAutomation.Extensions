@@ -11,7 +11,7 @@ internal sealed class CallAutomationRejectHelper : IRejectCallWithReason, IRejec
 {
     private readonly CallAutomationClient _client;
     private readonly IncomingCall _incomingCall;
-    private CallRejectReason _rejectReason;
+    private CallRejectReason? _rejectReason;
 
     internal CallAutomationRejectHelper(CallAutomationClient client, IncomingCall incomingCall)
     {
@@ -25,5 +25,17 @@ internal sealed class CallAutomationRejectHelper : IRejectCallWithReason, IRejec
         return this;
     }
 
-    public async ValueTask ExecuteAsync() => await _client.RejectCallAsync(_incomingCall.IncomingCallContext, _rejectReason);
+    public async ValueTask ExecuteAsync()
+    {
+        if (_rejectReason is not null)
+        {
+            await _client.RejectCallAsync(new RejectCallOptions(_incomingCall.IncomingCallContext)
+            {
+                CallRejectReason = (CallRejectReason)_rejectReason,
+            });
+            return;
+        }
+
+        await _client.RejectCallAsync(_incomingCall.IncomingCallContext);
+    }
 }

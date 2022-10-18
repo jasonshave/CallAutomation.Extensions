@@ -8,7 +8,7 @@ namespace CallAutomation.Extensions.Interfaces;
 
 public interface IPlayMediaCallback
 {
-    IPlayMediaCallback ToParticipant<T>(string id)
+    IPlayMediaCallback ToParticipant<T>(string rawId)
         where T : CommunicationIdentifier;
 
     IPlayMediaCallback OnPlayCompleted<THandler>()
