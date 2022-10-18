@@ -1,5 +1,7 @@
 # CallAutomation.Extensions
 
+[![.NET](https://github.com/jasonshave/CallAutomation.Extensions/actions/workflows/dotnet.yml/badge.svg)](https://github.com/jasonshave/CallAutomation.Extensions/actions/workflows/dotnet.yml) [![Nuget](https://img.shields.io/nuget/v/CallAutomation.Extensions.svg?style=flat)](https://www.nuget.org/packages/CallAutomation.Extensions/)
+
 An extension library using the 'fluent API' style for the Azure Communication Services Call Automation platform making it easier to invoke actions and correlate callbacks to functions at runtime.
 
 ## Setup and configuration
