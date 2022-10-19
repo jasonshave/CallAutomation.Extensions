@@ -3,6 +3,7 @@
 
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Models;
 using CallAutomation.Extensions.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +14,19 @@ public static class ServiceCollectionExtensions
     public static CallAutomationConfigurationBuilder AddCallAutomationClient(this IServiceCollection services, string connectionString)
     {
         services.AddSingleton(new CallAutomationClient(connectionString));
+        return new CallAutomationConfigurationBuilder(services);
+    }
+
+    public static CallAutomationConfigurationBuilder AddCallAutomationClient(this IServiceCollection services, Action<CallAutomationSdkClientOptions> options)
+    {
+        var callAutomationClientOptions = new CallAutomationSdkClientOptions();
+        options(callAutomationClientOptions);
+
+        services.AddSingleton(callAutomationClientOptions.OverrideEndpointUri is null
+            ? new CallAutomationClient(callAutomationClientOptions.ConnectionString)
+            : new CallAutomationClient(callAutomationClientOptions.OverrideEndpointUri,
+                callAutomationClientOptions.ConnectionString));
+
         return new CallAutomationConfigurationBuilder(services);
     }
 
