@@ -20,17 +20,17 @@ public interface IHandleDtmfResponse
     IHandleDtmfResponse OnPress<TTone>(Action callback)
         where TTone : IDtmfTone;
 
-    IHandleDtmfTimeout OnToneTimeout(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback);
+    IHandleDtmfTimeout OnInputTimeout(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback);
 
-    IHandleDtmfTimeout OnToneTimeout<THandler>()
+    IHandleDtmfTimeout OnInputTimeout<THandler>()
         where THandler : CallAutomationHandler;
 
-    IHandleDtmfTimeout OnPromptTimeout(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback);
+    IHandleDtmfTimeout OnInterToneTimeout(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback);
 
-    IHandleDtmfTimeout OnPromptTimeout<THandler>()
+    IHandleDtmfTimeout OnInterToneTimeout<THandler>()
         where THandler : CallAutomationHandler;
 
-    IHandleDtmfTimeout OnToneTimeout(Func<ValueTask> callback);
+    IHandleDtmfTimeout OnInputTimeout(Func<ValueTask> callback);
 
     ValueTask ExecuteAsync();
 }

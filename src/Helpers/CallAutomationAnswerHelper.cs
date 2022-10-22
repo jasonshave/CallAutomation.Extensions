@@ -34,14 +34,14 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
     public ICallConnectionHandler OnCallConnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<CallConnected, THandler>($"On{nameof(CallConnected)}", typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        HelperCallbacks.AddHandlerCallback<THandler, CallConnected>($"On{nameof(CallConnected)}", typeof(CallConnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 
     public ICallConnectionHandler OnCallDisconnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<CallDisconnected, THandler>($"On{nameof(CallDisconnected)}", typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        HelperCallbacks.AddHandlerCallback<THandler, CallDisconnected>($"On{nameof(CallDisconnected)}", typeof(CallDisconnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 

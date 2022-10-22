@@ -33,36 +33,33 @@ public class CallAutomationRecognizeDtmfEventHandler : ICallAutomationRecognizeD
 
         if (eventBase is RecognizeCompleted recognizeCompleted)
         {
-            var callbackDelegate = CallbackRegistry.GetHelperCallback(requestId, eventBase.GetType(), true);
-            if (callbackDelegate is not null)
-            {
-                _logger.LogInformation("Found callback delegate for request {requestId}, with {numTones} DTMF tone(s), and event {event}", requestId, recognizeCompleted.CollectTonesResult.Tones.Count, eventBase.GetType());
+            var tone = recognizeCompleted.CollectTonesResult.Tones.FirstOrDefault();
 
+            var callAutomationHelperCallback = CallbackRegistry.GetHelperCallback(requestId, typeof(RecognizeCompleted), true);
+            if (callAutomationHelperCallback is not null)
+            {
                 // need to determine if one or more tones are collected as we need to get a single
                 // delegate for a single tone or get a single delegate for multiple tones
                 if (recognizeCompleted.CollectTonesResult.Tones.Count is 1)
                 {
-                    var tone = recognizeCompleted.CollectTonesResult.Tones.FirstOrDefault();
-                    var multicastDelegates = callbackDelegate.HelperCallbacks.GetCallbacks(tone.GetType());
-                    foreach (var multicastDelegate in multicastDelegates)
+                    // dispatch delegate callbacks
+                    var delegates = callAutomationHelperCallback.HelperCallbacks.GetCallbacks(tone.Convert().GetType());
+                    foreach (var @delegate in delegates)
                     {
-                        await _dispatcher.DispatchAsync(eventBase, multicastDelegate, clientElements, recognizeCompleted.CollectTonesResult.Tones);
+                        _logger.LogInformation("Found callback delegate for request {requestId}, with {numTones} DTMF tone(s), and event {event}", requestId, recognizeCompleted.CollectTonesResult.Tones.Count, eventBase.GetType().Name);
+                        await _dispatcher.DispatchAsync(recognizeCompleted, @delegate, clientElements, recognizeCompleted.CollectTonesResult.Tones);
                     }
-                }
-            }
-        }
 
-        if (eventBase is RecognizeFailed recognizeFailed)
-        {
-            var callbackDelegate = CallbackRegistry.GetHelperCallback(requestId, eventBase.GetType(), true);
-            if (callbackDelegate is not null)
-            {
-                _logger.LogInformation("Found callback delegate for request {requestId}, and event {event}", requestId, eventBase.GetType());
+                    var handlerTuples = callAutomationHelperCallback.HelperCallbacks.GetHandlers(tone.Convert().GetType());
+                    foreach (var handlerTuple in handlerTuples)
+                    {
+                        var handler = _serviceProvider.GetService(handlerTuple.Item2);
 
-                var multicastDelegates = callbackDelegate.GetCallbacks(typeof(RecognizeFailed));
-                foreach (var multicastDelegate in multicastDelegates)
-                {
-                    await _dispatcher.DispatchAsync(eventBase, multicastDelegate, clientElements);
+                        if (handler is null) return;
+
+                        _logger.LogInformation("Found callback handler for request {requestId} and event {event}", requestId, eventBase.GetType());
+                        await _dispatcher.DispatchAsync(recognizeCompleted, handlerTuple.Item1, handler, clientElements, recognizeCompleted.CollectTonesResult.Tones);
+                    }
                 }
             }
         }

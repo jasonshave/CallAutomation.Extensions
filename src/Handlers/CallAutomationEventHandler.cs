@@ -5,8 +5,6 @@ using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
-using System.Reflection.Metadata;
 
 namespace CallAutomation.Extensions.Handlers;
 
@@ -34,16 +32,16 @@ internal sealed class CallAutomationEventHandler : ICallAutomationEventHandler
         var clientElements = new CallAutomationClientElements(_client, eventBase.CallConnectionId);
 
         // use the event type to retrieve the correct callback
-        var callAutomationCallback = CallbackRegistry.GetHelperCallback(requestId, eventBase.GetType(), true);
+        var callAutomationHelperCallback = CallbackRegistry.GetHelperCallback(requestId, eventBase.GetType(), true);
 
-        if (callAutomationCallback is null)
+        if (callAutomationHelperCallback is null)
         {
             _logger.LogDebug("No callbacks found for request {requestId}", requestId);
             return;
         }
 
         // dispatch delegate callbacks
-        var delegates = callAutomationCallback.HelperCallbacks.GetCallbacks(eventBase.GetType());
+        var delegates = callAutomationHelperCallback.HelperCallbacks.GetCallbacks(eventBase.GetType());
         foreach (var @delegate in delegates)
         {
             _logger.LogInformation("Found callback delegate for request {requestId} and event {event}", requestId, eventBase.GetType());
@@ -51,15 +49,15 @@ internal sealed class CallAutomationEventHandler : ICallAutomationEventHandler
         }
 
         // dispatch handler callbacks
-        var handlerTuples = callAutomationCallback.HelperCallbacks.GetHandlers(eventBase.GetType());
-        foreach (var handlerType in handlerTuples)
+        var handlerTuples = callAutomationHelperCallback.HelperCallbacks.GetHandlers(eventBase.GetType());
+        foreach (var handlerTuple in handlerTuples)
         {
-            var handler = _serviceProvider.GetService(handlerType.Item2);
+            var handler = _serviceProvider.GetService(handlerTuple.Item2);
 
             if (handler is null) return;
 
             _logger.LogInformation("Found callback handler for request {requestId} and event {event}", requestId, eventBase.GetType());
-            await _dispatcher.DispatchAsync(eventBase, handlerType.Item1, handler, clientElements);
+            await _dispatcher.DispatchAsync(eventBase, handlerTuple.Item1, handler, clientElements);
         }
     }
 }

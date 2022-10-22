@@ -60,7 +60,7 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
     public ICanAddParticipant OnAddParticipantsSucceeded<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<AddParticipantsSucceeded, THandler>($"On{nameof(AddParticipantsSucceeded)}", typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        HelperCallbacks.AddHandlerCallback<THandler, AddParticipantsSucceeded>($"On{nameof(AddParticipantsSucceeded)}", typeof(AddParticipantsSucceeded), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 
@@ -79,7 +79,7 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
     public ICanAddParticipant OnAddParticipantsFailed<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<AddParticipantsSucceeded, THandler>($"On{nameof(AddParticipantsSucceeded)}", typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        HelperCallbacks.AddHandlerCallback<THandler, AddParticipantsSucceeded>($"On{nameof(AddParticipantsSucceeded)}", typeof(AddParticipantsSucceeded), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 

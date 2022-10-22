@@ -30,11 +30,12 @@ internal sealed class CallAutomationCallbacks
         _callbackDelegates[(RequestId, typeof(T))].Add(callback);
     }
 
-    public void AddHandlerCallback<T, THandler>(string methodName, params Type[] methodParameters)
+    public void AddHandlerCallback<THandler, T>(string methodName, params Type[] methodParameters)
+        where THandler : CallAutomationHandler
     {
         var methodInfo = typeof(THandler).GetMethod(methodName, methodParameters);
         if (methodInfo is null)
-            throw new ApplicationException($"Could not find a method matching the signature for handler: {typeof(THandler)}. There were {methodParameters.Length} input parameters to the method signature.");
+            throw new ApplicationException($"Could not find a method matching the signature for handler: {typeof(THandler).Name}. There were {methodParameters.Length} input parameters to the method signature.");
 
         if (!_callbackHandlers.ContainsKey((RequestId, typeof(T))))
         {
@@ -45,7 +46,13 @@ internal sealed class CallAutomationCallbacks
         _callbackHandlers[(RequestId, typeof(T))].Add((methodInfo, typeof(THandler)));
     }
 
-    public List<Delegate> GetCallbacks(Type type) => _callbackDelegates[(RequestId, type)];
+    public IEnumerable<Delegate> GetCallbacks(Type type) => _callbackDelegates[(RequestId, type)];
 
-    public List<(MethodInfo, Type)> GetHandlers(Type type) => _callbackHandlers[(RequestId, type)];
+    public IEnumerable<(MethodInfo, Type)> GetHandlers(Type type)
+    {
+        _callbackHandlers.TryGetValue((RequestId, type), out var handlerTuple);
+        if (handlerTuple is null) return Enumerable.Empty<(MethodInfo, Type)>();
+
+        return handlerTuple;
+    }
 }

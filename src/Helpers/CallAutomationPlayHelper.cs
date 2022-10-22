@@ -32,7 +32,7 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
     public IPlayMediaCallback OnPlayCompleted<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<PlayCompleted, THandler>($"On{nameof(PlayCompleted)}", typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        HelperCallbacks.AddHandlerCallback<THandler, PlayCompleted>($"On{nameof(PlayCompleted)}", typeof(PlayCompleted), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 
@@ -51,7 +51,7 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
     public IPlayMediaCallback OnPlayFailed<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<PlayFailed, THandler>($"On{nameof(PlayFailed)}", typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        HelperCallbacks.AddHandlerCallback<THandler, PlayCompleted>($"On{nameof(PlayFailed)}", typeof(PlayFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 
@@ -63,6 +63,8 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
 
     public async ValueTask ExecuteAsync()
     {
+        CallbackRegistry.RegisterHelperCallback(this, new[] { typeof(PlayCompleted), typeof(PlayFailed) });
+
         if (_playToParticipants.Any())
         {
             await _callMedia.PlayAsync(new FileSource(new Uri(_playMediaOptions.FileUrl))

@@ -5,5 +5,5 @@ namespace CallAutomation.Extensions.Interfaces;
 
 public interface IRecognizeDtmf
 {
-    ICanChooseRecognizeOptions FromParticipant(string rawId);
+    ICanChooseRecognizeOptions FromParticipant(string id);
 }
