@@ -5,24 +5,24 @@ using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IAnswerCallback
+public interface ICallConnectionHandler
 {
-    IAnswerCallback OnCallConnected<THandler>()
+    ICallConnectionHandler OnCallConnected<THandler>()
         where THandler : CallAutomationHandler;
 
-    IAnswerCallback OnCallDisconnected<THandler>()
+    ICallConnectionHandler OnCallDisconnected<THandler>()
         where THandler : CallAutomationHandler;
 
-    IAnswerCallback OnCallConnected(
+    ICallConnectionHandler OnCallConnected(
         Func<ValueTask> callbackFunction);
 
-    IAnswerCallback OnCallConnected(
+    ICallConnectionHandler OnCallConnected(
         Func<CallConnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction);
 
-    IAnswerCallback OnCallDisconnected(
+    ICallConnectionHandler OnCallDisconnected(
         Func<ValueTask> callbackFunction);
 
-    IAnswerCallback OnCallDisconnected(
+    ICallConnectionHandler OnCallDisconnected(
         Func<CallDisconnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction);
 
     ValueTask ExecuteAsync();

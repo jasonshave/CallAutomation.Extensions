@@ -3,100 +3,110 @@
 
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
+using CallAutomation.Extensions.Extensions;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
+using CallAutomation.Extensions.Services;
 
 namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationCreateCallHelper :
-    ICanCallFrom,
+internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
+    ICallFrom,
     ICallWithCallbackUri,
-    IAnswerCallback
+    ICallConnectionHandler
 {
     private readonly CallAutomationClient _client;
     private readonly List<CommunicationIdentifier> _destinations = new ();
-    private readonly PstnParticipantOptions? _pstnParticipantOptions;
-    private readonly string _requestId;
-    private CommunicationUserIdentifier _from;
+    private string _from;
+    private CallFromOptions? _callFromOptions;
     private Uri _callbackUri;
 
-    internal CallAutomationCreateCallHelper(CallAutomationClient client, CommunicationIdentifier id, string requestId)
+    internal CallAutomationCreateCallHelper(CallAutomationClient client, string to, string requestId)
+        : base(requestId)
     {
         _client = client;
-        _destinations.Add(id);
-        _requestId = requestId;
+        _destinations.Add(to.ConvertToCommunicationIdentifier());
     }
 
-    internal CallAutomationCreateCallHelper(CallAutomationClient client, PhoneNumberIdentifier id, PstnParticipantOptions pstnParticipantOptions, string requestId)
+    public ICallWithCallbackUri From(string from)
     {
-        _client = client;
-        _pstnParticipantOptions = pstnParticipantOptions;
-        _destinations.Add(id);
-        _requestId = requestId;
-    }
-
-    public ICallWithCallbackUri From(string id)
-    {
-        _from = new CommunicationUserIdentifier(id);
+        _from = from;
         return this;
     }
 
-    public IAnswerCallback WithCallbackUri(string callbackUri)
+    public ICallWithCallbackUri From(string from, Action<CallFromOptions> options)
     {
-        _callbackUri = new Uri($"{callbackUri}?=requestId={_requestId}");
+        _from = from;
+
+        var callFromOptions = new CallFromOptions();
+        options(callFromOptions);
+        _callFromOptions = callFromOptions;
+
         return this;
     }
 
-    public IAnswerCallback OnCallConnected<THandler>()
+    public ICallConnectionHandler WithCallbackUri(string callbackUri)
+    {
+        _callbackUri = new Uri($"{callbackUri}?=requestId={RequestId}");
+        return this;
+    }
+
+    public ICallConnectionHandler OnCallConnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        CallbackRegistry.Register<THandler, CallConnected>(_requestId);
+        HelperCallbacks.AddHandlerCallback<CallConnected, THandler>($"On{nameof(CallConnected)}", typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 
-    public IAnswerCallback OnCallDisconnected<THandler>()
+    public ICallConnectionHandler OnCallDisconnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        CallbackRegistry.Register<THandler, CallDisconnected>(_requestId);
+        HelperCallbacks.AddHandlerCallback<CallDisconnected, THandler>($"On{nameof(CallDisconnected)}", typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 
-    public IAnswerCallback OnCallConnected(Func<ValueTask> callbackFunction)
+    public ICallConnectionHandler OnCallConnected(Func<ValueTask> callbackFunction)
     {
-        CallbackRegistry.Register<CallConnected>(_requestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<CallConnected>(callbackFunction);
         return this;
     }
 
-    public IAnswerCallback OnCallConnected(Func<CallConnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
+    public ICallConnectionHandler OnCallConnected(Func<CallConnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        CallbackRegistry.Register(_requestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<CallConnected>(callbackFunction);
         return this;
     }
 
-    public IAnswerCallback OnCallDisconnected(Func<ValueTask> callbackFunction)
+    public ICallConnectionHandler OnCallDisconnected(Func<ValueTask> callbackFunction)
     {
-        CallbackRegistry.Register<CallDisconnected>(_requestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<CallDisconnected>(callbackFunction);
         return this;
     }
 
-    public IAnswerCallback OnCallDisconnected(Func<CallDisconnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
+    public ICallConnectionHandler OnCallDisconnected(Func<CallDisconnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        CallbackRegistry.Register(_requestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<CallDisconnected>(callbackFunction);
         return this;
     }
 
     public async ValueTask ExecuteAsync()
     {
-        var callSource = new CallSource(_from);
+        CallbackRegistry.RegisterHelperCallback(this, new[] { typeof(CallConnected), typeof(CallDisconnected) });
 
-        if (_pstnParticipantOptions is not null)
+        var callSource = new CallSource(new CommunicationUserIdentifier(_callFromOptions.ApplicationId));
+        if (_callFromOptions is not null)
         {
-            callSource.CallerId = new PhoneNumberIdentifier(_pstnParticipantOptions.SourceCallerIdNumber);
+            callSource.DisplayName = _callFromOptions.CallerDisplayName;
+        }
+
+        if (_destinations.OfType<PhoneNumberIdentifier>().Any())
+        {
+            callSource.CallerId = new PhoneNumberIdentifier(_from);
         }
 
         var createCallOptions = new CreateCallOptions(callSource, _destinations, _callbackUri)
         {
-            OperationContext = _requestId,
+            OperationContext = RequestId,
         };
         await _client.CreateCallAsync(createCallOptions);
     }

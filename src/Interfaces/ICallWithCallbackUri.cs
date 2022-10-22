@@ -5,5 +5,5 @@ namespace CallAutomation.Extensions.Interfaces;
 
 public interface ICallWithCallbackUri
 {
-    IAnswerCallback WithCallbackUri(string callbackUri);
+    ICallConnectionHandler WithCallbackUri(string callbackUri);
 }

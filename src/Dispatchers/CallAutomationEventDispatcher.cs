@@ -6,19 +6,19 @@ using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
 using System.Reflection;
 
-namespace CallAutomation.Extensions.Services;
+namespace CallAutomation.Extensions.Dispatchers;
 
-public class CallAutomationEventDispatcher : ICallAutomationEventDispatcher
+internal sealed class CallAutomationEventDispatcher : ICallAutomationEventDispatcher
 {
-    public async ValueTask DispatchAsync(CallAutomationEventBase @event, Delegate callbackFunction, CallAutomationClientElements clientElements)
+    public async ValueTask DispatchAsync(CallAutomationEventBase @event, Delegate @delegate, CallAutomationClientElements clientElements)
     {
-        if (!callbackFunction.Method.GetParameters().Any())
+        if (!@delegate.Method.GetParameters().Any())
         {
-            await ((ValueTask)callbackFunction.DynamicInvoke()).ConfigureAwait(false);
+            await ((ValueTask)@delegate.DynamicInvoke()).ConfigureAwait(false);
             return;
         }
 
-        await ((ValueTask)callbackFunction.DynamicInvoke(@event, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording)).ConfigureAwait(false);
+        await ((ValueTask)@delegate.DynamicInvoke(@event, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording)).ConfigureAwait(false);
     }
 
     public async ValueTask DispatchAsync(CallAutomationEventBase @event, MethodInfo methodInfo, object handlerInstance, CallAutomationClientElements clientElements)

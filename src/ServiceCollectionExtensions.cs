@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 using Azure.Communication.CallAutomation;
+using CallAutomation.Extensions.Dispatchers;
+using CallAutomation.Extensions.Handlers;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
 using CallAutomation.Extensions.Services;

@@ -5,7 +5,7 @@ using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
 
-namespace CallAutomation.Extensions.Services;
+namespace CallAutomation.Extensions.Dispatchers;
 
 public class CallAutomationRecognizeEventDispatcher : ICallAutomationRecognizeEventDispatcher
 {

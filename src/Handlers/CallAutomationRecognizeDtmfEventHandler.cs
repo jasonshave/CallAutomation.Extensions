@@ -6,7 +6,7 @@ using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
 using Microsoft.Extensions.Logging;
 
-namespace CallAutomation.Extensions.Services;
+namespace CallAutomation.Extensions.Handlers;
 
 public class CallAutomationRecognizeDtmfEventHandler : ICallAutomationRecognizeDtmfHandler
 {
@@ -33,7 +33,7 @@ public class CallAutomationRecognizeDtmfEventHandler : ICallAutomationRecognizeD
 
         if (eventBase is RecognizeCompleted recognizeCompleted)
         {
-            var callbackDelegate = CallbackRegistry.GetDtmfCallback<DtmfTone>(requestId, eventBase.GetType(), true);
+            var callbackDelegate = CallbackRegistry.GetHelperCallback(requestId, eventBase.GetType(), true);
             if (callbackDelegate is not null)
             {
                 _logger.LogInformation("Found callback delegate for request {requestId}, with {numTones} DTMF tone(s), and event {event}", requestId, recognizeCompleted.CollectTonesResult.Tones.Count, eventBase.GetType());
@@ -43,7 +43,7 @@ public class CallAutomationRecognizeDtmfEventHandler : ICallAutomationRecognizeD
                 if (recognizeCompleted.CollectTonesResult.Tones.Count is 1)
                 {
                     var tone = recognizeCompleted.CollectTonesResult.Tones.FirstOrDefault();
-                    var multicastDelegates = callbackDelegate.GetCallbacks(tone);
+                    var multicastDelegates = callbackDelegate.HelperCallbacks.GetCallbacks(tone.GetType());
                     foreach (var multicastDelegate in multicastDelegates)
                     {
                         await _dispatcher.DispatchAsync(eventBase, multicastDelegate, clientElements, recognizeCompleted.CollectTonesResult.Tones);
@@ -54,7 +54,7 @@ public class CallAutomationRecognizeDtmfEventHandler : ICallAutomationRecognizeD
 
         if (eventBase is RecognizeFailed recognizeFailed)
         {
-            var callbackDelegate = CallbackRegistry.GetDtmfCallback<Type>(requestId, eventBase.GetType(), true);
+            var callbackDelegate = CallbackRegistry.GetHelperCallback(requestId, eventBase.GetType(), true);
             if (callbackDelegate is not null)
             {
                 _logger.LogInformation("Found callback delegate for request {requestId}, and event {event}", requestId, eventBase.GetType());

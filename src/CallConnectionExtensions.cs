@@ -3,6 +3,7 @@
 
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
+using CallAutomation.Contracts;
 using CallAutomation.Extensions.Helpers;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
@@ -11,39 +12,6 @@ namespace CallAutomation.Extensions;
 
 public static class CallConnectionExtensions
 {
-    /// <summary>
-    /// Call an Azure Communication Services user or application by specifying a <see cref="CommunicationUserIdentifier"/> type.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="client"></param>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public static ICanCallFrom Call<T>(this CallAutomationClient client, string id)
-        where T : CommunicationUserIdentifier
-    {
-        var helper =
-            new CallAutomationCreateCallHelper(client, new CommunicationUserIdentifier(id), Guid.NewGuid().ToString());
-        return helper;
-    }
-
-    /// <summary>
-    /// Call a PSTN number by specifying a <see cref="PhoneNumberIdentifier"/> type along with <see cref="PstnParticipantOptions"/> to set caller Id data.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="client"></param>
-    /// <param name="id"></param>
-    /// <param name="options"></param>
-    /// <returns></returns>
-    public static ICanCallFrom Call<T>(this CallAutomationClient client, string id, Action<PstnParticipantOptions> options)
-        where T : PhoneNumberIdentifier
-    {
-        var pstnParticipantOptions = new PstnParticipantOptions();
-        options(pstnParticipantOptions);
-        var helper =
-            new CallAutomationCreateCallHelper(client, new PhoneNumberIdentifier(id), pstnParticipantOptions, Guid.NewGuid().ToString());
-        return helper;
-    }
-
     public static ICanAddParticipant AddParticipant<T>(this CallConnection connection, string id)
         where T : CommunicationUserIdentifier
     {

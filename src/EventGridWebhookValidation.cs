@@ -37,6 +37,7 @@ public class EventGridWebhookValidation
                             ValidationResponse = subscriptionValidationEventData.ValidationCode,
                         };
                         await httpContext.Response.WriteAsync(JsonSerializer.Serialize(responseData));
+                        return;
                     }
                 }
             }
