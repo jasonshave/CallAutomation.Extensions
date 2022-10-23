@@ -17,6 +17,7 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
     ICanRecognizeDtmfOptions,
     ICanChooseRecognizeOptions
 {
+    private static readonly IEnumerable<Type> _types = new[] { typeof(RecognizeFailed), typeof(RecognizeCompleted), typeof(SilenceTimeout) };
     private readonly CallMedia _callMedia;
     private readonly int _numTones;
 
@@ -25,7 +26,7 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
     private RecognizeOptions _recognizeOptions;
 
     internal CallAutomationDtmfHelper(CallMedia callMedia, string requestId)
-        : base(requestId)
+        : base(requestId, _types)
     {
         _callMedia = callMedia;
         _numTones = 1;
@@ -80,29 +81,18 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
         return this;
     }
 
-    public IHandleDtmfTimeout OnInputTimeout(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback)
+    public IHandleDtmfTimeout OnFail<TRecognizeFail>(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback)
+        where TRecognizeFail : IRecognizeDtmfFailed
     {
-        HelperCallbacks.AddDelegateCallback<RecognizeFailed>(callback);
+        HelperCallbacks.AddDelegateCallback<TRecognizeFail>(callback);
         return this;
     }
 
-    public IHandleDtmfTimeout OnInputTimeout<THandler>()
+    public IHandleDtmfTimeout OnFail<TRecognizeFail, THandler>()
+        where TRecognizeFail : IRecognizeDtmfFailed
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, RecognizeFailed>($"{nameof(OnInputTimeout)}", typeof(RecognizeFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
-        return this;
-    }
-
-    public IHandleDtmfTimeout OnInterToneTimeout(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback)
-    {
-        HelperCallbacks.AddDelegateCallback<RecognizeFailed>(callback);
-        return this;
-    }
-
-    public IHandleDtmfTimeout OnInterToneTimeout<THandler>()
-        where THandler : CallAutomationHandler
-    {
-        HelperCallbacks.AddHandlerCallback<THandler, RecognizeFailed>($"{nameof(OnInterToneTimeout)}", typeof(RecognizeFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        HelperCallbacks.AddHandlerCallback<THandler, TRecognizeFail>($"On{typeof(TRecognizeFail).Name}", typeof(RecognizeFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 
@@ -114,9 +104,6 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
 
     public async ValueTask ExecuteAsync()
     {
-        // register callbacks
-        CallbackRegistry.RegisterHelperCallback(this, new[] { typeof(RecognizeFailed), typeof(RecognizeCompleted) });
-
         // invoke recognize API
         var recognizeOptions = new CallMediaRecognizeDtmfOptions(_recognizeInputFromParticipant, _numTones)
         {

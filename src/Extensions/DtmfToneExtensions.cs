@@ -5,9 +5,9 @@ using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
 
-namespace CallAutomation.Extensions;
+namespace CallAutomation.Extensions.Extensions;
 
-public static class DtmfToneExtensions
+internal static class DtmfToneExtensions
 {
     public static IDtmfTone? Convert(this DtmfTone tone)
     {

@@ -20,14 +20,11 @@ public interface IHandleDtmfResponse
     IHandleDtmfResponse OnPress<TTone>(Action callback)
         where TTone : IDtmfTone;
 
-    IHandleDtmfTimeout OnInputTimeout(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback);
+    IHandleDtmfTimeout OnFail<TRecognizeFail>(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback)
+        where TRecognizeFail : IRecognizeDtmfFailed;
 
-    IHandleDtmfTimeout OnInputTimeout<THandler>()
-        where THandler : CallAutomationHandler;
-
-    IHandleDtmfTimeout OnInterToneTimeout(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback);
-
-    IHandleDtmfTimeout OnInterToneTimeout<THandler>()
+    IHandleDtmfTimeout OnFail<TRecognizeFail, THandler>()
+        where TRecognizeFail : IRecognizeDtmfFailed
         where THandler : CallAutomationHandler;
 
     IHandleDtmfTimeout OnInputTimeout(Func<ValueTask> callback);

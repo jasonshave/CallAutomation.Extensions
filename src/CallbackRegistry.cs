@@ -10,15 +10,15 @@ internal static class CallbackRegistry
 {
     private static readonly ConcurrentDictionary<(string, Type), ICallAutomationHelperCallback> _genericCallbacks = new ();
 
-    internal static void RegisterHelperCallback(ICallAutomationHelperCallback helperCallbacks, Type[] eventTypes)
+    internal static void RegisterHelperCallback(ICallAutomationHelperCallback helperCallbacks, IEnumerable<Type> types)
     {
-        foreach (var eventType in eventTypes)
+        foreach (var type in types)
         {
-            var added = _genericCallbacks.TryAdd((helperCallbacks.HelperCallbacks.RequestId, eventType), helperCallbacks);
+            var added = _genericCallbacks.TryAdd((helperCallbacks.HelperCallbacks.RequestId, type), helperCallbacks);
             if (!added)
             {
                 throw new ApplicationException(
-                    $"Unable to add callback for request ID: {helperCallbacks.HelperCallbacks.RequestId}");
+                    $"Unable to add callback for {type.Name} for request ID: {helperCallbacks.HelperCallbacks.RequestId}");
             }
         }
     }

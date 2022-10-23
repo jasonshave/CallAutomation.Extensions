@@ -5,25 +5,25 @@ using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICallConnectionHandler
+public interface ICreateCallHandling
 {
-    ICallConnectionHandler OnCallConnected<THandler>()
+    ICreateCallHandling OnCallConnected<THandler>()
         where THandler : CallAutomationHandler;
 
-    ICallConnectionHandler OnCallDisconnected<THandler>()
+    ICreateCallHandling OnCallDisconnected<THandler>()
         where THandler : CallAutomationHandler;
 
-    ICallConnectionHandler OnCallConnected(
+    ICreateCallHandling OnCallConnected(
         Func<ValueTask> callbackFunction);
 
-    ICallConnectionHandler OnCallConnected(
+    ICreateCallHandling OnCallConnected(
         Func<CallConnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction);
 
-    ICallConnectionHandler OnCallDisconnected(
+    ICreateCallHandling OnCallDisconnected(
         Func<ValueTask> callbackFunction);
 
-    ICallConnectionHandler OnCallDisconnected(
+    ICreateCallHandling OnCallDisconnected(
         Func<CallDisconnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction);
 
-    ValueTask ExecuteAsync();
+    ValueTask<CreateCallResult> ExecuteAsync();
 }

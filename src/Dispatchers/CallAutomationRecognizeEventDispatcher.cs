@@ -16,6 +16,12 @@ internal sealed class CallAutomationRecognizeEventDispatcher : ICallAutomationRe
     public async ValueTask DispatchAsync(RecognizeCompleted @event, MethodInfo methodInfo, object handlerInstance, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone> tones) =>
         await LocalDispatchAsync(@event, methodInfo, handlerInstance, clientElements, tones);
 
+    public async ValueTask DispatchAsync(RecognizeFailed @event, Delegate callbackFunction, CallAutomationClientElements clientElements) =>
+        await LocalDispatchAsync(@event, callbackFunction, clientElements, null);
+
+    public async ValueTask DispatchAsync(RecognizeFailed @event, MethodInfo methodInfo, object handlerInstance, CallAutomationClientElements clientElements) =>
+        await LocalDispatchAsync(@event, methodInfo, handlerInstance, clientElements, null);
+
     private static async ValueTask LocalDispatchAsync(CallAutomationEventBase eventBase, MethodInfo methodInfo, object handlerInstance, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone>? tones)
     {
         Task task;

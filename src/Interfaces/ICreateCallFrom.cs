@@ -5,9 +5,9 @@ using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICallFrom
+public interface ICreateCallFrom
 {
-    ICallWithCallbackUri From(string from);
+    ICreateCallWithCallbackUri From(string from);
 
-    ICallWithCallbackUri From(string from, Action<CallFromOptions> options);
+    ICreateCallWithCallbackUri From(string from, Action<CallFromOptions> options);
 }

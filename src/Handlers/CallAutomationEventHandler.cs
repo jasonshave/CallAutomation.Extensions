@@ -41,7 +41,7 @@ internal sealed class CallAutomationEventHandler : ICallAutomationEventHandler
         }
 
         // dispatch delegate callbacks
-        var delegates = callAutomationHelperCallback.HelperCallbacks.GetCallbacks(eventBase.GetType());
+        var delegates = callAutomationHelperCallback.HelperCallbacks.GetDelegateCallbacks(eventBase.GetType());
         foreach (var @delegate in delegates)
         {
             _logger.LogInformation("Found callback delegate for request {requestId} and event {event}", requestId, eventBase.GetType());

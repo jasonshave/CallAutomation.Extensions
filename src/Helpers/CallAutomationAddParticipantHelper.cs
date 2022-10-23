@@ -12,20 +12,21 @@ namespace CallAutomation.Extensions.Helpers;
 /// <inheritdoc />
 internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, ICanAddParticipant
 {
+    private static readonly IEnumerable<Type> _types = new[] { typeof(AddParticipantsSucceeded), typeof(AddParticipantsFailed) };
     private readonly CallConnection _connection;
     private readonly List<CommunicationIdentifier> _participantsToAdd = new ();
     private ParticipantOptions? _addParticipantsOptions;
     private PstnParticipantOptions? _pstnParticipantOptions;
 
     internal CallAutomationAddParticipantHelper(CallConnection connection, CommunicationIdentifier firstUserToAdd, string requestId)
-        : base(requestId)
+        : base(requestId, _types)
     {
         _connection = connection;
         _participantsToAdd.Add(firstUserToAdd);
     }
 
     internal CallAutomationAddParticipantHelper(CallConnection connection, CommunicationIdentifier firstUserToAdd, PstnParticipantOptions pstnParticipantOptions, string requestId)
-        : base(requestId)
+        : base(requestId, _types)
     {
         _connection = connection;
         _participantsToAdd.Add(firstUserToAdd);
@@ -97,8 +98,6 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
 
     public async ValueTask ExecuteAsync()
     {
-        CallbackRegistry.RegisterHelperCallback(this, new[] { typeof(AddParticipantsSucceeded), typeof(AddParticipantsFailed) });
-
         var addParticipantsOptions = new AddParticipantsOptions(_participantsToAdd)
         {
             OperationContext = RequestId,

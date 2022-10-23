@@ -46,7 +46,13 @@ internal sealed class CallAutomationCallbacks
         _callbackHandlers[(RequestId, typeof(T))].Add((methodInfo, typeof(THandler)));
     }
 
-    public IEnumerable<Delegate> GetCallbacks(Type type) => _callbackDelegates[(RequestId, type)];
+    public IEnumerable<Delegate> GetDelegateCallbacks(Type type)
+    {
+        _callbackDelegates.TryGetValue((RequestId, type), out var callbacks);
+        if (callbacks is null) return Enumerable.Empty<Delegate>();
+
+        return callbacks;
+    }
 
     public IEnumerable<(MethodInfo, Type)> GetHandlers(Type type)
     {

@@ -11,19 +11,16 @@ internal sealed class CallAutomationRemoveParticipantHelper : ICanRemoveParticip
 {
     private readonly CallConnection _connection;
     private readonly List<CommunicationIdentifier> _identitiesToRemove = new ();
-    private readonly string _requestId;
 
     internal CallAutomationRemoveParticipantHelper(CallConnection connection, CommunicationIdentifier firstToRemove, string requestId)
     {
         _connection = connection;
-        _requestId = requestId;
         _identitiesToRemove.Add(firstToRemove);
     }
 
     internal CallAutomationRemoveParticipantHelper(CallConnection connection, CommunicationIdentifier[] firstCollectionToRemove, string requestId)
     {
         _connection = connection;
-        _requestId = requestId;
         _identitiesToRemove.AddRange(firstCollectionToRemove);
     }
 

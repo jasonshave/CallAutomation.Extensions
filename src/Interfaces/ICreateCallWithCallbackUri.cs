@@ -3,7 +3,7 @@
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICallWithCallbackUri
+public interface ICreateCallWithCallbackUri
 {
-    ICallConnectionHandler WithCallbackUri(string callbackUri);
+    ICreateCallHandling WithCallbackUri(string callbackUri);
 }

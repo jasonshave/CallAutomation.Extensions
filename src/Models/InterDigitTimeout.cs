@@ -6,7 +6,9 @@ using CallAutomation.Extensions.Interfaces;
 
 namespace CallAutomation.Extensions.Models;
 
-public struct Hash : IDtmfTone
+public struct InterDigitTimeout : IRecognizeDtmfFailed
 {
-    public DtmfTone Value => DtmfTone.Pound;
+    public ReasonCode Reason => ReasonCode.RecognizeInterDigitTimedOut;
+
+    public int Code => 8532;
 }

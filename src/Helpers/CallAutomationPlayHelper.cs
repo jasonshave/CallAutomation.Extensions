@@ -11,12 +11,13 @@ namespace CallAutomation.Extensions.Helpers;
 
 internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaCallback
 {
+    private static IEnumerable<Type> _types = new[] { typeof(PlayCompleted), typeof(PlayFailed) };
     private readonly CallMedia _callMedia;
     private readonly List<CommunicationIdentifier> _playToParticipants = new ();
     private readonly PlayMediaOptions _playMediaOptions;
 
     internal CallAutomationPlayHelper(CallMedia callMedia, PlayMediaOptions playMediaOptions, string requestId)
-        : base(requestId)
+        : base(requestId, _types)
     {
         _callMedia = callMedia;
         _playMediaOptions = playMediaOptions;
@@ -63,8 +64,6 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
 
     public async ValueTask ExecuteAsync()
     {
-        CallbackRegistry.RegisterHelperCallback(this, new[] { typeof(PlayCompleted), typeof(PlayFailed) });
-
         if (_playToParticipants.Any())
         {
             await _callMedia.PlayAsync(new FileSource(new Uri(_playMediaOptions.FileUrl))

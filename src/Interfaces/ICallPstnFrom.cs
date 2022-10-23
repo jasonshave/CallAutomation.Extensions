@@ -7,11 +7,11 @@ namespace CallAutomation.Extensions.Interfaces;
 
 public interface ICallPstnFrom
 {
-    ICallPstnWithOverride From<T>(string phoneNumber)
+    ICreateCallPstnWithOverride From<T>(string phoneNumber)
         where T : PhoneNumberIdentifier;
 }
 
-public interface ICallPstnWithOverride : ICallWithCallbackUri
+public interface ICreateCallPstnWithOverride : ICreateCallWithCallbackUri
 {
-    ICallWithCallbackUri AsCommunicationUser(string communicationUserId);
+    ICreateCallWithCallbackUri AsCommunicationUser(string communicationUserId);
 }
