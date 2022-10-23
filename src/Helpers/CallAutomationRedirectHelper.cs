@@ -1,12 +1,10 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure.Communication;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Contracts;
 using CallAutomation.Extensions.Interfaces;
-using CallAutomation.Extensions.Models;
-using CommunicationIdentifier = Azure.Communication.CommunicationIdentifier;
-using CommunicationUserIdentifier = Azure.Communication.CommunicationUserIdentifier;
 
 namespace CallAutomation.Extensions.Helpers;
 
@@ -15,7 +13,6 @@ internal sealed class CallAutomationRedirectHelper : IRedirectCall
     private readonly CallAutomationClient _client;
     private readonly IncomingCall _incomingCall;
     private CommunicationIdentifier _participant;
-    private PstnParticipantOptions? _pstnParticipantOptions;
 
     internal CallAutomationRedirectHelper(CallAutomationClient client, IncomingCall incomingCall)
     {
@@ -23,10 +20,9 @@ internal sealed class CallAutomationRedirectHelper : IRedirectCall
         _incomingCall = incomingCall;
     }
 
-    public ICanExecuteAsync ToParticipant<T>(string id)
-        where T : CommunicationUserIdentifier
+    public ICanExecuteAsync ToParticipant(string rawId)
     {
-        _participant = CommunicationIdentifier.FromRawId(id);
+        _participant = CommunicationIdentifier.FromRawId(rawId);
         return this;
     }
 

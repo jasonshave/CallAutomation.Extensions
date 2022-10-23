@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure;
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
@@ -33,20 +34,18 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
         _pstnParticipantOptions = pstnParticipantOptions;
     }
 
-    public ICanAddParticipant AddParticipant<TUser>(string id)
-        where TUser : CommunicationUserIdentifier
+    public ICanAddParticipant AddParticipant(string rawId)
     {
-        _participantsToAdd.Add(new CommunicationUserIdentifier(id));
+        _participantsToAdd.Add(CommunicationIdentifier.FromRawId(rawId));
         return this;
     }
 
-    public ICanAddParticipant AddParticipant<TUser>(string id, Action<PstnParticipantOptions> options)
-        where TUser : PhoneNumberIdentifier
+    public ICanAddParticipant AddParticipant(string rawId, Action<PstnParticipantOptions> options)
     {
-        var participantOptions = new PstnParticipantOptions();
-        options(participantOptions);
-        _pstnParticipantOptions = participantOptions;
-        _participantsToAdd.Add(new PhoneNumberIdentifier(id));
+        var pstnParticipantOptions = new PstnParticipantOptions();
+        options(pstnParticipantOptions);
+        _pstnParticipantOptions = pstnParticipantOptions;
+        _participantsToAdd.Add(CommunicationIdentifier.FromRawId(rawId));
         return this;
     }
 
@@ -96,7 +95,7 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
         return this;
     }
 
-    public async ValueTask ExecuteAsync()
+    public async ValueTask<AddParticipantsResult> ExecuteAsync()
     {
         var addParticipantsOptions = new AddParticipantsOptions(_participantsToAdd)
         {
@@ -111,6 +110,7 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
                 new PhoneNumberIdentifier(_pstnParticipantOptions.SourceCallerIdNumber);
         }
 
-        await _connection.AddParticipantsAsync(addParticipantsOptions);
+        Response<AddParticipantsResult> result = await _connection.AddParticipantsAsync(addParticipantsOptions);
+        return result;
     }
 }

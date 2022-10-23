@@ -3,7 +3,7 @@
 
 namespace CallAutomation.Extensions.Models;
 
-public class PlayMediaOptions
+public sealed class PlayMediaOptions
 {
     public string FileUrl { get; set; }
 

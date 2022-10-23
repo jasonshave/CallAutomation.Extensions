@@ -4,11 +4,11 @@
 using CallAutomation.Extensions.Interfaces;
 using System.Collections.Concurrent;
 
-namespace CallAutomation.Extensions;
+namespace CallAutomation.Extensions.Services;
 
 internal static class CallbackRegistry
 {
-    private static readonly ConcurrentDictionary<(string, Type), ICallAutomationHelperCallback> _genericCallbacks = new ();
+    private static readonly ConcurrentDictionary<(string, Type), ICallAutomationHelperCallback> _genericCallbacks = new();
 
     internal static void RegisterHelperCallback(ICallAutomationHelperCallback helperCallbacks, IEnumerable<Type> types)
     {

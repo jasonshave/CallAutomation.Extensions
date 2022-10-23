@@ -23,8 +23,7 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
         _playMediaOptions = playMediaOptions;
     }
 
-    public IPlayMediaCallback ToParticipant<T>(string rawId)
-        where T : CommunicationIdentifier
+    public IPlayMediaCallback ToParticipant(string rawId)
     {
         _playToParticipants.Add(CommunicationIdentifier.FromRawId(rawId));
         return this;

@@ -12,10 +12,10 @@ internal sealed class CallAutomationRemoveParticipantHelper : ICanRemoveParticip
     private readonly CallConnection _connection;
     private readonly List<CommunicationIdentifier> _identitiesToRemove = new ();
 
-    internal CallAutomationRemoveParticipantHelper(CallConnection connection, CommunicationIdentifier firstToRemove, string requestId)
+    internal CallAutomationRemoveParticipantHelper(CallConnection connection, CommunicationIdentifier id, string requestId)
     {
         _connection = connection;
-        _identitiesToRemove.Add(firstToRemove);
+        _identitiesToRemove.Add(id);
     }
 
     internal CallAutomationRemoveParticipantHelper(CallConnection connection, CommunicationIdentifier[] firstCollectionToRemove, string requestId)
@@ -24,18 +24,9 @@ internal sealed class CallAutomationRemoveParticipantHelper : ICanRemoveParticip
         _identitiesToRemove.AddRange(firstCollectionToRemove);
     }
 
-    public ICanRemoveParticipant RemoveParticipant<T>(string id)
-        where T : CommunicationIdentifier
+    public ICanRemoveParticipant RemoveParticipant(string rawId)
     {
-        if (typeof(T) is CommunicationUserIdentifier)
-        {
-            _identitiesToRemove.Add(new CommunicationUserIdentifier(id));
-        }
-
-        if (typeof(T) is PhoneNumberIdentifier)
-        {
-            _identitiesToRemove.Add(new PhoneNumberIdentifier(id));
-        }
+        _identitiesToRemove.Add(CommunicationIdentifier.FromRawId(rawId));
 
         return this;
     }

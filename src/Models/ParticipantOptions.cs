@@ -3,7 +3,7 @@
 
 namespace CallAutomation.Extensions.Models;
 
-public class ParticipantOptions
+public sealed class ParticipantOptions
 {
     public int InvitationTimeoutInSeconds { get; set; }
 }

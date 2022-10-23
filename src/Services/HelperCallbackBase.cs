@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using CallAutomation.Extensions.Interfaces;
-using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Services;
 

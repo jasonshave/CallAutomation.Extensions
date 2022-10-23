@@ -10,6 +10,12 @@ namespace CallAutomation.Extensions;
 
 public static class CallMediaExtensions
 {
+    /// <summary>
+    /// Initiates the Play audio sequence while allowing <see cref="PlayMediaOptions"/> configuration.
+    /// </summary>
+    /// <param name="callMedia"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
     public static IPlayMediaCallback Play(this CallMedia callMedia, Action<PlayMediaOptions> options)
     {
         var playOptions = new PlayMediaOptions();
@@ -17,6 +23,11 @@ public static class CallMediaExtensions
         return new CallAutomationPlayHelper(callMedia, playOptions, Guid.NewGuid().ToString());
     }
 
+    /// <summary>
+    /// Initiates the Recognize API.
+    /// </summary>
+    /// <param name="callMedia"></param>
+    /// <returns></returns>
     public static IRecognizeDtmf ReceiveDtmfTone(this CallMedia callMedia)
     {
         return new CallAutomationDtmfHelper(callMedia, Guid.NewGuid().ToString());

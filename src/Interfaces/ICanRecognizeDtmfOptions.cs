@@ -7,5 +7,10 @@ namespace CallAutomation.Extensions.Interfaces;
 
 public interface ICanRecognizeDtmfOptions
 {
+    /// <summary>
+    /// Allows specification of the recognize API options through the <see cref="RecognizeOptions"/>
+    /// </summary>
+    /// <param name="options"></param>
+    /// <returns></returns>
     IHandleDtmfResponse WithOptions(Action<RecognizeOptions> options);
 }

@@ -5,5 +5,9 @@ namespace CallAutomation.Extensions.Interfaces;
 
 public interface IRejectCall
 {
+    /// <summary>
+    /// Executes the reject call sequence.
+    /// </summary>
+    /// <returns></returns>
     ValueTask ExecuteAsync();
 }

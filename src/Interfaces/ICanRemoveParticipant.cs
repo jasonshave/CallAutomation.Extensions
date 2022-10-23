@@ -9,8 +9,7 @@ public interface ICanRemoveParticipant
 {
     ICanRemoveParticipant RemoveParticipants(CommunicationIdentifier[] participantsToRemove);
 
-    ICanRemoveParticipant RemoveParticipant<T>(string id)
-        where T : CommunicationIdentifier;
+    ICanRemoveParticipant RemoveParticipant(string rawId);
 
     ValueTask ExecuteAsync();
 }

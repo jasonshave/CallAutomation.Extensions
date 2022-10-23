@@ -3,7 +3,7 @@
 
 namespace CallAutomation.Extensions.Models;
 
-public class RecognizeOptions
+public sealed class RecognizeOptions
 {
     public int WaitForResponseInSeconds { get; set; }
 

@@ -3,12 +3,12 @@
 
 using System.Reflection;
 
-namespace CallAutomation.Extensions.Models;
+namespace CallAutomation.Extensions.Services;
 
 internal sealed class CallAutomationCallbacks
 {
-    private readonly Dictionary<(string, Type), List<Delegate>> _callbackDelegates = new ();
-    private readonly Dictionary<(string, Type), List<(MethodInfo, Type)>> _callbackHandlers = new ();
+    private readonly Dictionary<(string, Type), List<Delegate>> _callbackDelegates = new();
+    private readonly Dictionary<(string, Type), List<(MethodInfo, Type)>> _callbackHandlers = new();
 
     public string RequestId { get; }
 

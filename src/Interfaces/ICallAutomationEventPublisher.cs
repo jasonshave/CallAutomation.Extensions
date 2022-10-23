@@ -7,5 +7,11 @@ namespace CallAutomation.Extensions.Interfaces;
 
 public interface ICallAutomationEventPublisher
 {
-    ValueTask PublishAsync(CloudEvent[] cloudEvents, string? requestId = default);
+    /// <summary>
+    /// Inject and use to send the Webhook callback <see cref="CloudEvent"/> collection and invoke handlers and/or delegates.
+    /// </summary>
+    /// <param name="cloudEvents"></param>
+    /// <param name="requestId"></param>
+    /// <returns></returns>
+    ValueTask PublishAsync(CloudEvent[] cloudEvents);
 }
