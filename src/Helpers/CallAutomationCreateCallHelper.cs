@@ -29,15 +29,15 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
         _destinations.Add(to.ConvertToCommunicationIdentifier());
     }
 
-    public ICreateCallWithCallbackUri From(string from)
+    public ICreateCallWithCallbackUri From(string id)
     {
-        _from = from;
+        _from = id;
         return this;
     }
 
-    public ICreateCallWithCallbackUri From(string from, Action<CallFromOptions> options)
+    public ICreateCallWithCallbackUri From(string id, Action<CallFromOptions> options)
     {
-        _from = from;
+        _from = id;
 
         var callFromOptions = new CallFromOptions();
         options(callFromOptions);

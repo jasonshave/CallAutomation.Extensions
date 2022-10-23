@@ -13,6 +13,8 @@ internal static class ReasonCodeExtensions
     {
         if (reasonCode == ReasonCode.RecognizeInitialSilenceTimedOut) return default(SilenceTimeout);
         if (reasonCode == ReasonCode.RecognizeInterDigitTimedOut) return default(InterDigitTimeout);
+        if (reasonCode == ReasonCode.RecognizePlayPromptFailed) return default(PromptFailed);
+        if (reasonCode == ReasonCode.RecognizeStopToneDetected) return default(StopToneDetected);
 
         return null;
     }

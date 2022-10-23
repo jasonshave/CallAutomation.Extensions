@@ -7,7 +7,18 @@ namespace CallAutomation.Extensions.Interfaces;
 
 public interface ICreateCallFrom
 {
-    ICreateCallWithCallbackUri From(string from);
+    /// <summary>
+    /// Defines which identity to use as the source of the call.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    ICreateCallWithCallbackUri From(string id);
 
-    ICreateCallWithCallbackUri From(string from, Action<CallFromOptions> options);
+    /// <summary>
+    /// Defines which identity to use as the source of the call while offering a delegate to change options using <see cref="CallFromOptions"/>
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    ICreateCallWithCallbackUri From(string id, Action<CallFromOptions> options);
 }

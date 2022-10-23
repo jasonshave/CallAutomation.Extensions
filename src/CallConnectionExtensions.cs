@@ -12,29 +12,50 @@ namespace CallAutomation.Extensions;
 
 public static class CallConnectionExtensions
 {
-    public static ICanAddParticipant AddParticipant<T>(this CallConnection connection, string id)
-        where T : CommunicationUserIdentifier
+    /// <summary>
+    /// Add a participant to an existing call using the <see cref="string"/> raw ID value.
+    /// </summary>
+    /// <param name="connection"></param>
+    /// <param name="rawId"></param>
+    public static ICanAddParticipant AddParticipant(this CallConnection connection, string rawId)
     {
-        var helper = new CallAutomationAddParticipantHelper(connection, new CommunicationUserIdentifier(id), Guid.NewGuid().ToString());
+        var helper = new CallAutomationAddParticipantHelper(connection, CommunicationIdentifier.FromRawId(rawId), Guid.NewGuid().ToString());
         return helper;
     }
 
-    public static ICanAddParticipant AddParticipant<T>(this CallConnection connection, string id, Action<PstnParticipantOptions> options)
-        where T : PhoneNumberIdentifier
+    /// <summary>
+    /// Adds a PSTN participant while offering options to set for the request using the <see cref="string"/> raw ID value.
+    /// </summary>
+    /// <param name="connection"></param>
+    /// <param name="rawId"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static ICanAddParticipant AddParticipant(this CallConnection connection, string rawId, Action<PstnParticipantOptions> options)
     {
         var pstnParticipantOptions = new PstnParticipantOptions();
         options(pstnParticipantOptions);
-        var helper = new CallAutomationAddParticipantHelper(connection, new PhoneNumberIdentifier(id), pstnParticipantOptions, Guid.NewGuid().ToString());
+        var helper = new CallAutomationAddParticipantHelper(connection, CommunicationIdentifier.FromRawId(rawId), pstnParticipantOptions, Guid.NewGuid().ToString());
         return helper;
     }
 
-    public static ICanRemoveParticipant RemoveParticipant<T>(this CallConnection connection, string id)
+    /// <summary>
+    /// Removes a participant from the call using the <see cref="string"/> raw ID value.
+    /// </summary>
+    /// <param name="connection"></param>
+    /// <param name="rawId"></param>
+    /// <returns></returns>
+    public static ICanRemoveParticipant RemoveParticipant(this CallConnection connection, string rawId)
     {
-        var firstUserToAdd = CommunicationIdentifier.FromRawId(id);
-        var helper = new CallAutomationRemoveParticipantHelper(connection, firstUserToAdd, Guid.NewGuid().ToString());
+        var helper = new CallAutomationRemoveParticipantHelper(connection, CommunicationIdentifier.FromRawId(rawId), Guid.NewGuid().ToString());
         return helper;
     }
 
+    /// <summary>
+    /// Removes a collection of identities from a call using the <see cref="CommunicationIdentifier"/> abstract type.
+    /// </summary>
+    /// <param name="connection"></param>
+    /// <param name="participantsToRemove"></param>
+    /// <returns></returns>
     public static ICanRemoveParticipant RemoveParticipants(this CallConnection connection, CommunicationIdentifier[] participantsToRemove)
     {
         var helper = new CallAutomationRemoveParticipantHelper(connection, participantsToRemove, Guid.NewGuid().ToString());

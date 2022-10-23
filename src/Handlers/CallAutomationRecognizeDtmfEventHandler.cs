@@ -5,6 +5,7 @@ using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Extensions;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
+using CallAutomation.Extensions.Services;
 using Microsoft.Extensions.Logging;
 
 namespace CallAutomation.Extensions.Handlers;

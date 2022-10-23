@@ -10,6 +10,11 @@ namespace CallAutomation.Extensions
 {
     public static class CallAutomationClientExtensions
     {
+        /// <summary>
+        /// Initiates the outbound call sequence.
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="id"></param>
         public static ICreateCallFrom Call(this CallAutomationClient client, string id)
         {
             var helper =
@@ -17,18 +22,36 @@ namespace CallAutomation.Extensions
             return helper;
         }
 
+        /// <summary>
+        /// Initiates the answer call sequence.
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="incomingCall"></param>
+        /// <returns></returns>
         public static IAnswerWithCallbackUri Answer(this CallAutomationClient client, IncomingCall incomingCall)
         {
             var helper = new CallAutomationAnswerHelper(client, incomingCall, incomingCall.CorrelationId);
             return helper;
         }
 
+        /// <summary>
+        /// Initiates the reject call sequence.
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="incomingCall"></param>
+        /// <returns></returns>
         public static IRejectCallWithReason Reject(this CallAutomationClient client, IncomingCall incomingCall)
         {
             var helper = new CallAutomationRejectHelper(client, incomingCall);
             return helper;
         }
 
+        /// <summary>
+        /// Initiates the redirect call sequence.
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="incomingCall"></param>
+        /// <returns></returns>
         public static IRedirectCall Redirect(this CallAutomationClient client, IncomingCall incomingCall)
         {
             var helper = new CallAutomationRedirectHelper(client, incomingCall);

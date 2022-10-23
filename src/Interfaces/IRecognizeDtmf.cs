@@ -5,5 +5,10 @@ namespace CallAutomation.Extensions.Interfaces;
 
 public interface IRecognizeDtmf
 {
+    /// <summary>
+    /// Collect DTMF tones from a participant on the call.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     ICanChooseRecognizeOptions FromParticipant(string id);
 }

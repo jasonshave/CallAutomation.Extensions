@@ -3,7 +3,7 @@
 
 namespace CallAutomation.Extensions.Models;
 
-public class PstnParticipantOptions
+public sealed class PstnParticipantOptions
 {
     public string SourceCallerIdNumber { get; set; }
 }

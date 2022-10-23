@@ -24,7 +24,7 @@ internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublish
         _logger = logger;
     }
 
-    public async ValueTask PublishAsync(CloudEvent[] cloudEvents, string? requestId = default)
+    public async ValueTask PublishAsync(CloudEvent[] cloudEvents)
     {
         foreach (var cloudEvent in cloudEvents)
         {

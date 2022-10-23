@@ -5,7 +5,7 @@ using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Models;
 
-public class CallAutomationClientElements
+public sealed class CallAutomationClientElements
 {
     private readonly string _callConnectionId;
 

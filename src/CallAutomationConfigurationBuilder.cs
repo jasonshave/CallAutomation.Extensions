@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CallAutomation.Extensions;
 
-public class CallAutomationConfigurationBuilder
+public sealed class CallAutomationConfigurationBuilder
 {
     public IServiceCollection Services { get; }
 
