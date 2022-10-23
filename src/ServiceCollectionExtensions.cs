@@ -43,8 +43,9 @@ public static class ServiceCollectionExtensions
         return builder;
     }
 
-    public static CallAutomationConfigurationBuilder DiscoverCallbackHandlers(this CallAutomationConfigurationBuilder builder, params Type[] searchTypes)
-    {
-        return builder;
-    }
+    // todo: add auto discovery
+    // public static CallAutomationConfigurationBuilder DiscoverCallbackHandlers(this CallAutomationConfigurationBuilder builder, params Type[] searchTypes)
+    // {
+    //     return builder;
+    // }
 }
