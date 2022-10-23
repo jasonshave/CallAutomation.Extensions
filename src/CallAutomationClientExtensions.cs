@@ -10,6 +10,13 @@ namespace CallAutomation.Extensions
 {
     public static class CallAutomationClientExtensions
     {
+        public static ICreateCallFrom Call(this CallAutomationClient client, string id)
+        {
+            var helper =
+                new CallAutomationCreateCallHelper(client, id, Guid.NewGuid().ToString());
+            return helper;
+        }
+
         public static IAnswerWithCallbackUri Answer(this CallAutomationClient client, IncomingCall incomingCall)
         {
             var helper = new CallAutomationAnswerHelper(client, incomingCall, incomingCall.CorrelationId);

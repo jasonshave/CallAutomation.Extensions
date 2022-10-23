@@ -3,9 +3,7 @@
 
 namespace CallAutomation.Extensions.Interfaces;
 
-internal interface ICallAutomationCallback<in T>
+public interface ICreateCallWithCallbackUri
 {
-    string RequestId { get; }
-
-    List<Delegate> GetCallbacks(T value);
+    ICreateCallHandling WithCallbackUri(string callbackUri);
 }

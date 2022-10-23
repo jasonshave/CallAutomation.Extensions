@@ -31,48 +31,73 @@ app.MapPost("/api/callbacks", async (CloudEvent[] events, ICallAutomationEventPu
 
 The outbound calling experience is greatly simplified into a series of chained methods which lead the developer to the correct conclusion all without having to 'new up' classes or figure out what requirements you need to meet.
 
-### Calling another Azure Communication Services user
+### Calling an Azure Communication Services user
 
 ```csharp
 
 // inject the CallAutomationClient
 await client
-        .Call<CommunicationUserIdentifier>("[ACS_USER_ID]")
+        .Call("[ACS_USER_ID]")
         .From("[YOUR_APP_ID]")
-        .WithCallbackUri("https://yourwebserver.com/path")
+        .WithCallbackUri("https://yourwebserver.com/api/callabcks")
+        .OnCallConnected<ConnectionHandler>()
         .ExecuteAsync();
 ```
 
 ### Calling a PSTN number
 
-Since calling to the PSTN requires you to specify a source caller ID number, the API leads you to add this property as a requirement when the called party is a `PhoneNumberIdentifier` type.
+Since calling to the PSTN requires you to specify a source caller ID for your application, the API permits setting this as an optional parameter.
 
 ```csharp
 
 // inject the CallAutomationClient
 await client
-        .Call<PhoneNumberIdentifier>("+14255551212", x => x.SourceCallerIdNumber = "+18005551212")
-        .From("[YOUR_APP_ID]")
-        .WithCallbackUri("https://yourwebserver.com/path")
+        .Call("+14255551212")
+        .From("+18005551212", x =>
+        {
+            x.CallerDisplayName = "Contoso Airlines";
+            x.ApplicationId = "[YOUR_APP_ID]";
+        })
+        .WithCallbackUri("https://yourwebserver.com/api/callbacks")
+        .OnCallConnected<ConnectionHandler>()
         .ExecuteAsync();
 ```
 
 ## Playing audio
 
-The Call Automation platform currently supports playing audio file from a URI. The file must be recorded in 16Khz, mono, and a WAV file format.
+The Call Automation platform currently supports playing audio file from a URI. The file must be recorded in 16Khz, mono, and a WAV file format. In the following example, the `CallMedia` object can be obtained from any of the `On[EventName]` methods as shown in the detailed example below. Alternatively you can get the `CallMedia` object by using the `CallAutomationClient` and invoking `.GetCallConnection(connectionId).GetCallMedia()`.
 
 ```csharp
-app.MapPost("/api/call", async (CallAutomationClient client) =>
+var callMedia = client.GetCallConnection(connectionId).GetCallMedia();
+
+await callMedia
+    .Play(x =>
+    {
+        x.FileUrl = holdMusic;
+        x.Loop = true;
+    })
+    .ExecuteAsync();
+```
+
+## Outbound call then play audio
+
+The following API sample assumes you've created a model for `CallRequest` which has a `string` for both the `Source` and `Destination` properties.
+
+```csharp
+app.MapPost("/api/call", async (CallRequest callRequest, CallAutomationClient client) =>
 {
     await client
-        .Call<PhoneNumberIdentifier>("+14255551212", x => x.SourceCallerIdNumber = "+18005551212")
-        .From("8:acs:[YOUR_RESOURCE_ID]_[GUID]")
+        .Call(callRequest.Destination)
+        .From(callRequest.Source, x =>
+        {
+            x.CallerDisplayName = "Contoso Airlines";
+            x.ApplicationId = applicationId;
+        })
         .WithCallbackUri("https://yourwebserver.com/api/callbacks")
-        .OnCallConnected(async (callConnected, callConnection, callMedia, callRecording) =>
+        .OnCallConnected(async (_, _, callMedia, _) =>
         {
             await callMedia
-                .Play(x => x.FileUrl = builder.Configuration["Prompt"])
-                .OnPlayCompleted(async () => await callConnection.HangUpAsync())
+                .Play(x => x.FileUrl = holdMusic)
                 .ExecuteAsync();
         })
         .ExecuteAsync();
@@ -102,7 +127,8 @@ await client.Answer(incomingCall)
             .OnPlayCompleted(async () =>
             {
                 // language menu
-                await callMedia.ReceiveDtmfTone()
+                await callMedia
+                    .ReceiveDtmfTone()
                     .FromParticipant(incomingCall.From.RawId)
                     .WithPrompt(_languageSelection)
                     .WithOptions(x =>
@@ -111,8 +137,14 @@ await client.Answer(incomingCall)
                         x.AllowInterruptPrompt = true;
                         x.WaitForResponseInSeconds = 5;
                     })
-                    .OnPress<One>(async () => await MainMenu(_mainMenuEnglish))
-                    .OnPress<Two>(async () => await MainMenu(_mainMenuSpanish))
+                    .OnPress<One, MainMenuEnglish>()
+                    .OnPress<Two, MainMenuSpanish>()
+                    .OnPress<Zero>(async () =>
+                    {
+                        await callConnection
+                            .AddParticipant<CommunicationUserIdentifier>(["ACS_USER_ID"])
+                            .ExecuteAsync();
+                    })
                     .ExecuteAsync();
             })
             .ExecuteAsync();
@@ -136,7 +168,14 @@ await client.Answer(incomingCall)
             .ExecuteAsync();
 ```
 
-Use your custom handler as follows:
+Use your custom handler is implemented and will receive the event, the `CallConnection`, `CallMedia`, and `CallRecording` objects automatically.
+
+> NOTE: You will need to register your custom handler in .NET's dependency injection manually however a work item is in the backlog to perform this automatically for you.
+
+```csharp
+// remember to register your handler in Program.cs or Startup.cs
+builder.Services.AddSingleton<CustomHandler>();
+```
 
 ```csharp
 public class CustomHandler : CallAutomationHandler

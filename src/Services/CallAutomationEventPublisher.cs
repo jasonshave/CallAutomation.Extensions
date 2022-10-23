@@ -32,26 +32,27 @@ internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublish
 
             if (callAutomationEventBase is CallConnected or CallDisconnected)
             {
-                // inbound calls will have a correlationId on the base class used to correlate the callback
-                // outbound calls will have the operationContext used to correlate the callback
-                if (callAutomationEventBase.CorrelationId is not null)
+                if (callAutomationEventBase.OperationContext is null)
                 {
+                    // OperationContext will be null for inbound calls
                     await _callAutomationEventHandler.Handle(callAutomationEventBase, callAutomationEventBase.CorrelationId);
                 }
                 else
                 {
+                    // outbound calls won't have a correlation ID so we have to use the operation context.
                     await _callAutomationEventHandler.Handle(callAutomationEventBase, callAutomationEventBase.OperationContext);
                 }
+
+                return;
             }
 
-            if (callAutomationEventBase is RecognizeCompleted or RecognizeFailed)
-            {
-                await _callAutomationRecognizeDtmfHandler.Handle(callAutomationEventBase, callAutomationEventBase.OperationContext);
-            }
-            else
+            if (callAutomationEventBase is PlayCompleted or PlayFailed)
             {
                 await _callAutomationEventHandler.Handle(callAutomationEventBase, callAutomationEventBase.OperationContext);
+                return;
             }
+
+            await _callAutomationRecognizeDtmfHandler.Handle(callAutomationEventBase, callAutomationEventBase.OperationContext);
         }
     }
 }

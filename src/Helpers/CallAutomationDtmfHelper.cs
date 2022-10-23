@@ -3,23 +3,21 @@
 
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
+using CallAutomation.Extensions.Extensions;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
+using CallAutomation.Extensions.Services;
 
 namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationDtmfHelper :
+internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
     IRecognizeDtmf,
     IHandleDtmfResponse,
     IHandleDtmfTimeout,
     ICanRecognizeDtmfOptions,
-    ICanChooseRecognizeOptions,
-    ICallAutomationCallback<DtmfTone>,
-    ICallAutomationCallback<Type>
+    ICanChooseRecognizeOptions
 {
-    public string RequestId { get; }
-
-    private readonly DtmfToneCallbacks _callbacks = new ();
+    private static readonly IEnumerable<Type> _types = new[] { typeof(RecognizeFailed), typeof(RecognizeCompleted), typeof(SilenceTimeout) };
     private readonly CallMedia _callMedia;
     private readonly int _numTones;
 
@@ -27,21 +25,11 @@ internal sealed class CallAutomationDtmfHelper :
     private CommunicationIdentifier _recognizeInputFromParticipant;
     private RecognizeOptions _recognizeOptions;
 
-    public List<Delegate> GetCallbacks(DtmfTone tone)
-    {
-        return _callbacks.GetCallbacks(tone.Convert());
-    }
-
-    public List<Delegate> GetCallbacks(Type eventTYpe)
-    {
-        return _callbacks.GetCallbacks(RequestId, eventTYpe);
-    }
-
     internal CallAutomationDtmfHelper(CallMedia callMedia, string requestId)
+        : base(requestId, _types)
     {
         _callMedia = callMedia;
         _numTones = 1;
-        RequestId = requestId;
     }
 
     public ICanRecognizeDtmfOptions WithPrompt(string fileUri)
@@ -50,32 +38,38 @@ internal sealed class CallAutomationDtmfHelper :
         return this;
     }
 
-    public ICanChooseRecognizeOptions FromParticipant(string rawId)
+    public ICanChooseRecognizeOptions FromParticipant(string id)
     {
-        // todo: fix this!
-        //_recognizeInputFromParticipant = CommunicationIdentifier.FromRawId(rawId.Replace("4:", ""));
-        _recognizeInputFromParticipant = new PhoneNumberIdentifier(rawId.Replace("4:", ""));
+        _recognizeInputFromParticipant = id.ConvertToCommunicationIdentifier();
         return this;
     }
 
     public IHandleDtmfResponse OnPress<TTone>(Func<RecognizeCompleted, CallConnection, CallMedia, CallRecording, IReadOnlyList<DtmfTone>, ValueTask> callback)
         where TTone : IDtmfTone
     {
-        _callbacks.AddCallback<TTone>(callback);
+        HelperCallbacks.AddDelegateCallback<TTone>(callback);
+        return this;
+    }
+
+    public IHandleDtmfResponse OnPress<TTone, THandler>()
+        where TTone : IDtmfTone
+        where THandler : CallAutomationHandler
+    {
+        HelperCallbacks.AddHandlerCallback<THandler, TTone>($"On{nameof(RecognizeCompleted)}", typeof(RecognizeCompleted), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(IReadOnlyList<DtmfTone>));
         return this;
     }
 
     public IHandleDtmfResponse OnPress<TTone>(Func<ValueTask> callback)
         where TTone : IDtmfTone
     {
-        _callbacks.AddCallback<TTone>(callback);
+        HelperCallbacks.AddDelegateCallback<TTone>(callback);
         return this;
     }
 
     public IHandleDtmfResponse OnPress<TTone>(Action callback)
         where TTone : IDtmfTone
     {
-        _callbacks.AddCallback<TTone>(callback);
+        HelperCallbacks.AddDelegateCallback<TTone>(callback);
         return this;
     }
 
@@ -87,25 +81,30 @@ internal sealed class CallAutomationDtmfHelper :
         return this;
     }
 
-    public IHandleDtmfTimeout OnToneTimeout(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback)
+    public IHandleDtmfTimeout OnFail<TRecognizeFail>(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback)
+        where TRecognizeFail : IRecognizeDtmfFailed
     {
-        _callbacks.AddCallback<RecognizeFailed>(RequestId, callback);
+        HelperCallbacks.AddDelegateCallback<TRecognizeFail>(callback);
         return this;
     }
 
-    public IHandleDtmfTimeout OnToneTimeout(Func<ValueTask> callback)
+    public IHandleDtmfTimeout OnFail<TRecognizeFail, THandler>()
+        where TRecognizeFail : IRecognizeDtmfFailed
+        where THandler : CallAutomationHandler
     {
-        _callbacks.AddCallback<RecognizeFailed>(RequestId, callback);
+        HelperCallbacks.AddHandlerCallback<THandler, TRecognizeFail>($"On{typeof(TRecognizeFail).Name}", typeof(RecognizeFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        return this;
+    }
+
+    public IHandleDtmfTimeout OnInputTimeout(Func<ValueTask> callback)
+    {
+        HelperCallbacks.AddDelegateCallback<RecognizeFailed>(callback);
         return this;
     }
 
     public async ValueTask ExecuteAsync()
     {
-        // register callbacks
-        CallbackRegistry.Register<DtmfTone>(this, typeof(RecognizeCompleted));
-        CallbackRegistry.Register<Type>(this, typeof(RecognizeFailed));
-
-        // invoke method
+        // invoke recognize API
         var recognizeOptions = new CallMediaRecognizeDtmfOptions(_recognizeInputFromParticipant, _numTones)
         {
             OperationContext = RequestId,

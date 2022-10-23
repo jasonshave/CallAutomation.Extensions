@@ -1,76 +1,77 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Contracts;
 using CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Services;
 
 namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationAnswerHelper :
+internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
     IAnswerWithCallbackUri,
-    IAnswerCallback,
-    ICanExecuteAsync
+    IAnswerCallHandling
 {
+    private static readonly IEnumerable<Type> _types = new[] { typeof(CallConnected), typeof(CallDisconnected) };
     private readonly CallAutomationClient _client;
     private readonly IncomingCall _incomingCall;
-    private readonly string _requestId;
-
     private Uri _callbackUri;
 
     internal CallAutomationAnswerHelper(CallAutomationClient client, IncomingCall incomingCall, string requestId)
+        : base(requestId, _types)
     {
-        _requestId = requestId;
         _client = client;
         _incomingCall = incomingCall;
     }
 
-    public IAnswerCallback WithCallbackUri(string callbackUri)
+    public IAnswerCallHandling WithCallbackUri(string callbackUri)
     {
         _callbackUri = new Uri(callbackUri);
         return this;
     }
 
-    public IAnswerCallback OnCallConnected<THandler>()
+    public IAnswerCallHandling OnCallConnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        CallbackRegistry.Register<THandler, CallConnected>(_requestId);
+        HelperCallbacks.AddHandlerCallback<THandler, CallConnected>($"On{nameof(CallConnected)}", typeof(CallConnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 
-    public IAnswerCallback OnCallDisconnected<THandler>()
+    public IAnswerCallHandling OnCallDisconnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        CallbackRegistry.Register<THandler, CallDisconnected>(_requestId);
+        HelperCallbacks.AddHandlerCallback<THandler, CallDisconnected>($"On{nameof(CallDisconnected)}", typeof(CallDisconnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 
-    public IAnswerCallback OnCallConnected(Func<CallConnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
+    public IAnswerCallHandling OnCallConnected(Func<CallConnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        CallbackRegistry.Register(_requestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<CallConnected>(callbackFunction);
         return this;
     }
 
-    public IAnswerCallback OnCallConnected(Func<ValueTask> callbackFunction)
+    public IAnswerCallHandling OnCallConnected(Func<ValueTask> callbackFunction)
     {
-        CallbackRegistry.Register<CallConnected>(_requestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<CallConnected>(callbackFunction);
         return this;
     }
 
-    public IAnswerCallback OnCallDisconnected(Func<ValueTask> callbackFunction)
+    public IAnswerCallHandling OnCallDisconnected(Func<ValueTask> callbackFunction)
     {
-        CallbackRegistry.Register<CallDisconnected>(_requestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<CallDisconnected>(callbackFunction);
         return this;
     }
 
-    public IAnswerCallback OnCallDisconnected(Func<CallDisconnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
+    public IAnswerCallHandling OnCallDisconnected(Func<CallDisconnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        CallbackRegistry.Register(_requestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<CallConnected>(callbackFunction);
         return this;
     }
 
-    public async ValueTask ExecuteAsync()
+    public async ValueTask<AnswerCallResult> ExecuteAsync()
     {
-        await _client.AnswerCallAsync(new AnswerCallOptions(_incomingCall.IncomingCallContext, _callbackUri));
+        Response<AnswerCallResult> result = await _client.AnswerCallAsync(new AnswerCallOptions(_incomingCall.IncomingCallContext, _callbackUri));
+        return result;
     }
 }

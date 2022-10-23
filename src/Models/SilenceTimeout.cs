@@ -6,7 +6,9 @@ using CallAutomation.Extensions.Interfaces;
 
 namespace CallAutomation.Extensions.Models;
 
-public struct Star : IDtmfTone
+public struct SilenceTimeout : IRecognizeDtmfFailed
 {
-    public DtmfTone Value => DtmfTone.Asterisk;
+    public ReasonCode Reason => ReasonCode.RecognizeInitialSilenceTimedOut;
+
+    public int Code => 8510;
 }

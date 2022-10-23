@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 using Azure.Communication.CallAutomation;
+using CallAutomation.Extensions.Dispatchers;
+using CallAutomation.Extensions.Handlers;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
 using CallAutomation.Extensions.Services;
@@ -41,8 +43,9 @@ public static class ServiceCollectionExtensions
         return builder;
     }
 
-    public static CallAutomationConfigurationBuilder DiscoverCallbackHandlers(this CallAutomationConfigurationBuilder builder, params Type[] searchTypes)
-    {
-        return builder;
-    }
+    // todo: add auto discovery
+    // public static CallAutomationConfigurationBuilder DiscoverCallbackHandlers(this CallAutomationConfigurationBuilder builder, params Type[] searchTypes)
+    // {
+    //     return builder;
+    // }
 }

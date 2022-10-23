@@ -10,15 +10,24 @@ public interface IHandleDtmfResponse
     IHandleDtmfResponse OnPress<TTone>(Func<RecognizeCompleted, CallConnection, CallMedia, CallRecording, IReadOnlyList<DtmfTone>, ValueTask> callback)
         where TTone : IDtmfTone;
 
+    IHandleDtmfResponse OnPress<TTone, THandler>()
+        where TTone : IDtmfTone
+        where THandler : CallAutomationHandler;
+
     IHandleDtmfResponse OnPress<TTone>(Func<ValueTask> callback)
         where TTone : IDtmfTone;
 
     IHandleDtmfResponse OnPress<TTone>(Action callback)
         where TTone : IDtmfTone;
 
-    IHandleDtmfTimeout OnToneTimeout(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback);
+    IHandleDtmfTimeout OnFail<TRecognizeFail>(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback)
+        where TRecognizeFail : IRecognizeDtmfFailed;
 
-    IHandleDtmfTimeout OnToneTimeout(Func<ValueTask> callback);
+    IHandleDtmfTimeout OnFail<TRecognizeFail, THandler>()
+        where TRecognizeFail : IRecognizeDtmfFailed
+        where THandler : CallAutomationHandler;
+
+    IHandleDtmfTimeout OnInputTimeout(Func<ValueTask> callback);
 
     ValueTask ExecuteAsync();
 }
