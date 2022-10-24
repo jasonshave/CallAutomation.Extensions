@@ -39,7 +39,7 @@ The outbound calling experience is greatly simplified into a series of chained m
 await client
         .Call("[ACS_USER_ID]")
         .From("[YOUR_APP_ID]")
-        .WithCallbackUri("https://yourwebserver.com/api/callabcks")
+        .WithCallbackUri("https://yourwebserver.com/api/callbacks")
         .OnCallConnected<ConnectionHandler>()
         .ExecuteAsync();
 ```
