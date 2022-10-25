@@ -46,7 +46,7 @@ internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublish
                 return;
             }
 
-            if (callAutomationEventBase is PlayCompleted or PlayFailed)
+            if (callAutomationEventBase is not RecognizeCompleted or RecognizeFailed)
             {
                 await _callAutomationEventHandler.Handle(callAutomationEventBase, callAutomationEventBase.OperationContext);
                 return;
