@@ -6,6 +6,7 @@ using Azure.Communication.CallAutomation;
 using CallAutomation.Contracts;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Services;
+using CallNotificationService.Contracts.Models;
 
 namespace CallAutomation.Extensions.Helpers;
 
@@ -15,19 +16,29 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
 {
     private static readonly IEnumerable<Type> _types = new[] { typeof(CallConnected), typeof(CallDisconnected) };
     private readonly CallAutomationClient _client;
-    private readonly IncomingCall _incomingCall;
-    private Uri _callbackUri;
+    private readonly string _incomingCallContext;
+
+
+    private Uri _midEventCallbackUri;
 
     internal CallAutomationAnswerHelper(CallAutomationClient client, IncomingCall incomingCall, string requestId)
         : base(requestId, _types)
     {
         _client = client;
-        _incomingCall = incomingCall;
+        _incomingCallContext = incomingCall.IncomingCallContext;
+    }
+
+    internal CallAutomationAnswerHelper(CallAutomationClient client, CallNotification callNotification, string requestId)
+        : base(requestId, _types)
+    {
+        _client = client;
+        _midEventCallbackUri = new Uri(callNotification.MidCallEventsUri);
+        _incomingCallContext = callNotification.IncomingCallContext;
     }
 
     public IAnswerCallHandling WithCallbackUri(string callbackUri)
     {
-        _callbackUri = new Uri(callbackUri);
+        _midEventCallbackUri = new Uri(callbackUri);
         return this;
     }
 
@@ -71,7 +82,7 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
 
     public async ValueTask<AnswerCallResult> ExecuteAsync()
     {
-        Response<AnswerCallResult> result = await _client.AnswerCallAsync(new AnswerCallOptions(_incomingCall.IncomingCallContext, _callbackUri));
+        Response<AnswerCallResult> result = await _client.AnswerCallAsync(new AnswerCallOptions(_incomingCallContext, _midEventCallbackUri));
         return result;
     }
 }
