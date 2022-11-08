@@ -102,12 +102,12 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
         return this;
     }
 
-    public async ValueTask ExecuteAsync()
+    public async ValueTask ExecuteAsync(IOperationContext operationContext)
     {
         // invoke recognize API
         var recognizeOptions = new CallMediaRecognizeDtmfOptions(_recognizeInputFromParticipant, _numTones)
         {
-            OperationContext = RequestId,
+            OperationContext = OperationContextToJSON(operationContext),
             Prompt = new FileSource(_fileUri),
             InterruptCallMediaOperation = _recognizeOptions.AllowInterruptExistingMediaOperation,
             InterruptPrompt = _recognizeOptions.AllowInterruptPrompt,

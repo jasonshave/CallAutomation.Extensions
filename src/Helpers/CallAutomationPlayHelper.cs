@@ -61,8 +61,9 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
         return this;
     }
 
-    public async ValueTask ExecuteAsync()
+    public async ValueTask ExecuteAsync(IOperationContext operationContext)
     {
+        var operationContextJSON = OperationContextToJSON(operationContext);
         if (_playToParticipants.Any())
         {
             await _callMedia.PlayAsync(new FileSource(new Uri(_playMediaOptions.FileUrl))
@@ -71,7 +72,7 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
                 PlaySourceId = RequestId,
             }, _playToParticipants, new PlayOptions()
             {
-                OperationContext = RequestId,
+                OperationContext = operationContextJSON,
                 Loop = _playMediaOptions.Loop,
             });
         }
@@ -83,7 +84,7 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
                 PlaySourceId = RequestId,
             }, new PlayOptions()
             {
-                OperationContext = RequestId,
+                OperationContext = operationContextJSON,
                 Loop = _playMediaOptions.Loop,
             });
         }
