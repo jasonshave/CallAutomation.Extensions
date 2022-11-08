@@ -3,7 +3,6 @@
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IHandleDtmfTimeout
+public interface IHandleDtmfTimeout : IExecuteAsync
 {
-    ValueTask ExecuteAsync();
 }

@@ -90,7 +90,7 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
         return this;
     }
 
-    public async ValueTask<CreateCallResult> ExecuteAsync()
+    public async ValueTask<CreateCallResult> ExecuteAsync(IOperationContext operationContext)
     {
         var callSource = new CallSource(new CommunicationUserIdentifier(_callFromOptions.ApplicationId));
         if (_callFromOptions is not null)
@@ -105,7 +105,7 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
 
         var createCallOptions = new CreateCallOptions(callSource, _destinations, _callbackUri)
         {
-            OperationContext = RequestId,
+            OperationContext = OperationContextToJSON(operationContext),
         };
 
         var result = await _client.CreateCallAsync(createCallOptions);

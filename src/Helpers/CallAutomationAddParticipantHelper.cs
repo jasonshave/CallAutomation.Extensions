@@ -95,11 +95,11 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
         return this;
     }
 
-    public async ValueTask<AddParticipantsResult> ExecuteAsync()
+    public async ValueTask<AddParticipantsResult> ExecuteAsync(IOperationContext operationContext)
     {
         var addParticipantsOptions = new AddParticipantsOptions(_participantsToAdd)
         {
-            OperationContext = RequestId,
+            OperationContext = OperationContextToJSON(operationContext),
             InvitationTimeoutInSeconds = _addParticipantsOptions?.InvitationTimeoutInSeconds,
         };
 
