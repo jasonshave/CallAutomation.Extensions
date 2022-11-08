@@ -28,6 +28,6 @@ internal abstract class HelperCallbackBase : ICallAutomationHelperCallback
     {
         if (operationContext is null) operationContext = new OperationContext();
         operationContext.RequestID = RequestId;
-        return JsonSerializer.Serialize(operationContext);
+        return JsonSerializer.Serialize((object)operationContext);
     }
 }
