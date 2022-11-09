@@ -13,13 +13,10 @@ namespace CallAutomation.Extensions
 {
     public static class CallAutomationClientExtensions
     {
-        private static readonly Uri _registrationUri = new (
-            "https://callnotificationeventhandler-dev.azurewebsites.net/api/registration?code=uY2YJxc5zP6tMEqO7jzXlnCplT0mTxngKxBCn3GOtTYYAzFu-2K5zQ==");
-
+        private static readonly Uri _registrationUri = new ("https://callnotificationeventhandler-dev.azurewebsites.net/api/registration?code=uY2YJxc5zP6tMEqO7jzXlnCplT0mTxngKxBCn3GOtTYYAzFu-2K5zQ==");
         //private static readonly Uri _registrationUri = new("http://localhost:7013/api/registration");
 
-        public static async Task<CallbackRegistrationDto> RegisterAsync(this CallAutomationClient client,
-            Action<CreateRegistrationRequest> registrationRequest)
+        public static async Task<CallbackRegistrationDto> RegisterCallbackAsync(this CallAutomationClient client, Action<CreateRegistrationRequest> registrationRequest)
         {
             var request = new CreateRegistrationRequest();
             registrationRequest(request);
@@ -41,7 +38,8 @@ namespace CallAutomation.Extensions
 
         public static IAnswerCallHandling Accept(this CallAutomationClient client, CallNotification callNotification)
         {
-            var helper = new CallAutomationAnswerHelper(client, callNotification, callNotification.CorrelationId);
+            var acceptCallUri = new Uri($"https://callnotificationeventhandler-dev.azurewebsites.net/api/calls/{callNotification.Id}:accept?code=kWrps9mSj9fE5u1bHjGFZgpPHR1zLZ2JPCHxEO4yi1VrAzFuXmmg6A==");
+            var helper = new CallAutomationAnswerHelper(client, callNotification, acceptCallUri, callNotification.CorrelationId);
             return helper;
         }
 

@@ -54,5 +54,5 @@ public interface IAnswerCallHandling
     /// Executes the create call process.
     /// </summary>
     /// <returns><see cref="AnswerCallResult"/></returns>
-    ValueTask<AnswerCallResult> ExecuteAsync();
+    ValueTask<AnswerCallResult?> ExecuteAsync();
 }

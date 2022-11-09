@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Text.Json;
 using Azure;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Contracts;
@@ -17,7 +18,7 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
     private static readonly IEnumerable<Type> _types = new[] { typeof(CallConnected), typeof(CallDisconnected) };
     private readonly CallAutomationClient _client;
     private readonly string _incomingCallContext;
-
+    private readonly Uri? _acceptCallUri;
 
     private Uri _midEventCallbackUri;
 
@@ -28,12 +29,20 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
         _incomingCallContext = incomingCall.IncomingCallContext;
     }
 
-    internal CallAutomationAnswerHelper(CallAutomationClient client, CallNotification callNotification, string requestId)
+    //internal CallAutomationAnswerHelper(CallAutomationClient client, CallNotification callNotification, string requestId)
+    //    : base(requestId, _types)
+    //{
+    //    _client = client;
+    //    _midEventCallbackUri = new Uri(callNotification.MidCallEventsUri);
+    //    //_incomingCallContext = callNotification.IncomingCallContext;
+    //}
+
+    internal CallAutomationAnswerHelper(CallAutomationClient client, CallNotification callNotification, Uri acceptCallUri, string requestId)
         : base(requestId, _types)
     {
         _client = client;
         _midEventCallbackUri = new Uri(callNotification.MidCallEventsUri);
-        _incomingCallContext = callNotification.IncomingCallContext;
+        _acceptCallUri = acceptCallUri;
     }
 
     public IAnswerCallHandling WithCallbackUri(string callbackUri)
@@ -80,9 +89,25 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
         return this;
     }
 
-    public async ValueTask<AnswerCallResult> ExecuteAsync()
+    public async ValueTask<AnswerCallResult?> ExecuteAsync()
     {
-        Response<AnswerCallResult> result = await _client.AnswerCallAsync(new AnswerCallOptions(_incomingCallContext, _midEventCallbackUri));
-        return result;
+        AnswerCallResult result;
+        if (_acceptCallUri is null)
+        {
+            result = await _client.AnswerCallAsync(new AnswerCallOptions(_incomingCallContext, _midEventCallbackUri));
+        }
+        else
+        {
+            using var httpClient = new HttpClient();
+            var httpRequest = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Post,
+                RequestUri = _acceptCallUri
+            };
+
+            await httpClient.SendAsync(httpRequest);
+        }
+
+        return null;
     }
 }
