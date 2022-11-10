@@ -10,7 +10,7 @@ namespace CallAutomation.Extensions.Helpers;
 internal sealed class CallAutomationRemoveParticipantHelper : ICanRemoveParticipant
 {
     private readonly CallConnection _connection;
-    private readonly List<CommunicationIdentifier> _identitiesToRemove = new ();
+    private readonly List<CommunicationIdentifier> _identitiesToRemove = new();
 
     internal CallAutomationRemoveParticipantHelper(CallConnection connection, CommunicationIdentifier id, string requestId)
     {

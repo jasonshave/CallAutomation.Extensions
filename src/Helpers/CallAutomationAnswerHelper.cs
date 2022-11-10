@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Text.Json;
-using Azure;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Contracts;
 using CallAutomation.Extensions.Interfaces;

@@ -13,7 +13,7 @@ namespace CallAutomation.Extensions
 {
     public static class CallAutomationClientExtensions
     {
-        private static readonly Uri _registrationUri = new ("https://callnotificationeventhandler-dev.azurewebsites.net/api/registration?code=uY2YJxc5zP6tMEqO7jzXlnCplT0mTxngKxBCn3GOtTYYAzFu-2K5zQ==");
+        private static readonly Uri _registrationUri = new("https://callnotificationeventhandler-dev.azurewebsites.net/api/registration?code=uY2YJxc5zP6tMEqO7jzXlnCplT0mTxngKxBCn3GOtTYYAzFu-2K5zQ==");
         //private static readonly Uri _registrationUri = new("http://localhost:7013/api/registration");
 
         public static async Task<CallbackRegistrationDto> RegisterCallbackAsync(this CallAutomationClient client, Action<CreateRegistrationRequest> registrationRequest)
