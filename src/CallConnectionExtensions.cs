@@ -3,7 +3,6 @@
 
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
-using CallAutomation.Contracts;
 using CallAutomation.Extensions.Helpers;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
