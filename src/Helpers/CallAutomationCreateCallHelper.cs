@@ -17,7 +17,7 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
 {
     private static readonly IEnumerable<Type> _types = new[] { typeof(CallConnected), typeof(CallDisconnected) };
     private readonly CallAutomationClient _client;
-    private readonly List<CommunicationIdentifier> _destinations = new ();
+    private readonly List<CommunicationIdentifier> _destinations = new();
     private string _from;
     private CallFromOptions? _callFromOptions;
     private Uri _callbackUri;
