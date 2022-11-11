@@ -15,14 +15,36 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
 {
     private static readonly IEnumerable<Type> _types = new[] { typeof(CallConnected), typeof(CallDisconnected) };
     private readonly CallAutomationClient _client;
-    private readonly IncomingCall _incomingCall;
+    private readonly IncomingCall? _incomingCall;
+    private readonly CallNotification? _callNotification;
+
     private Uri _callbackUri;
 
+    /// <summary>
+    /// Used to handle Event Grid data directly
+    /// </summary>
+    /// <param name="client"></param>
+    /// <param name="incomingCall"></param>
+    /// <param name="requestId"></param>
     internal CallAutomationAnswerHelper(CallAutomationClient client, IncomingCall incomingCall, string requestId)
         : base(requestId, _types)
     {
         _client = client;
         _incomingCall = incomingCall;
+    }
+
+    /// <summary>
+    /// Used to handle <see cref="CallNotification"/> payload from the Call Notification Service
+    /// </summary>
+    /// <param name="client"></param>
+    /// <param name="callNotification"></param>
+    /// <param name="requestId"></param>
+    internal CallAutomationAnswerHelper(CallAutomationClient client, CallNotification callNotification, string requestId)
+        : base(requestId, _types)
+    {
+        _client = client;
+        _callNotification = callNotification;
+        _callbackUri = new Uri(callNotification.MidCallEventsUri);
     }
 
     public IAnswerCallHandling WithCallbackUri(string callbackUri)
