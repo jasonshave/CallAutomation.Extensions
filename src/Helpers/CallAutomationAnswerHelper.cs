@@ -15,10 +15,9 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
 {
     private static readonly IEnumerable<Type> _types = new[] { typeof(CallConnected), typeof(CallDisconnected) };
     private readonly CallAutomationClient _client;
-    private readonly IncomingCall? _incomingCall;
-    private readonly CallNotification? _callNotification;
+    private readonly string? _incomingCallContext;
 
-    private Uri _callbackUri;
+    private Uri? _callbackUri;
 
     /// <summary>
     /// Used to handle Event Grid data directly
@@ -30,7 +29,7 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
         : base(requestId, _types)
     {
         _client = client;
-        _incomingCall = incomingCall;
+        _incomingCallContext = incomingCall.IncomingCallContext;
     }
 
     /// <summary>
@@ -43,7 +42,7 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
         : base(requestId, _types)
     {
         _client = client;
-        _callNotification = callNotification;
+        _incomingCallContext = callNotification.IncomingCallContext;
         _callbackUri = new Uri(callNotification.MidCallEventsUri);
     }
 
@@ -93,7 +92,7 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
 
     public async ValueTask<AnswerCallResult> ExecuteAsync()
     {
-        Response<AnswerCallResult> result = await _client.AnswerCallAsync(new AnswerCallOptions(_incomingCall.IncomingCallContext, _callbackUri));
+        Response<AnswerCallResult> result = await _client.AnswerCallAsync(new AnswerCallOptions(_incomingCallContext, _callbackUri));
         return result;
     }
 }
