@@ -23,11 +23,4 @@ internal abstract class HelperCallbackBase : ICallAutomationHelperCallback
 
         CallbackRegistry.RegisterHelperCallback(this, Types);
     }
-
-    protected string OperationContextToJSON(IOperationContext operationContext)
-    {
-        if (operationContext is null) operationContext = new OperationContext();
-        operationContext.RequestID = RequestId;
-        return JsonSerializer.Serialize((object)operationContext);
-    }
 }

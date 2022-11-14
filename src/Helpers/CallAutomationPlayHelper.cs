@@ -6,14 +6,15 @@ using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
 using CallAutomation.Extensions.Services;
+using System.Text.Json;
 
 namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaCallback
+internal sealed class CallAutomationPlayHelper : HelperCallbackWithContext, IPlayMediaCallback
 {
     private static IEnumerable<Type> _types = new[] { typeof(PlayCompleted), typeof(PlayFailed) };
     private readonly CallMedia _callMedia;
-    private readonly List<CommunicationIdentifier> _playToParticipants = new ();
+    private readonly List<CommunicationIdentifier> _playToParticipants = new();
     private readonly PlayMediaOptions _playMediaOptions;
 
     internal CallAutomationPlayHelper(CallMedia callMedia, PlayMediaOptions playMediaOptions, string requestId)
@@ -51,7 +52,7 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
     public IPlayMediaCallback OnPlayFailed<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, PlayCompleted>($"On{nameof(PlayFailed)}", typeof(PlayFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        HelperCallbacks.AddHandlerCallback<THandler, PlayFailed>($"On{nameof(PlayFailed)}", typeof(PlayFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 
@@ -61,9 +62,14 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
         return this;
     }
 
-    public async ValueTask ExecuteAsync(IOperationContext operationContext)
+    IExecuteAsync ICallbackContext<IExecuteAsync>.WithContext(IOperationContext context)
     {
-        var operationContextJSON = OperationContextToJSON(operationContext);
+        WithContext(context);
+        return this;
+    }
+
+    public async ValueTask ExecuteAsync()
+    {
         if (_playToParticipants.Any())
         {
             await _callMedia.PlayAsync(new FileSource(new Uri(_playMediaOptions.FileUrl))
@@ -72,7 +78,7 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
                 PlaySourceId = RequestId,
             }, _playToParticipants, new PlayOptions()
             {
-                OperationContext = operationContextJSON,
+                OperationContext = JSONContext,
                 Loop = _playMediaOptions.Loop,
             });
         }
@@ -84,7 +90,7 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
                 PlaySourceId = RequestId,
             }, new PlayOptions()
             {
-                OperationContext = operationContextJSON,
+                OperationContext = JSONContext,
                 Loop = _playMediaOptions.Loop,
             });
         }

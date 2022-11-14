@@ -10,7 +10,7 @@ using CallAutomation.Extensions.Services;
 
 namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
+internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
     IRecognizeDtmf,
     IHandleDtmfResponse,
     IHandleDtmfTimeout,
@@ -102,12 +102,18 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
         return this;
     }
 
-    public async ValueTask ExecuteAsync(IOperationContext operationContext)
+    IExecuteAsync ICallbackContext<IExecuteAsync>.WithContext(IOperationContext context)
+    {
+        WithContext(context);
+        return this;
+    }
+
+    public async ValueTask ExecuteAsync()
     {
         // invoke recognize API
         var recognizeOptions = new CallMediaRecognizeDtmfOptions(_recognizeInputFromParticipant, _numTones)
         {
-            OperationContext = OperationContextToJSON(operationContext),
+            OperationContext = JSONContext,
             Prompt = new FileSource(_fileUri),
             InterruptCallMediaOperation = _recognizeOptions.AllowInterruptExistingMediaOperation,
             InterruptPrompt = _recognizeOptions.AllowInterruptPrompt,

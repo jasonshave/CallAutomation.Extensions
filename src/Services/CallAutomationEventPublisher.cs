@@ -31,7 +31,7 @@ internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublish
         string? RequestIDFrom(string operationContext) =>
             (operationContext is null)
             ? null
-            : (JsonSerializer.Deserialize<OperationContext>(operationContext)?.RequestID ?? operationContext);
+            : (JsonSerializer.Deserialize<OperationContext>(operationContext)?.RequestId ?? operationContext);
 
         foreach (var cloudEvent in cloudEvents)
         {
