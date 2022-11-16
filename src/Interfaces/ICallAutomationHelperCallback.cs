@@ -9,5 +9,5 @@ internal interface ICallAutomationHelperCallback
 {
     IEnumerable<Type> Types { get; }
 
-    CallAutomationCallbacks HelperCallbacks { get; }
+    CallAutomationCallbacksLegacy HelperCallbacks { get; }
 }

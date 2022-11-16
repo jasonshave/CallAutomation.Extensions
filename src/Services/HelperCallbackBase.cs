@@ -11,13 +11,13 @@ internal abstract class HelperCallbackBase : ICallAutomationHelperCallback
 {
     public IEnumerable<Type> Types { get; }
 
-    public CallAutomationCallbacks HelperCallbacks { get; }
+    public CallAutomationCallbacksLegacy HelperCallbacks { get; }
 
     protected string RequestId { get; }
 
     protected HelperCallbackBase(string requestId, IEnumerable<Type> types)
     {
-        HelperCallbacks = new CallAutomationCallbacks(requestId);
+        HelperCallbacks = new CallAutomationCallbacksLegacy(requestId);
         RequestId = requestId;
         Types = types.ToList();
 
