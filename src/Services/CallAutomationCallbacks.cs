@@ -61,7 +61,7 @@ internal static class CallAutomationCallbacks
 
     public static IEnumerable<(string HandlerName, string MethodName)> GetHandlers(string requestId, Type type)
     {
-        _callbackHandlers.TryGetValue((requestId, type.Name), out var handlerTuple);
+        _callbackHandlers.TryRemove((requestId, type.Name), out var handlerTuple);
         return handlerTuple ?? Enumerable.Empty<(string HandlerName, string MethodName)>();
     }
 }
