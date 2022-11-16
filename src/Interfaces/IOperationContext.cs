@@ -14,6 +14,6 @@ namespace CallAutomation.Extensions.Interfaces
         /// <summary>
         /// Unique identifier for the Request
         /// </summary>
-        public string? RequestId { get; }
+        public string? RequestId { get; set; }
     }
 }
