@@ -14,7 +14,7 @@
     <version>1.0.0</version>
     <tags>Azure-Communication-Services JasonShave ACS CallAutomation Call Automation</tags>
     <dependencies>
-      <dependency id="Azure.Communication.CallAutomation" version="1.0.0-alpha.20221017.1"/>
+      <dependency id="Azure.Communication.CallAutomation" version="1.0.0-beta.1"/>
       <dependency id="CallAutomation.Contracts" version="1.0.8"/>
     </dependencies>
   </metadata>

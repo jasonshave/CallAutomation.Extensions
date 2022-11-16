@@ -15,7 +15,7 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackWithCon
 {
     private static readonly IEnumerable<Type> _types = new[] { typeof(AddParticipantsSucceeded), typeof(AddParticipantsFailed) };
     private readonly CallConnection _connection;
-    private readonly List<CommunicationIdentifier> _participantsToAdd = new ();
+    private readonly List<CommunicationIdentifier> _participantsToAdd = new();
     private ParticipantOptions? _addParticipantsOptions;
     private PstnParticipantOptions? _pstnParticipantOptions;
 
