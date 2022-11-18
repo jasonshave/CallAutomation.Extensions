@@ -34,6 +34,12 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackWithCon
         _pstnParticipantOptions = pstnParticipantOptions;
     }
 
+    public ICanAddParticipant WithCallbackHandler(ICallbacksHandler handler)
+    {
+        CallbackHandler = handler;
+        return this;
+    }
+
     public ICanAddParticipant AddParticipant(string rawId)
     {
         _participantsToAdd.Add(CommunicationIdentifier.FromRawId(rawId));
@@ -60,38 +66,38 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackWithCon
     public ICanAddParticipant OnAddParticipantsSucceeded<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, AddParticipantsSucceeded>($"On{nameof(AddParticipantsSucceeded)}", typeof(AddParticipantsSucceeded), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        CallbackHandler.AddHandlerCallback<THandler, AddParticipantsSucceeded>(RequestId, $"On{nameof(AddParticipantsSucceeded)}");
         return this;
     }
 
     public ICanAddParticipant OnAddParticipantsSucceeded(Func<ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<AddParticipantsSucceeded>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<AddParticipantsSucceeded>(RequestId, callbackFunction);
         return this;
     }
 
     public ICanAddParticipant OnAddParticipantsSucceeded(Func<AddParticipantsSucceeded, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<AddParticipantsSucceeded>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<AddParticipantsSucceeded>(RequestId, callbackFunction);
         return this;
     }
 
     public ICanAddParticipant OnAddParticipantsFailed<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, AddParticipantsFailed>($"On{nameof(AddParticipantsFailed)}", typeof(AddParticipantsFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        CallbackHandler.AddHandlerCallback<THandler, AddParticipantsFailed>(RequestId, $"On{nameof(AddParticipantsFailed)}");
         return this;
     }
 
     public ICanAddParticipant OnAddParticipantsFailed(Func<ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<AddParticipantsFailed>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<AddParticipantsFailed>(RequestId, callbackFunction);
         return this;
     }
 
     public ICanAddParticipant OnAddParticipantsFailed(Func<AddParticipantsFailed, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<AddParticipantsFailed>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<AddParticipantsFailed>(RequestId, callbackFunction);
         return this;
     }
 

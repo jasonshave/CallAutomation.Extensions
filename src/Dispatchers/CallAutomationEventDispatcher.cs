@@ -29,11 +29,9 @@ internal sealed class CallAutomationEventDispatcher : ICallAutomationEventDispat
         //        await handlerInstance.OnCallConnected(cc, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording);
         //        break;
         //}
-
+        
         var methodInfo = handlerInstance.GetType().GetMethod(methodName);
-
-        var task = methodInfo.Invoke(handlerInstance, new object[] { @event, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording }) as Task;
-        if (task is null) return;
+        var task = (ValueTask)methodInfo.Invoke(handlerInstance, new object[] { @event, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording });
 
         await task.ConfigureAwait(false);
     }

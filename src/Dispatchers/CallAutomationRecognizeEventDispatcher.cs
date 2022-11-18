@@ -13,26 +13,27 @@ internal sealed class CallAutomationRecognizeEventDispatcher : ICallAutomationRe
     public async ValueTask DispatchAsync(RecognizeCompleted @event, Delegate callbackFunction, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone> tones) =>
         await LocalDispatchAsync(@event, callbackFunction, clientElements, tones);
 
-    public async ValueTask DispatchAsync(RecognizeCompleted @event, MethodInfo methodInfo, object handlerInstance, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone> tones) =>
-        await LocalDispatchAsync(@event, methodInfo, handlerInstance, clientElements, tones);
+    public async ValueTask DispatchAsync(RecognizeCompleted @event, CallAutomationHandler handlerInstance, string methodName, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone> tones) =>
+        await LocalDispatchAsync(@event, handlerInstance, methodName, clientElements, tones);
 
     public async ValueTask DispatchAsync(RecognizeFailed @event, Delegate callbackFunction, CallAutomationClientElements clientElements) =>
         await LocalDispatchAsync(@event, callbackFunction, clientElements, null);
 
-    public async ValueTask DispatchAsync(RecognizeFailed @event, MethodInfo methodInfo, object handlerInstance, CallAutomationClientElements clientElements) =>
-        await LocalDispatchAsync(@event, methodInfo, handlerInstance, clientElements, null);
+    public async ValueTask DispatchAsync(RecognizeFailed @event, CallAutomationHandler handlerInstance, string methodName, CallAutomationClientElements clientElements) =>
+        await LocalDispatchAsync(@event, handlerInstance, methodName, clientElements, null);
 
-    private static async ValueTask LocalDispatchAsync(CallAutomationEventBase eventBase, MethodInfo methodInfo, object handlerInstance, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone>? tones)
+    private static async ValueTask LocalDispatchAsync(CallAutomationEventBase eventBase, CallAutomationHandler handlerInstance, string methodName, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone>? tones)
     {
-        Task task;
+        var methodInfo = handlerInstance.GetType().GetMethod(methodName);
+        ValueTask task;
         if (tones is null)
         {
-            task = methodInfo.Invoke(handlerInstance, new object[] { eventBase, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording }) as Task;
-            if (task is null) return;
+            task = (ValueTask)methodInfo.Invoke(handlerInstance, new object[] { eventBase, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording });
         }
-
-        task = methodInfo.Invoke(handlerInstance, new object[] { eventBase, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording, tones }) as Task;
-        if (task is null) return;
+        else
+        {
+            task = (ValueTask)methodInfo.Invoke(handlerInstance, new object[] { eventBase, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording, tones });
+        }
 
         await task.ConfigureAwait(false);
     }

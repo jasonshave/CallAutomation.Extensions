@@ -9,10 +9,9 @@ using System.Threading.Tasks;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IOperationContext
+public interface IWithCallbackHandler<T>
 {
-    /// <summary>
-    /// Unique identifier for the Request
-    /// </summary>
-    public string? RequestId { get; set; }
+    ICallbacksHandler CallbackHandler { get; }
+
+    T WithCallbackHandler(ICallbacksHandler handler);
 }

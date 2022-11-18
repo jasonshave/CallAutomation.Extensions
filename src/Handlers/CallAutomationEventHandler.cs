@@ -9,22 +9,20 @@ using Microsoft.Extensions.Logging;
 
 namespace CallAutomation.Extensions.Handlers;
 
-internal sealed class CallAutomationEventHandler : ICallAutomationEventHandler
+internal sealed class CallAutomationEventHandler : BaseEventHandler, ICallAutomationEventHandler
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly ICallAutomationEventDispatcher _dispatcher;
-    private readonly CallAutomationClient _client;
     private readonly ILogger<CallAutomationEventHandler> _logger;
 
     public CallAutomationEventHandler(
         IServiceProvider serviceProvider,
         ICallAutomationEventDispatcher dispatcher,
+        ICallbacksHandler callbackHandler,
         CallAutomationClient client,
         ILogger<CallAutomationEventHandler> logger)
+        : base(serviceProvider, callbackHandler, client)
     {
-        _serviceProvider = serviceProvider;
         _dispatcher = dispatcher;
-        _client = client;
         _logger = logger;
     }
 
@@ -32,18 +30,18 @@ internal sealed class CallAutomationEventHandler : ICallAutomationEventHandler
     {
         var clientElements = new CallAutomationClientElements(_client, eventBase.CallConnectionId);
 
+        var delegates = _callbackHandler.GetDelegateCallbacks(requestId, eventBase.GetType());
+        foreach (var @delegate in delegates)
+        {
+            _logger.LogInformation("Found callback delegate for request {requestId} and event {event}", requestId, eventBase.GetType());
+            await _dispatcher.DispatchAsync(eventBase, @delegate, clientElements);
+        }
+
         // dispatch handler callbacks
-        var handlerTuples = CallAutomationCallbacks.GetHandlers(requestId, eventBase.GetType());
+        var handlerTuples = _callbackHandler.GetHandlers(requestId, eventBase.GetType());
         foreach (var handlerTuple in handlerTuples)
         {
-            var cahType = typeof(CallAutomationHandler);
-            var handlerType = AppDomain.CurrentDomain.GetAssemblies()
-                .Select(assembly => assembly.GetType(handlerTuple.HandlerName))
-                .FirstOrDefault(t => t?.IsSubclassOf(cahType) == true);
-            if (handlerType is null) return;
-
-            var handler = (CallAutomationHandler)_serviceProvider.GetService(handlerType);
-
+            var handler = GetHandler(handlerTuple.HandlerName);
             if (handler is null) return;
 
             _logger.LogInformation("Found callback handler for request {requestId} and event {event}", requestId, eventBase.GetType());

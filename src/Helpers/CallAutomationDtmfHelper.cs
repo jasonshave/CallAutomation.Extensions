@@ -47,7 +47,7 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
     public IHandleDtmfResponse OnPress<TTone>(Func<RecognizeCompleted, CallConnection, CallMedia, CallRecording, IReadOnlyList<DtmfTone>, ValueTask> callback)
         where TTone : IDtmfTone
     {
-        HelperCallbacks.AddDelegateCallback<TTone>(callback);
+        CallbackHandler.AddDelegateCallback<TTone>(RequestId, callback);
         return this;
     }
 
@@ -55,21 +55,21 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
         where TTone : IDtmfTone
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, TTone>($"On{nameof(RecognizeCompleted)}", typeof(RecognizeCompleted), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(IReadOnlyList<DtmfTone>));
+        CallbackHandler.AddHandlerCallback<THandler, TTone>(RequestId, $"On{nameof(RecognizeCompleted)}");
         return this;
     }
 
     public IHandleDtmfResponse OnPress<TTone>(Func<ValueTask> callback)
         where TTone : IDtmfTone
     {
-        HelperCallbacks.AddDelegateCallback<TTone>(callback);
+        CallbackHandler.AddDelegateCallback<TTone>(RequestId, callback);
         return this;
     }
 
     public IHandleDtmfResponse OnPress<TTone>(Action callback)
         where TTone : IDtmfTone
     {
-        HelperCallbacks.AddDelegateCallback<TTone>(callback);
+        CallbackHandler.AddDelegateCallback<TTone>(RequestId, callback);
         return this;
     }
 
@@ -84,7 +84,7 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
     public IHandleDtmfTimeout OnFail<TRecognizeFail>(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback)
         where TRecognizeFail : IRecognizeDtmfFailed
     {
-        HelperCallbacks.AddDelegateCallback<TRecognizeFail>(callback);
+        CallbackHandler.AddDelegateCallback<TRecognizeFail>(RequestId, callback);
         return this;
     }
 
@@ -92,13 +92,13 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
         where TRecognizeFail : IRecognizeDtmfFailed
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, TRecognizeFail>($"On{typeof(TRecognizeFail).Name}", typeof(RecognizeFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        CallbackHandler.AddHandlerCallback<THandler, TRecognizeFail>(RequestId, $"On{typeof(TRecognizeFail).Name}");
         return this;
     }
 
     public IHandleDtmfTimeout OnInputTimeout(Func<ValueTask> callback)
     {
-        HelperCallbacks.AddDelegateCallback<RecognizeFailed>(callback);
+        CallbackHandler.AddDelegateCallback<RecognizeFailed>(RequestId, callback);
         return this;
     }
 

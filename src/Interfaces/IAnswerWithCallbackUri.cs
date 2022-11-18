@@ -3,7 +3,7 @@
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IAnswerWithCallbackUri
+public interface IAnswerWithCallbackUri : IWithCallbackHandler<IAnswerWithCallbackUri>
 {
     /// <summary>
     /// The callback <see cref="Uri"/> is created from the <see cref="string"/> input and used for mid-call event callbacks.
