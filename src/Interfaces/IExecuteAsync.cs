@@ -3,15 +3,8 @@
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IExecuteAsync<T> : ICallbackContext<IExecuteAsync<T>>
+public interface IExecuteAsync<T>
 {
-    ///// <summary>
-    ///// Setting custom context.
-    ///// </summary>
-    ///// <param name="context"></param>
-    ///// <returns><see cref="IExecuteAsync{T}"/></returns>
-    //IExecuteAsync<T> WithContext(IOperationContext context);
-
     /// <summary>
     /// Executes the create call process.
     /// </summary>
@@ -19,7 +12,7 @@ public interface IExecuteAsync<T> : ICallbackContext<IExecuteAsync<T>>
     ValueTask<T> ExecuteAsync();
 }
 
-public interface IExecuteAsync : ICallbackContext<IExecuteAsync>
+public interface IExecuteAsync
 {
     /// <summary>
     /// Executes the create call process.
