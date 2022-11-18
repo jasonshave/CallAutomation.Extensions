@@ -20,7 +20,7 @@ public static class CallMediaExtensions
     {
         var playOptions = new PlayMediaOptions();
         options(playOptions);
-        return new CallAutomationPlayHelper(callMedia, playOptions, Guid.NewGuid().ToString());
+        return new CallAutomationPlayHelper(callMedia, playOptions);
     }
 
     /// <summary>
@@ -30,6 +30,6 @@ public static class CallMediaExtensions
     /// <returns></returns>
     public static IRecognizeDtmf ReceiveDtmfTone(this CallMedia callMedia)
     {
-        return new CallAutomationDtmfHelper(callMedia, Guid.NewGuid().ToString());
+        return new CallAutomationDtmfHelper(callMedia);
     }
 }

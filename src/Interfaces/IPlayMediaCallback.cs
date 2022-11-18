@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Azure.Communication.CallAutomation;
+using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
@@ -56,8 +57,9 @@ public interface IPlayMediaCallback
         Func<PlayFailed, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction);
 
     /// <summary>
-    /// Executes create call action.
+    /// 
     /// </summary>
+    /// <param name="context"></param>
     /// <returns></returns>
-    ValueTask ExecuteAsync();
+    IPlayMediaCallback WithContext(OperationContext context);
 }

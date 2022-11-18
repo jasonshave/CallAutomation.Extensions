@@ -34,6 +34,14 @@ public class GenericTests
                     .WithOptions(x => x.InvitationTimeoutInSeconds = 1)
                     .OnAddParticipantsSucceeded(() => ValueTask.CompletedTask)
                     .ExecuteAsync();
+
+                await callMedia.ReceiveDtmfTone()
+                    .FromParticipant("")
+                    .WithPrompt("")
+                    .WithOptions(x => x.AllowInterruptExistingMediaOperation = true)
+                    .OnPress<One>(() => ValueTask.CompletedTask)
+                    .OnFail<SilenceTimeout>(() => ValueTask.CompletedTask)
+                    .ExecuteAsync();
             })
             .ExecuteAsync();
 

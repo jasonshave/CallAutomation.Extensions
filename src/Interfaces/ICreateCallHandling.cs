@@ -6,7 +6,7 @@ using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICreateCallHandling
+public interface ICreateCallHandling : IExecuteAsync<CreateCallResult>
 {
     /// <summary>
     /// Specifies the handler to invoke when a call is connected.
@@ -60,10 +60,4 @@ public interface ICreateCallHandling
     /// <param name="context"></param>
     /// <returns></returns>
     ICreateCallHandling WithContext(OperationContext context);
-
-    /// <summary>
-    /// Executes create call action.
-    /// </summary>
-    /// <returns></returns>
-    ValueTask<CreateCallResult> ExecuteAsync();
 }

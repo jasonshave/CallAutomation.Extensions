@@ -1,12 +1,13 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IHandleDtmfResponse
+public interface IHandleDtmfResponse : IExecuteAsync<Response>
 {
     /// <summary>
     /// Specifies the callback delegate when the requested <see cref="IDtmfTone"/> is received.
@@ -37,7 +38,6 @@ public interface IHandleDtmfResponse
     /// <summary>
     /// Specifies the callback delegate when the collection of DTMF fails.
     /// </summary>
-    /// <typeparam name="TTone"></typeparam>
     /// <param name="callback"></param>
     IHandleDtmfTimeout OnFail<TRecognizeFail>(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callback)
         where TRecognizeFail : IRecognizeDtmfFailed;
@@ -45,15 +45,14 @@ public interface IHandleDtmfResponse
     /// <summary>
     /// Specifies the callback delegate when the collection of DTMF fails.
     /// </summary>
-    /// <typeparam name="TTone"></typeparam>
     /// <param name="callback"></param>
+    IHandleDtmfTimeout OnFail<TRecognizeFail>(Func<ValueTask> callback)
+        where TRecognizeFail : IRecognizeDtmfFailed;
+
+    /// <summary>
+    /// Specifies the callback delegate when the collection of DTMF fails.
+    /// </summary>
     IHandleDtmfTimeout OnFail<TRecognizeFail, THandler>()
         where TRecognizeFail : IRecognizeDtmfFailed
         where THandler : CallAutomationHandler;
-
-    /// <summary>
-    /// Executes the recognize API process.
-    /// </summary>
-    /// <returns></returns>
-    ValueTask ExecuteAsync();
 }

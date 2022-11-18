@@ -45,14 +45,14 @@ public class CallAutomationRecognizeDtmfEventHandler : ICallAutomationRecognizeD
                 if (recognizeCompleted.CollectTonesResult.Tones.Count is 1)
                 {
                     // dispatch delegate callbacks
-                    var delegates = callAutomationHelperCallback.HelperCallbacks.GetDelegateCallbacks(tone.Convert().GetType());
+                    var delegates = callAutomationHelperCallback.GetDelegateCallbacks(tone.Convert().GetType());
                     foreach (var @delegate in delegates)
                     {
                         _logger.LogInformation("Found callback delegate for request {requestId}, with {numTones} DTMF tone(s), and event {event}", requestId, recognizeCompleted.CollectTonesResult.Tones.Count, eventBase.GetType().Name);
                         await _dispatcher.DispatchAsync(recognizeCompleted, @delegate, clientElements, recognizeCompleted.CollectTonesResult.Tones);
                     }
 
-                    var handlerTuples = callAutomationHelperCallback.HelperCallbacks.GetHandlers(tone.Convert().GetType());
+                    var handlerTuples = callAutomationHelperCallback.GetHandlers(tone.Convert().GetType());
                     foreach (var handlerTuple in handlerTuples)
                     {
                         var handler = _serviceProvider.GetService(handlerTuple.Item2);
@@ -72,14 +72,14 @@ public class CallAutomationRecognizeDtmfEventHandler : ICallAutomationRecognizeD
             if (callAutomationHelperCallback is not null)
             {
                 // dispatch delegate callbacks
-                var delegates = callAutomationHelperCallback.HelperCallbacks.GetDelegateCallbacks(recognizeFailed.ReasonCode.Convert().GetType());
+                var delegates = callAutomationHelperCallback.GetDelegateCallbacks(recognizeFailed.ReasonCode.Convert().GetType());
                 foreach (var @delegate in delegates)
                 {
                     _logger.LogInformation("Found callback delegate for request {requestId}, and event {event}", requestId, eventBase.GetType().Name);
                     await _dispatcher.DispatchAsync(recognizeFailed, @delegate, clientElements);
                 }
 
-                var handlerTuples = callAutomationHelperCallback.HelperCallbacks.GetHandlers(recognizeFailed.ReasonCode.Convert().GetType());
+                var handlerTuples = callAutomationHelperCallback.GetHandlers(recognizeFailed.ReasonCode.Convert().GetType());
                 foreach (var handlerTuple in handlerTuples)
                 {
                     var handler = _serviceProvider.GetService(handlerTuple.Item2);

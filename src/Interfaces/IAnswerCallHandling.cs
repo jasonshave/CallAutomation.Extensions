@@ -6,7 +6,7 @@ using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IAnswerCallHandling
+public interface IAnswerCallHandling : IExecuteAsync<AnswerCallResult>
 {
     /// <summary>
     /// Specifies the handler to invoke when a call is connected.
@@ -50,10 +50,4 @@ public interface IAnswerCallHandling
     /// <param name="callbackFunction"></param>
     IAnswerCallHandling OnCallDisconnected(
         Func<CallDisconnected, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction);
-
-    /// <summary>
-    /// Executes the create call process.
-    /// </summary>
-    /// <returns><see cref="AnswerCallResult"/></returns>
-    ValueTask<AnswerCallResult> ExecuteAsync();
 }

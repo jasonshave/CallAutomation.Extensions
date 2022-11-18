@@ -95,7 +95,8 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
         return this;
     }
 
-    public ICanAddParticipant WithContext(OperationContext context)
+    public ICanAddParticipant WithContext<TContext>(TContext context)
+        where TContext : OperationContext
     {
         SetContext(context);
         return this;

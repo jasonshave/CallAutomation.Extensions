@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure;
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Extensions;
@@ -12,10 +13,10 @@ namespace CallAutomation.Extensions.Helpers;
 
 internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
     IRecognizeDtmf,
-    IHandleDtmfResponse,
     IHandleDtmfTimeout,
     ICanRecognizeDtmfOptions,
-    ICanChooseRecognizeOptions
+    ICanChooseRecognizeOptions,
+    IHandleDtmfResponse
 {
     private static readonly IEnumerable<Type> _types = new[] { typeof(RecognizeFailed), typeof(RecognizeCompleted), typeof(SilenceTimeout) };
     private readonly CallMedia _callMedia;
@@ -88,6 +89,13 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
         return this;
     }
 
+    public IHandleDtmfTimeout OnFail<TRecognizeFail>(Func<ValueTask> callback)
+        where TRecognizeFail : IRecognizeDtmfFailed
+    {
+        AddDelegateCallback<TRecognizeFail>(callback);
+        return this;
+    }
+
     public IHandleDtmfTimeout OnFail<TRecognizeFail, THandler>()
         where TRecognizeFail : IRecognizeDtmfFailed
         where THandler : CallAutomationHandler
@@ -108,7 +116,7 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
         return this;
     }
 
-    public async ValueTask ExecuteAsync()
+    public async ValueTask<Response> ExecuteAsync()
     {
         // invoke recognize API
         var recognizeOptions = new CallMediaRecognizeDtmfOptions(_recognizeInputFromParticipant, _numTones)
@@ -125,6 +133,6 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
         if (_recognizeOptions.WaitForResponseInSeconds < 0)
             recognizeOptions.InitialSilenceTimeout = TimeSpan.FromSeconds(_recognizeOptions.WaitForResponseInSeconds);
 
-        await _callMedia.StartRecognizingAsync(recognizeOptions);
+        return await _callMedia.StartRecognizingAsync(recognizeOptions);
     }
 }
