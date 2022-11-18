@@ -1,12 +1,6 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace CallAutomation.Extensions.Interfaces
 {
     public interface IOperationContext
@@ -14,6 +8,10 @@ namespace CallAutomation.Extensions.Interfaces
         /// <summary>
         /// Unique identifier for the Request
         /// </summary>
-        public string? RequestId { get; set; }
+        public string RequestId { get; }
+
+        public string Payload { get; }
+
+        public Type PayloadType { get; }
     }
 }

@@ -7,6 +7,8 @@ namespace CallAutomation.Extensions.Interfaces;
 
 internal interface ICallAutomationHelperCallback
 {
+    IOperationContext Context { get; }
+
     IEnumerable<Type> Types { get; }
 
     CallAutomationCallbacks HelperCallbacks { get; }
