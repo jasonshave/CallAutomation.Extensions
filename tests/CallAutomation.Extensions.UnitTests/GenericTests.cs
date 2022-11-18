@@ -20,7 +20,7 @@ public class GenericTests
 
         await client.Answer(incomingCall)
             .WithCallbackUri("")
-            .OnCallConnected(async (@event, callConnection, callMedia, callRecording) =>
+            .OnCallConnected(async (@event, callConnection, callMedia, callRecording, context) =>
             {
                 // with custom context
                 await callConnection.AddParticipant("")

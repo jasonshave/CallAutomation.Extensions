@@ -105,7 +105,7 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
     {
         var addParticipantsOptions = new AddParticipantsOptions(_participantsToAdd)
         {
-            OperationContext = JSONContext,
+            OperationContext = GetSerializedContext(),
             InvitationTimeoutInSeconds = _addParticipantsOptions?.InvitationTimeoutInSeconds,
         };
 
