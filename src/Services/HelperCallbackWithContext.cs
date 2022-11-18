@@ -18,7 +18,7 @@ internal abstract class HelperCallbackWithContext : HelperCallbackBase
         Context = new OperationContext { RequestId = requestId };
     }
 
-    public void WithContext(IOperationContext context)
+    public void SetContext(IOperationContext context)
     {
         context.RequestId = RequestId;
         Context = context;

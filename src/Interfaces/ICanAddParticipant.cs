@@ -6,7 +6,7 @@ using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICanAddParticipant : IExecuteAsync<AddParticipantsResult>
+public interface ICanAddParticipant : ICallbackContext<AddParticipantsResult>
 {
     ICanAddParticipant AddParticipant(string rawId);
 
