@@ -14,7 +14,7 @@ internal static class CallbackRegistry
     {
         foreach (var type in types)
         {
-            var added = _genericCallbacks.TryAdd((helperCallbacks.HelperCallbacks.Context, type), helperCallbacks);
+            var added = _genericCallbacks.TryAdd((helperCallbacks.HelperCallbacks.Context.RequestId, type), helperCallbacks);
             if (!added)
             {
                 throw new ApplicationException(

@@ -3,47 +3,33 @@
 
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
-using CallAutomation.Extensions.Extensions;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
 using CallAutomation.Extensions.Services;
 
 namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationCreateCallHelper : HelperCallbackWithContext,
+internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
     ICreateCallFrom,
     ICreateCallWithCallbackUri,
     ICreateCallHandling
 {
     private static readonly IEnumerable<Type> _types = new[] { typeof(CallConnected), typeof(CallDisconnected) };
     private readonly CallAutomationClient _client;
-    private readonly List<CommunicationIdentifier> _destinations = new();
-    private string _from;
-    private CallFromOptions? _callFromOptions;
+    private readonly CallTarget _callTarget;
+    private CommunicationIdentifier _from;
     private Uri _callbackUri;
 
-    internal CallAutomationCreateCallHelper(CallAutomationClient client, string to, string requestId)
-        : base(requestId, _types)
+    internal CallAutomationCreateCallHelper(CallAutomationClient client, CallTarget callTarget)
+        : base(_types)
     {
         _client = client;
-        _destinations.Add(to.ConvertToCommunicationIdentifier());
+        _callTarget = callTarget;
     }
 
-    //Hossein:should be removed as the option is needed
-    //public ICreateCallWithCallbackUri From(string id)
-    //{
-    //    _from = id;
-    //    return this;
-    //}
-
-    public ICreateCallWithCallbackUri From(string id, Action<CallFromOptions> options)
+    public ICreateCallWithCallbackUri From(string applicationId)
     {
-        _from = id;
-
-        var callFromOptions = new CallFromOptions();
-        options(callFromOptions);
-        _callFromOptions = callFromOptions;
-
+        _from = CommunicationIdentifier.FromRawId(applicationId);
         return this;
     }
 
@@ -56,63 +42,68 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackWithContext
     public ICreateCallHandling OnCallConnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, CallConnected>($"On{nameof(CallConnected)}", typeof(CallConnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        AddHandlerCallback<THandler, CallConnected>($"On{nameof(CallConnected)}", typeof(CallConnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(OperationContext));
         return this;
     }
 
     public ICreateCallHandling OnCallDisconnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, CallDisconnected>($"On{nameof(CallDisconnected)}", typeof(CallDisconnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        AddHandlerCallback<THandler, CallDisconnected>($"On{nameof(CallDisconnected)}", typeof(CallDisconnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(OperationContext));
         return this;
     }
 
     public ICreateCallHandling OnCallConnected(Func<ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallConnected>(callbackFunction);
+        AddDelegateCallback<CallConnected>(callbackFunction);
         return this;
     }
 
-    public ICreateCallHandling OnCallConnected(Func<CallConnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
+    public ICreateCallHandling OnCallConnected(Func<CallConnected, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallConnected>(callbackFunction);
+        AddDelegateCallback<CallConnected>(callbackFunction);
         return this;
     }
 
     public ICreateCallHandling OnCallDisconnected(Func<ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallDisconnected>(callbackFunction);
+        AddDelegateCallback<CallDisconnected>(callbackFunction);
         return this;
     }
 
-    public ICreateCallHandling OnCallDisconnected(Func<CallDisconnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
+    public ICreateCallHandling OnCallDisconnected(Func<CallDisconnected, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallDisconnected>(callbackFunction);
+        AddDelegateCallback<CallDisconnected>(callbackFunction);
         return this;
     }
 
-    IExecuteAsync<CreateCallResult> ICallbackContext<IExecuteAsync<CreateCallResult>>.WithContext(IOperationContext context)
+    public ICreateCallHandling WithContext(OperationContext context)
     {
-        WithContext(context);
+        SetContext(context);
         return this;
     }
 
     public async ValueTask<CreateCallResult> ExecuteAsync()
     {
-        var callSource = new CallSource(new CommunicationUserIdentifier(_callFromOptions.ApplicationId));
-        if (_callFromOptions is not null)
+        var callSource = new CallSource(_from);
+        if (_callTarget.DisplayName is not null)
         {
-            callSource.DisplayName = _callFromOptions.CallerDisplayName;
+            callSource.DisplayName = _callTarget.DisplayName;
         }
 
-        if (_destinations.OfType<PhoneNumberIdentifier>().Any())
+        if (_callTarget.Target is PhoneNumberIdentifier)
         {
-            callSource.CallerId = new PhoneNumberIdentifier(_from);
+            callSource.CallerId = _callTarget.CallerId;
         }
 
-        var createCallOptions = new CreateCallOptions(callSource, _destinations, _callbackUri)
+        var targets = new List<CommunicationIdentifier>()
         {
-            OperationContext = JSONContext,
+            _callTarget.Target,
+        };
+
+        var createCallOptions = new CreateCallOptions(callSource, targets, _callbackUri)
+        {
+            OperationContext = GetSerializedContext(),
         };
 
         var result = await _client.CreateCallAsync(createCallOptions);

@@ -5,37 +5,38 @@ using Azure.Communication.CallAutomation;
 using CallAutomation.Contracts;
 using CallAutomation.Extensions.Helpers;
 using CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions
 {
     public static class CallAutomationClientExtensions
     {
         /// <summary>
-        /// Initiates the outbound call sequence.
+        /// Creates a call to a <see cref="CallTarget"/>
         /// </summary>
         /// <param name="client"></param>
-        /// <param name="id"></param>
-        public static ICreateCallFrom Call(this CallAutomationClient client, string id)
+        /// <param name="callTarget"></param>
+        /// <returns></returns>
+        public static ICreateCallFrom Call(this CallAutomationClient client, CallTarget callTarget)
         {
-            var helper =
-                new CallAutomationCreateCallHelper(client, id, Guid.NewGuid().ToString());
+            var helper = new CallAutomationCreateCallHelper(client, callTarget);
             return helper;
         }
 
         /// <summary>
-        /// Initiates the answer call sequence.
+        /// Answers an <see cref="IncomingCall"/>
         /// </summary>
         /// <param name="client"></param>
         /// <param name="incomingCall"></param>
         /// <returns></returns>
         public static IAnswerWithCallbackUri Answer(this CallAutomationClient client, IncomingCall incomingCall)
         {
-            var helper = new CallAutomationAnswerHelper(client, incomingCall, incomingCall.CorrelationId);
+            var helper = new CallAutomationAnswerHelper(client, incomingCall);
             return helper;
         }
 
         /// <summary>
-        /// Initiates the reject call sequence.
+        /// Rejects an <see cref="IncomingCall"/>
         /// </summary>
         /// <param name="client"></param>
         /// <param name="incomingCall"></param>
@@ -47,7 +48,7 @@ namespace CallAutomation.Extensions
         }
 
         /// <summary>
-        /// Initiates the redirect call sequence.
+        /// Redirects an <see cref="IncomingCall"/>
         /// </summary>
         /// <param name="client"></param>
         /// <param name="incomingCall"></param>

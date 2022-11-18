@@ -3,9 +3,7 @@
 
 namespace CallAutomation.Extensions.Models;
 
-public sealed class CallFromOptions
+public class CallTargetOptions
 {
-    public string CallerDisplayName { get; set; }
-
-    public string ApplicationId { get; set; }
+    public string CallerId { get; set; }
 }

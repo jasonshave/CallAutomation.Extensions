@@ -6,13 +6,15 @@ using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICanAddParticipant //: IExecuteAsync<AddParticipantsResult>
+public interface ICanAddParticipant
 {
     ICanAddParticipant AddParticipant(string rawId);
 
     ICanAddParticipant AddParticipant(string rawId, Action<PstnParticipantOptions> options);
 
     ICanAddParticipant WithOptions(Action<ParticipantOptions> options);
+
+    ICanAddParticipant WithContext(OperationContext context);
 
     ICanAddParticipant OnAddParticipantsSucceeded<THandler>()
         where THandler : CallAutomationHandler;

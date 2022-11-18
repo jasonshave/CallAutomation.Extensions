@@ -1,12 +1,13 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
-using CallAutomation.Extensions.Interfaces;
+namespace CallAutomation.Extensions.Models;
 
-namespace CallAutomation.Extensions.Models
+public abstract class OperationContext
 {
-    public class OperationContext : IOperationContext
-    {
-        public string? RequestId { get; set; }
-    }
+    public abstract string RequestId { get; }
+
+    public virtual string? Payload { get; set; }
+
+    public virtual Type? PayloadType { get; set; }
 }

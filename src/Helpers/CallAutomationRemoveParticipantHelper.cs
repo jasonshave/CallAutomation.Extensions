@@ -12,13 +12,13 @@ internal sealed class CallAutomationRemoveParticipantHelper : ICanRemoveParticip
     private readonly CallConnection _connection;
     private readonly List<CommunicationIdentifier> _identitiesToRemove = new();
 
-    internal CallAutomationRemoveParticipantHelper(CallConnection connection, CommunicationIdentifier id, string requestId)
+    internal CallAutomationRemoveParticipantHelper(CallConnection connection, CommunicationIdentifier id)
     {
         _connection = connection;
         _identitiesToRemove.Add(id);
     }
 
-    internal CallAutomationRemoveParticipantHelper(CallConnection connection, CommunicationIdentifier[] firstCollectionToRemove, string requestId)
+    internal CallAutomationRemoveParticipantHelper(CallConnection connection, CommunicationIdentifier[] firstCollectionToRemove)
     {
         _connection = connection;
         _identitiesToRemove.AddRange(firstCollectionToRemove);

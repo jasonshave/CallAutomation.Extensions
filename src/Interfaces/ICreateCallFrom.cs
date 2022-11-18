@@ -1,24 +1,14 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
-using CallAutomation.Extensions.Models;
-
 namespace CallAutomation.Extensions.Interfaces;
 
 public interface ICreateCallFrom
 {
-    ///// <summary>
-    ///// Defines which identity to use as the source of the call.
-    ///// </summary>
-    ///// <param name="id"></param>
-    ///// <returns></returns>
-    //ICreateCallWithCallbackUri From(string id);
-
     /// <summary>
     /// Defines which identity to use as the source of the call while offering a delegate to change options using <see cref="CallFromOptions"/>
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="options"></param>
+    /// <param name="applicationId"></param>
     /// <returns></returns>
-    ICreateCallWithCallbackUri From(string id, Action<CallFromOptions> options);
+    ICreateCallWithCallbackUri From(string applicationId);
 }

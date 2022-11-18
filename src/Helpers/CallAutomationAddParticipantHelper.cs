@@ -11,7 +11,7 @@ using CallAutomation.Extensions.Services;
 namespace CallAutomation.Extensions.Helpers;
 
 /// <inheritdoc />
-internal sealed class CallAutomationAddParticipantHelper : HelperCallbackWithContext, ICanAddParticipant
+internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, ICanAddParticipant
 {
     private static readonly IEnumerable<Type> _types = new[] { typeof(AddParticipantsSucceeded), typeof(AddParticipantsFailed) };
     private readonly CallConnection _connection;
@@ -19,15 +19,15 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackWithCon
     private ParticipantOptions? _addParticipantsOptions;
     private PstnParticipantOptions? _pstnParticipantOptions;
 
-    internal CallAutomationAddParticipantHelper(CallConnection connection, CommunicationIdentifier firstUserToAdd, string requestId)
-        : base(requestId, _types)
+    internal CallAutomationAddParticipantHelper(CallConnection connection, CommunicationIdentifier firstUserToAdd)
+        : base(_types)
     {
         _connection = connection;
         _participantsToAdd.Add(firstUserToAdd);
     }
 
-    internal CallAutomationAddParticipantHelper(CallConnection connection, CommunicationIdentifier firstUserToAdd, PstnParticipantOptions pstnParticipantOptions, string requestId)
-        : base(requestId, _types)
+    internal CallAutomationAddParticipantHelper(CallConnection connection, CommunicationIdentifier firstUserToAdd, PstnParticipantOptions pstnParticipantOptions)
+        : base(_types)
     {
         _connection = connection;
         _participantsToAdd.Add(firstUserToAdd);
@@ -60,44 +60,44 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackWithCon
     public ICanAddParticipant OnAddParticipantsSucceeded<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, AddParticipantsSucceeded>($"On{nameof(AddParticipantsSucceeded)}", typeof(AddParticipantsSucceeded), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        AddHandlerCallback<THandler, AddParticipantsSucceeded>($"On{nameof(AddParticipantsSucceeded)}", typeof(AddParticipantsSucceeded), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 
     public ICanAddParticipant OnAddParticipantsSucceeded(Func<ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<AddParticipantsSucceeded>(callbackFunction);
+        AddDelegateCallback<AddParticipantsSucceeded>(callbackFunction);
         return this;
     }
 
     public ICanAddParticipant OnAddParticipantsSucceeded(Func<AddParticipantsSucceeded, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<AddParticipantsSucceeded>(callbackFunction);
+        AddDelegateCallback<AddParticipantsSucceeded>(callbackFunction);
         return this;
     }
 
     public ICanAddParticipant OnAddParticipantsFailed<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, AddParticipantsFailed>($"On{nameof(AddParticipantsFailed)}", typeof(AddParticipantsFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        AddHandlerCallback<THandler, AddParticipantsFailed>($"On{nameof(AddParticipantsFailed)}", typeof(AddParticipantsFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 
     public ICanAddParticipant OnAddParticipantsFailed(Func<ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<AddParticipantsFailed>(callbackFunction);
+        AddDelegateCallback<AddParticipantsFailed>(callbackFunction);
         return this;
     }
 
     public ICanAddParticipant OnAddParticipantsFailed(Func<AddParticipantsFailed, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<AddParticipantsFailed>(callbackFunction);
+        AddDelegateCallback<AddParticipantsFailed>(callbackFunction);
         return this;
     }
 
-    public ICanAddParticipant WithContext(IOperationContext context)
+    public ICanAddParticipant WithContext(OperationContext context)
     {
-        WithContext(context);
+        SetContext(context);
         return this;
     }
 

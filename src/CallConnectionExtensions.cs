@@ -18,7 +18,7 @@ public static class CallConnectionExtensions
     /// <param name="rawId"></param>
     public static ICanAddParticipant AddParticipant(this CallConnection connection, string rawId)
     {
-        var helper = new CallAutomationAddParticipantHelper(connection, CommunicationIdentifier.FromRawId(rawId), Guid.NewGuid().ToString());
+        var helper = new CallAutomationAddParticipantHelper(connection, CommunicationIdentifier.FromRawId(rawId));
         return helper;
     }
 
@@ -33,7 +33,7 @@ public static class CallConnectionExtensions
     {
         var pstnParticipantOptions = new PstnParticipantOptions();
         options(pstnParticipantOptions);
-        var helper = new CallAutomationAddParticipantHelper(connection, CommunicationIdentifier.FromRawId(rawId), pstnParticipantOptions, Guid.NewGuid().ToString());
+        var helper = new CallAutomationAddParticipantHelper(connection, CommunicationIdentifier.FromRawId(rawId), pstnParticipantOptions);
         return helper;
     }
 
@@ -45,7 +45,7 @@ public static class CallConnectionExtensions
     /// <returns></returns>
     public static ICanRemoveParticipant RemoveParticipant(this CallConnection connection, string rawId)
     {
-        var helper = new CallAutomationRemoveParticipantHelper(connection, CommunicationIdentifier.FromRawId(rawId), Guid.NewGuid().ToString());
+        var helper = new CallAutomationRemoveParticipantHelper(connection, CommunicationIdentifier.FromRawId(rawId));
         return helper;
     }
 
@@ -57,7 +57,7 @@ public static class CallConnectionExtensions
     /// <returns></returns>
     public static ICanRemoveParticipant RemoveParticipants(this CallConnection connection, CommunicationIdentifier[] participantsToRemove)
     {
-        var helper = new CallAutomationRemoveParticipantHelper(connection, participantsToRemove, Guid.NewGuid().ToString());
+        var helper = new CallAutomationRemoveParticipantHelper(connection, participantsToRemove);
         return helper;
     }
 }

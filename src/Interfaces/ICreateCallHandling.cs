@@ -2,10 +2,11 @@
 // Licensed under the MIT License.
 
 using Azure.Communication.CallAutomation;
+using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICreateCallHandling : IExecuteAsync<CreateCallResult>
+public interface ICreateCallHandling
 {
     /// <summary>
     /// Specifies the handler to invoke when a call is connected.
@@ -31,11 +32,11 @@ public interface ICreateCallHandling : IExecuteAsync<CreateCallResult>
 
     /// <summary>
     /// Specifies the callback delegate when a call is connected.
-    /// The <see cref="CallConnected"/> event along with <see cref="CallConnection"/>, <see cref="CallMedia"/>, and <see cref="CallRecording"/> are provided.
+    /// The <see cref="CallConnected"/> event along with <see cref="CallConnection"/>, <see cref="CallMedia"/>, <see cref="CallRecording"/>, and <see cref="OperationContext"/> are provided.
     /// </summary>
     /// <param name="callbackFunction"></param>
     ICreateCallHandling OnCallConnected(
-        Func<CallConnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction);
+        Func<CallConnected, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction);
 
     /// <summary>
     /// Specifies the callback delegate when a call is disconnected.
@@ -47,9 +48,22 @@ public interface ICreateCallHandling : IExecuteAsync<CreateCallResult>
 
     /// <summary>
     /// Specifies the callback delegate when a call is disconnected.
-    /// The <see cref="CallConnected"/> event along with <see cref="CallConnection"/>, <see cref="CallMedia"/>, and <see cref="CallRecording"/> are provided.
+    /// The <see cref="CallConnected"/> event along with <see cref="CallConnection"/>, <see cref="CallMedia"/>, <see cref="CallRecording"/>, and <see cref="OperationContext"/> are provided.
     /// </summary>
     /// <param name="callbackFunction"></param>
     ICreateCallHandling OnCallDisconnected(
-        Func<CallDisconnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction);
+        Func<CallDisconnected, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction);
+
+    /// <summary>
+    /// Adds custom context to be serialized and returned.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    ICreateCallHandling WithContext(OperationContext context);
+
+    /// <summary>
+    /// Executes create call action.
+    /// </summary>
+    /// <returns></returns>
+    ValueTask<CreateCallResult> ExecuteAsync();
 }

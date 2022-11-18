@@ -2,9 +2,10 @@
 // Licensed under the MIT License.
 
 using AutoFixture;
+using Azure.Communication;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Contracts;
-using CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.UnitTests;
 
@@ -21,17 +22,28 @@ public class GenericTests
             .WithCallbackUri("")
             .OnCallConnected(async (@event, callConnection, callMedia, callRecording) =>
             {
+                // with custom context
                 await callConnection.AddParticipant("")
                     .WithOptions(x => x.InvitationTimeoutInSeconds = 1)
+                    .WithContext(new CustomContext("abc123"))
+                    .OnAddParticipantsSucceeded(() => ValueTask.CompletedTask)
+                    .ExecuteAsync();
 
+                // or omit context and use built-in DefaultOperationContext implementation
+                await callConnection.AddParticipant("")
+                    .WithOptions(x => x.InvitationTimeoutInSeconds = 1)
                     .OnAddParticipantsSucceeded(() => ValueTask.CompletedTask)
                     .ExecuteAsync();
             })
             .ExecuteAsync();
+
+        await client.Call(new CallTarget(new CommunicationUserIdentifier(""))).From("").WithCallbackUri("").ExecuteAsync();
     }
 
-    public class CustomContext : IOperationContext
+    public class CustomContext : OperationContext
     {
-        public string? RequestId { get; set; }
+        public override string RequestId { get; }
+
+        public CustomContext(string requestId) => RequestId = requestId;
     }
 }
