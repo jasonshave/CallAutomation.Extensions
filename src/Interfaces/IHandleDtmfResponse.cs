@@ -5,7 +5,7 @@ using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IHandleDtmfResponse
+public interface IHandleDtmfResponse : ICallbackContext
 {
     /// <summary>
     /// Specifies the callback delegate when the requested <see cref="IDtmfTone"/> is received.
@@ -49,10 +49,4 @@ public interface IHandleDtmfResponse
     IHandleDtmfTimeout OnFail<TRecognizeFail, THandler>()
         where TRecognizeFail : IRecognizeDtmfFailed
         where THandler : CallAutomationHandler;
-
-    /// <summary>
-    /// Executes the recognize API process.
-    /// </summary>
-    /// <returns></returns>
-    ValueTask ExecuteAsync();
 }

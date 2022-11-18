@@ -6,10 +6,11 @@ using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
 using CallAutomation.Extensions.Services;
+using System.Text.Json;
 
 namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaCallback
+internal sealed class CallAutomationPlayHelper : HelperCallbackWithContext, IPlayMediaCallback
 {
     private static IEnumerable<Type> _types = new[] { typeof(PlayCompleted), typeof(PlayFailed) };
     private readonly CallMedia _callMedia;
@@ -51,13 +52,19 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
     public IPlayMediaCallback OnPlayFailed<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, PlayCompleted>($"On{nameof(PlayFailed)}", typeof(PlayFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        HelperCallbacks.AddHandlerCallback<THandler, PlayFailed>($"On{nameof(PlayFailed)}", typeof(PlayFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 
     public IPlayMediaCallback OnPlayFailed(Func<PlayFailed, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
         HelperCallbacks.AddDelegateCallback<PlayFailed>(callbackFunction);
+        return this;
+    }
+
+    public IExecuteAsync WithContext(IOperationContext context)
+    {
+        SetContext(context);
         return this;
     }
 
@@ -71,7 +78,7 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
                 PlaySourceId = RequestId,
             }, _playToParticipants, new PlayOptions()
             {
-                OperationContext = RequestId,
+                OperationContext = JSONContext,
                 Loop = _playMediaOptions.Loop,
             });
         }
@@ -83,7 +90,7 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
                 PlaySourceId = RequestId,
             }, new PlayOptions()
             {
-                OperationContext = RequestId,
+                OperationContext = JSONContext,
                 Loop = _playMediaOptions.Loop,
             });
         }

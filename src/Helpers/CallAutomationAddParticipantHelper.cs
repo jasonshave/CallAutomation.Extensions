@@ -11,7 +11,7 @@ using CallAutomation.Extensions.Services;
 namespace CallAutomation.Extensions.Helpers;
 
 /// <inheritdoc />
-internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, ICanAddParticipant
+internal sealed class CallAutomationAddParticipantHelper : HelperCallbackWithContext, ICanAddParticipant
 {
     private static readonly IEnumerable<Type> _types = new[] { typeof(AddParticipantsSucceeded), typeof(AddParticipantsFailed) };
     private readonly CallConnection _connection;
@@ -79,7 +79,7 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
     public ICanAddParticipant OnAddParticipantsFailed<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, AddParticipantsSucceeded>($"On{nameof(AddParticipantsSucceeded)}", typeof(AddParticipantsSucceeded), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        HelperCallbacks.AddHandlerCallback<THandler, AddParticipantsFailed>($"On{nameof(AddParticipantsFailed)}", typeof(AddParticipantsFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
         return this;
     }
 
@@ -95,11 +95,17 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
         return this;
     }
 
+    public IExecuteAsync<AddParticipantsResult> WithContext(IOperationContext context)
+    {
+        SetContext(context);
+        return this;
+    }
+
     public async ValueTask<AddParticipantsResult> ExecuteAsync()
     {
         var addParticipantsOptions = new AddParticipantsOptions(_participantsToAdd)
         {
-            OperationContext = RequestId,
+            OperationContext = JSONContext,
             InvitationTimeoutInSeconds = _addParticipantsOptions?.InvitationTimeoutInSeconds,
         };
 

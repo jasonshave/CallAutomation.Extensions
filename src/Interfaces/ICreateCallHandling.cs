@@ -5,7 +5,7 @@ using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICreateCallHandling
+public interface ICreateCallHandling : ICallbackContext<CreateCallResult>
 {
     /// <summary>
     /// Specifies the handler to invoke when a call is connected.
@@ -52,10 +52,4 @@ public interface ICreateCallHandling
     /// <param name="callbackFunction"></param>
     ICreateCallHandling OnCallDisconnected(
         Func<CallDisconnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction);
-
-    /// <summary>
-    /// Executes the create call process.
-    /// </summary>
-    /// <returns><see cref="CreateCallResult"/></returns>
-    ValueTask<CreateCallResult> ExecuteAsync();
 }

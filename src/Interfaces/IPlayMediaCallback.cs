@@ -5,7 +5,7 @@ using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IPlayMediaCallback
+public interface IPlayMediaCallback : ICallbackContext
 {
     /// <summary>
     /// Targets a specific participant on the call to hear the audio file.
@@ -54,10 +54,4 @@ public interface IPlayMediaCallback
     /// <returns></returns>
     IPlayMediaCallback OnPlayFailed(
         Func<PlayFailed, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction);
-
-    /// <summary>
-    /// Executes the play audio process.
-    /// </summary>
-    /// <returns></returns>
-    ValueTask ExecuteAsync();
 }

@@ -4,7 +4,9 @@
 using Azure.Communication.CallAutomation;
 using Azure.Messaging;
 using CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Models;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace CallAutomation.Extensions.Services;
 
@@ -26,6 +28,11 @@ internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublish
 
     public async ValueTask PublishAsync(CloudEvent[] cloudEvents)
     {
+        string? RequestIDFrom(string operationContext) =>
+            (operationContext is null)
+            ? null
+            : (JsonSerializer.Deserialize<OperationContext>(operationContext)?.RequestId ?? operationContext);
+
         foreach (var cloudEvent in cloudEvents)
         {
             CallAutomationEventBase callAutomationEventBase = CallAutomationEventParser.Parse(cloudEvent);
@@ -40,7 +47,7 @@ internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublish
                 else
                 {
                     // outbound calls won't have a correlation ID so we have to use the operation context.
-                    await _callAutomationEventHandler.Handle(callAutomationEventBase, callAutomationEventBase.OperationContext);
+                    await _callAutomationEventHandler.Handle(callAutomationEventBase, RequestIDFrom(callAutomationEventBase.OperationContext));
                 }
 
                 return;
@@ -48,11 +55,11 @@ internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublish
 
             if (callAutomationEventBase is not RecognizeCompleted or RecognizeFailed)
             {
-                await _callAutomationEventHandler.Handle(callAutomationEventBase, callAutomationEventBase.OperationContext);
+                await _callAutomationEventHandler.Handle(callAutomationEventBase, RequestIDFrom(callAutomationEventBase.OperationContext));
                 return;
             }
 
-            await _callAutomationRecognizeDtmfHandler.Handle(callAutomationEventBase, callAutomationEventBase.OperationContext);
+            await _callAutomationRecognizeDtmfHandler.Handle(callAutomationEventBase, RequestIDFrom(callAutomationEventBase.OperationContext));
         }
     }
 }

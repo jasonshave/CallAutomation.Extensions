@@ -6,7 +6,7 @@ using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICanAddParticipant
+public interface ICanAddParticipant : ICallbackContext<AddParticipantsResult>
 {
     ICanAddParticipant AddParticipant(string rawId);
 
@@ -31,6 +31,4 @@ public interface ICanAddParticipant
 
     ICanAddParticipant OnAddParticipantsFailed(
         Func<AddParticipantsFailed, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction);
-
-    ValueTask<AddParticipantsResult> ExecuteAsync();
 }
