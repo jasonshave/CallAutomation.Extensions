@@ -12,10 +12,10 @@ namespace CallAutomation.Extensions.Helpers;
 
 internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
     IRecognizeDtmf,
-    IHandleDtmfResponse,
     IHandleDtmfTimeout,
     ICanRecognizeDtmfOptions,
-    ICanChooseRecognizeOptions
+    ICanChooseRecognizeOptions,
+    IHandleDtmfResponseWithHandler
 {
     private static readonly IEnumerable<Type> _types = new[] { typeof(RecognizeFailed), typeof(RecognizeCompleted), typeof(SilenceTimeout) };
     private readonly CallMedia _callMedia;
@@ -41,6 +41,12 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
     public ICanChooseRecognizeOptions FromParticipant(string id)
     {
         _recognizeInputFromParticipant = id.ConvertToCommunicationIdentifier();
+        return this;
+    }
+
+    public IHandleDtmfResponse WithCallbackHandler(ICallbacksHandler handler)
+    {
+        CallbackHandler = handler;
         return this;
     }
 
@@ -73,7 +79,7 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
         return this;
     }
 
-    public IHandleDtmfResponse WithOptions(Action<RecognizeOptions> options)
+    public IHandleDtmfResponseWithHandler WithOptions(Action<RecognizeOptions> options)
     {
         var recognizeOptions = new RecognizeOptions();
         options(recognizeOptions);

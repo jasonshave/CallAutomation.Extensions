@@ -16,7 +16,7 @@ public static class CallMediaExtensions
     /// <param name="callMedia"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static IPlayMediaCallback Play(this CallMedia callMedia, Action<PlayMediaOptions> options)
+    public static IPlayMediaCallbackWithHandler Play(this CallMedia callMedia, Action<PlayMediaOptions> options)
     {
         var playOptions = new PlayMediaOptions();
         options(playOptions);

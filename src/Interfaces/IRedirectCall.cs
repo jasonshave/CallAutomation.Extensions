@@ -3,12 +3,12 @@
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IRedirectCall : ICanExecuteAsync
+public interface IRedirectCall
 {
     /// <summary>
     /// Redirects a call to an identity.
     /// </summary>
     /// <param name="rawId"></param>
     /// <returns></returns>
-    ICanExecuteAsync ToParticipant(string rawId);
+    IExecuteAsync ToParticipant(string rawId);
 }

@@ -5,6 +5,9 @@ using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
+public interface ICanAddParticipantWithHandler : IWithCallbackHandler<ICanAddParticipant>, ICanAddParticipant
+{
+}
 
 public interface ICanAddParticipant : ICallbackContext<AddParticipantsResult>
 {

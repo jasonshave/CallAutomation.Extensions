@@ -11,7 +11,7 @@ using CallAutomation.Extensions.Services;
 namespace CallAutomation.Extensions.Helpers;
 
 internal sealed class CallAutomationCreateCallHelper : HelperCallbackWithContext,
-    ICreateCallFrom,
+    ICreateCallFromWithHandler,
     ICreateCallWithCallbackUri,
     ICreateCallHandling
 {

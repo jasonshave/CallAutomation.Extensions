@@ -5,6 +5,10 @@ using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
 
+public interface IHandleDtmfResponseWithHandler : IWithCallbackHandler<IHandleDtmfResponse>, IHandleDtmfResponse
+{
+}
+
 public interface IHandleDtmfResponse : ICallbackContext
 {
     /// <summary>

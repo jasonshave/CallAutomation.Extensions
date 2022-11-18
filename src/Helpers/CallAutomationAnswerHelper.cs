@@ -10,7 +10,7 @@ using CallAutomation.Extensions.Services;
 namespace CallAutomation.Extensions.Helpers;
 
 internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
-    IAnswerWithCallbackUri,
+    IAnswerWithCallbackUriWithHandler,
     IAnswerCallHandling
 {
     private static readonly IEnumerable<Type> _types = new[] { typeof(CallConnected), typeof(CallDisconnected) };

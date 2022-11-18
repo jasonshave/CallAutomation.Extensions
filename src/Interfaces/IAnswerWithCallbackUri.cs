@@ -2,8 +2,11 @@
 // Licensed under the MIT License.
 
 namespace CallAutomation.Extensions.Interfaces;
+public interface IAnswerWithCallbackUriWithHandler : IWithCallbackHandler<IAnswerWithCallbackUri>, IAnswerWithCallbackUri
+{
+}
 
-public interface IAnswerWithCallbackUri : IWithCallbackHandler<IAnswerWithCallbackUri>
+public interface IAnswerWithCallbackUri
 {
     /// <summary>
     /// The callback <see cref="Uri"/> is created from the <see cref="string"/> input and used for mid-call event callbacks.

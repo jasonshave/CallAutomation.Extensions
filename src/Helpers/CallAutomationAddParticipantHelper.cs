@@ -11,7 +11,7 @@ using CallAutomation.Extensions.Services;
 namespace CallAutomation.Extensions.Helpers;
 
 /// <inheritdoc />
-internal sealed class CallAutomationAddParticipantHelper : HelperCallbackWithContext, ICanAddParticipant
+internal sealed class CallAutomationAddParticipantHelper : HelperCallbackWithContext, ICanAddParticipantWithHandler
 {
     private static readonly IEnumerable<Type> _types = new[] { typeof(AddParticipantsSucceeded), typeof(AddParticipantsFailed) };
     private readonly CallConnection _connection;

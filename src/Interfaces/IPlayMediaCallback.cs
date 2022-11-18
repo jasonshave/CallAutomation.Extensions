@@ -4,6 +4,9 @@
 using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
+public interface IPlayMediaCallbackWithHandler : IWithCallbackHandler<IPlayMediaCallback>, IPlayMediaCallback
+{
+}
 
 public interface IPlayMediaCallback : ICallbackContext
 {
