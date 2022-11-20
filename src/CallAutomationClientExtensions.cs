@@ -36,6 +36,18 @@ namespace CallAutomation.Extensions
         }
 
         /// <summary>
+        /// Initiates the answer call sequence.
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="callNotification"></param>
+        /// <returns></returns>
+        public static IAnswerCallHandling Answer(this CallAutomationClient client, CallNotification callNotification)
+        {
+            var helper = new CallAutomationAnswerHelper(client, callNotification);
+            return helper;
+        }
+
+        /// <summary>
         /// Rejects an <see cref="IncomingCall"/>
         /// </summary>
         /// <param name="client"></param>

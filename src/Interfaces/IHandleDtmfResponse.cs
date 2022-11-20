@@ -3,7 +3,6 @@
 
 using Azure;
 using Azure.Communication.CallAutomation;
-using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
@@ -14,7 +13,7 @@ public interface IHandleDtmfResponse : IExecuteAsync<Response>
     /// </summary>
     /// <typeparam name="TTone"></typeparam>
     /// <param name="callback"></param>
-    IHandleDtmfResponse OnPress<TTone>(Func<RecognizeCompleted, CallConnection, CallMedia, CallRecording, IReadOnlyList<DtmfTone>, OperationContext, ValueTask> callback)
+    IHandleDtmfResponse OnPress<TTone>(Func<RecognizeCompleted, CallConnection, CallMedia, CallRecording, IReadOnlyList<DtmfTone>, IOperationContext, ValueTask> callback)
         where TTone : IDtmfTone;
 
     /// <summary>
@@ -39,7 +38,7 @@ public interface IHandleDtmfResponse : IExecuteAsync<Response>
     /// Specifies the callback delegate when the collection of DTMF fails.
     /// </summary>
     /// <param name="callback"></param>
-    IHandleDtmfTimeout OnFail<TRecognizeFail>(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callback)
+    IHandleDtmfTimeout OnFail<TRecognizeFail>(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callback)
         where TRecognizeFail : IRecognizeDtmfFailed;
 
     /// <summary>

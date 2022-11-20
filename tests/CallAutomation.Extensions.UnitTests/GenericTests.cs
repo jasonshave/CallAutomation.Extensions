@@ -5,6 +5,7 @@ using AutoFixture;
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Contracts;
+using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.UnitTests;
@@ -25,7 +26,7 @@ public class GenericTests
                 // with custom context
                 await callConnection.AddParticipant("")
                     .WithOptions(x => x.InvitationTimeoutInSeconds = 1)
-                    .WithContext(new CustomContext("abc123"))
+                    .WithContext(new MyCustomOperationContext())
                     .OnAddParticipantsSucceeded(() => ValueTask.CompletedTask)
                     .ExecuteAsync();
 
@@ -45,13 +46,19 @@ public class GenericTests
             })
             .ExecuteAsync();
 
-        await client.Call(new CallTarget(new CommunicationUserIdentifier(""))).From("").WithCallbackUri("").ExecuteAsync();
+        await client
+            .Call(new CallTarget(new CommunicationUserIdentifier("8:acs:guid_guid")))
+            .From("appId")
+            .WithCallbackUri("")
+            .ExecuteAsync();
     }
 
-    public class CustomContext : OperationContext
+    public class MyCustomOperationContext : IOperationContext
     {
-        public override string RequestId { get; }
+        public string RequestId { get; } = Guid.NewGuid().ToString();
 
-        public CustomContext(string requestId) => RequestId = requestId;
+        public string? Payload => null;
+
+        public string? PayloadType => null;
     }
 }

@@ -1,14 +1,15 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using CallAutomation.Extensions.Interfaces;
+
 namespace CallAutomation.Extensions.Models;
 
-internal sealed class DefaultOperationContext : OperationContext
+public class DefaultOperationContext : IOperationContext
 {
-    public override string RequestId { get; }
+    public string RequestId { get; } = Guid.NewGuid().ToString();
 
-    public DefaultOperationContext()
-    {
-        RequestId = Guid.NewGuid().ToString();
-    }
+    public string? Payload => null;
+
+    public string? PayloadType => null;
 }

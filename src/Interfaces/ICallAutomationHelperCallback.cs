@@ -1,9 +1,7 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
-using CallAutomation.Extensions.Models;
 using System.Reflection;
-using System.Text.Json;
 
 namespace CallAutomation.Extensions.Interfaces;
 
@@ -11,11 +9,7 @@ internal interface ICallAutomationHelperCallback
 {
     IEnumerable<Type> Types { get; }
 
-    OperationContext Context { get; }
-
-    void SetContext(OperationContext context);
-
-    string GetSerializedContext(JsonSerializerOptions? serializerOptions = null);
+    public IOperationContext? OperationContext { get; }
 
     void AddDelegateCallback<T>(Delegate callback);
 

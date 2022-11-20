@@ -28,16 +28,16 @@ internal sealed class CallAutomationEventHandler : ICallAutomationEventHandler
         _logger = logger;
     }
 
-    public async ValueTask Handle(CallAutomationEventBase eventBase, string? requestId)
+    public async ValueTask Handle(CallAutomationEventBase eventBase, IOperationContext? context)
     {
         var clientElements = new CallAutomationClientElements(_client, eventBase.CallConnectionId);
 
         // use the event type to retrieve the correct callback
-        var callAutomationHelperCallback = CallbackRegistry.GetHelperCallback(requestId, eventBase.GetType(), true);
+        var callAutomationHelperCallback = CallbackRegistry.GetHelperCallback(context.RequestId, eventBase.GetType(), true);
 
         if (callAutomationHelperCallback is null)
         {
-            _logger.LogDebug("No callbacks found for request {requestId}", requestId);
+            _logger.LogDebug("No callbacks found for request {requestId}", context.RequestId);
             return;
         }
 
@@ -45,7 +45,7 @@ internal sealed class CallAutomationEventHandler : ICallAutomationEventHandler
         var delegates = callAutomationHelperCallback.GetDelegateCallbacks(eventBase.GetType());
         foreach (var @delegate in delegates)
         {
-            _logger.LogInformation("Found callback delegate for request {requestId} and event {event}", requestId, eventBase.GetType());
+            _logger.LogInformation("Found callback delegate for request {requestId} and event {event}", context.RequestId, eventBase.GetType());
             await _dispatcher.DispatchAsync(eventBase, @delegate, clientElements);
         }
 
@@ -57,7 +57,7 @@ internal sealed class CallAutomationEventHandler : ICallAutomationEventHandler
 
             if (handler is null) return;
 
-            _logger.LogInformation("Found callback handler for request {requestId} and event {event}", requestId, eventBase.GetType());
+            _logger.LogInformation("Found callback handler for request {requestId} and event {event}", context.RequestId, eventBase.GetType());
             await _dispatcher.DispatchAsync(eventBase, handlerTuple.Item1, handler, clientElements);
         }
     }

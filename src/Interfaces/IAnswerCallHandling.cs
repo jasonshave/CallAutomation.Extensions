@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using Azure.Communication.CallAutomation;
-using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
@@ -30,12 +29,12 @@ public interface IAnswerCallHandling : IExecuteAsync<AnswerCallResult>
         Func<ValueTask> callbackFunction);
 
     /// <summary>
-    /// Specifies the callback delegate when a call is connected. The event, <see cref="CallConnection"/>, <see cref="CallMedia"/>, <see cref="CallRecording"/>, and <see cref="OperationContext"/>
-    /// are provided to the delegate when invoked.
+    /// Specifies the callback delegate when a call is connected. The event, <see cref="CallConnection"/>, <see cref="CallMedia"/>, <see cref="CallRecording"/>, and <see cref="IOperationContext"/>
+    /// are returned.
     /// </summary>
     /// <param name="callbackFunction"></param>
     IAnswerCallHandling OnCallConnected(
-        Func<CallConnected, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction);
+        Func<CallConnected, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction);
 
     /// <summary>
     /// Specifies the callback delegate when a call is disconnected. The event and base objects are not returned in this method.
@@ -45,9 +44,16 @@ public interface IAnswerCallHandling : IExecuteAsync<AnswerCallResult>
         Func<ValueTask> callbackFunction);
 
     /// <summary>
-    /// Specifies the callback delegate when a call is disconnected. The event, <see cref="CallConnection"/>, <see cref="CallMedia"/>, <see cref="CallRecording"/>
+    /// Specifies the callback delegate when a call is disconnected. The event, <see cref="CallConnection"/>, <see cref="CallMedia"/>, <see cref="CallRecording"/>, and <see cref="IOperationContext"/> are returned.
     /// </summary>
     /// <param name="callbackFunction"></param>
     IAnswerCallHandling OnCallDisconnected(
-        Func<CallDisconnected, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction);
+        Func<CallDisconnected, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction);
+
+    /// <summary>
+    /// Sets the operation context which is returned on the next delegate.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    IAnswerCallHandling WithContext(IOperationContext context);
 }

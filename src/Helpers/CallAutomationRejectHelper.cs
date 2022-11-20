@@ -10,13 +10,13 @@ namespace CallAutomation.Extensions.Helpers;
 internal sealed class CallAutomationRejectHelper : IRejectCallWithReason, IRejectCall
 {
     private readonly CallAutomationClient _client;
-    private readonly IncomingCall _incomingCall;
+    private readonly string? _incomingCallContext;
     private CallRejectReason? _rejectReason;
 
     internal CallAutomationRejectHelper(CallAutomationClient client, IncomingCall incomingCall)
     {
         _client = client;
-        _incomingCall = incomingCall;
+        _incomingCallContext = incomingCall.IncomingCallContext;
     }
 
     public IRejectCall WithReason(CallRejectReason reason)
@@ -29,13 +29,13 @@ internal sealed class CallAutomationRejectHelper : IRejectCallWithReason, IRejec
     {
         if (_rejectReason is not null)
         {
-            await _client.RejectCallAsync(new RejectCallOptions(_incomingCall.IncomingCallContext)
+            await _client.RejectCallAsync(new RejectCallOptions(_incomingCallContext)
             {
                 CallRejectReason = (CallRejectReason)_rejectReason,
             });
             return;
         }
 
-        await _client.RejectCallAsync(_incomingCall.IncomingCallContext);
+        await _client.RejectCallAsync(_incomingCallContext);
     }
 }

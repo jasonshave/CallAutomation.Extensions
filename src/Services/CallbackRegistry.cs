@@ -14,11 +14,11 @@ internal static class CallbackRegistry
     {
         foreach (var type in types)
         {
-            var added = _genericCallbacks.TryAdd((helperCallbacks.Context.RequestId, type), helperCallbacks);
+            var added = _genericCallbacks.TryAdd((helperCallbacks.OperationContext.RequestId, type), helperCallbacks);
             if (!added)
             {
                 throw new ApplicationException(
-                    $"Unable to add callback for {type.Name} for request ID: {helperCallbacks.Context.RequestId}");
+                    $"Unable to add callback for {type.Name} for request ID: {helperCallbacks.OperationContext.RequestId}");
             }
         }
     }

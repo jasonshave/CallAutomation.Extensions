@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure;
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
@@ -32,7 +33,7 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
     public IPlayMediaCallback OnPlayCompleted<THandler>()
         where THandler : CallAutomationHandler
     {
-        AddHandlerCallback<THandler, PlayCompleted>($"On{nameof(PlayCompleted)}", typeof(PlayCompleted), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        AddHandlerCallback<THandler, PlayCompleted>($"On{nameof(PlayCompleted)}", typeof(PlayCompleted), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(IOperationContext));
         return this;
     }
 
@@ -42,7 +43,7 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
         return this;
     }
 
-    public IPlayMediaCallback OnPlayCompleted(Func<PlayCompleted, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
+    public IPlayMediaCallback OnPlayCompleted(Func<PlayCompleted, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction)
     {
         AddDelegateCallback<PlayCompleted>(callbackFunction);
         return this;
@@ -51,39 +52,37 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
     public IPlayMediaCallback OnPlayFailed<THandler>()
         where THandler : CallAutomationHandler
     {
-        AddHandlerCallback<THandler, PlayFailed>($"On{nameof(PlayFailed)}", typeof(PlayFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        AddHandlerCallback<THandler, PlayFailed>($"On{nameof(PlayFailed)}", typeof(PlayFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(IOperationContext));
         return this;
     }
 
-    public IPlayMediaCallback OnPlayFailed(Func<PlayFailed, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
+    public IPlayMediaCallback OnPlayFailed(Func<PlayFailed, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction)
     {
         AddDelegateCallback<PlayFailed>(callbackFunction);
         return this;
     }
 
-    public IPlayMediaCallback WithContext(OperationContext context)
+    public IPlayMediaCallback WithContext(IOperationContext context)
     {
-        SetContext(context);
+        OperationContext = context;
         return this;
     }
 
-    public async ValueTask ExecuteAsync()
+    public async ValueTask<Response> ExecuteAsync()
     {
         if (_playToParticipants.Any())
         {
-            await _callMedia.PlayAsync(new FileSource(new Uri(_playMediaOptions.FileUrl)), _playToParticipants, new PlayOptions()
+            return await _callMedia.PlayAsync(new FileSource(new Uri(_playMediaOptions.FileUrl)), _playToParticipants, new PlayOptions()
             {
                 OperationContext = GetSerializedContext(),
                 Loop = _playMediaOptions.Loop,
             });
         }
-        else
+
+        return await _callMedia.PlayToAllAsync(new FileSource(new Uri(_playMediaOptions.FileUrl)), new PlayOptions()
         {
-            await _callMedia.PlayToAllAsync(new FileSource(new Uri(_playMediaOptions.FileUrl)), new PlayOptions()
-            {
-                OperationContext = GetSerializedContext(),
-                Loop = _playMediaOptions.Loop,
-            });
-        }
+            OperationContext = GetSerializedContext(),
+            Loop = _playMediaOptions.Loop,
+        });
     }
 }
