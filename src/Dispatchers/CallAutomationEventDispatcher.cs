@@ -10,7 +10,7 @@ namespace CallAutomation.Extensions.Dispatchers;
 
 internal sealed class CallAutomationEventDispatcher : ICallAutomationEventDispatcher
 {
-    public async ValueTask DispatchAsync(CallAutomationEventBase @event, Delegate @delegate, CallAutomationClientElements clientElements)
+    public async ValueTask DispatchAsync(CallAutomationEventBase @event, Delegate @delegate, CallAutomationClientElements clientElements, OperationContext context)
     {
         if (!@delegate.Method.GetParameters().Any())
         {
@@ -18,10 +18,10 @@ internal sealed class CallAutomationEventDispatcher : ICallAutomationEventDispat
             return;
         }
 
-        await ((ValueTask)@delegate.DynamicInvoke(@event, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording)).ConfigureAwait(false);
+        await ((ValueTask)@delegate.DynamicInvoke(@event, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording, context)).ConfigureAwait(false);
     }
 
-    public async ValueTask DispatchAsync(CallAutomationEventBase @event, MethodInfo methodInfo, object handlerInstance, CallAutomationClientElements clientElements)
+    public async ValueTask DispatchAsync(CallAutomationEventBase @event, MethodInfo methodInfo, object handlerInstance, CallAutomationClientElements clientElements, OperationContext context)
     {
         var task = methodInfo.Invoke(handlerInstance, new object[] { @event, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording }) as Task;
         if (task is null) return;
@@ -29,8 +29,8 @@ internal sealed class CallAutomationEventDispatcher : ICallAutomationEventDispat
         await task.ConfigureAwait(false);
     }
 
-    public void Dispatch(CallAutomationEventBase @event, Action<CallAutomationEventBase, CallConnection, CallMedia, CallRecording> callbackAction, CallAutomationClientElements clientElements)
+    public void Dispatch(CallAutomationEventBase @event, Action<CallAutomationEventBase, CallConnection, CallMedia, CallRecording, OperationContext> callbackAction, CallAutomationClientElements clientElements, OperationContext context)
     {
-        callbackAction(@event, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording);
+        callbackAction(@event, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording, context);
     }
 }

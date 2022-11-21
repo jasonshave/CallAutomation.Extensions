@@ -14,13 +14,13 @@ public interface ICanAddParticipant : IExecuteAsync<AddParticipantsResult>
 
     ICanAddParticipant WithOptions(Action<ParticipantOptions> options);
 
-    ICanAddParticipant WithContext(IOperationContext context);
+    ICanAddParticipant WithContext(OperationContext context);
 
     ICanAddParticipant OnAddParticipantsSucceeded<THandler>()
         where THandler : CallAutomationHandler;
 
     ICanAddParticipant OnAddParticipantsSucceeded(
-        Func<AddParticipantsSucceeded, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction);
+        Func<AddParticipantsSucceeded, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction);
 
     ICanAddParticipant OnAddParticipantsSucceeded(
         Func<ValueTask> callbackFunction);
@@ -32,5 +32,5 @@ public interface ICanAddParticipant : IExecuteAsync<AddParticipantsResult>
         Func<ValueTask> callbackFunction);
 
     ICanAddParticipant OnAddParticipantsFailed(
-        Func<AddParticipantsFailed, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction);
+        Func<AddParticipantsFailed, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction);
 }

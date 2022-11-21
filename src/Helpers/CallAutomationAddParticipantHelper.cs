@@ -60,7 +60,7 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
     public ICanAddParticipant OnAddParticipantsSucceeded<THandler>()
         where THandler : CallAutomationHandler
     {
-        AddHandlerCallback<THandler, AddParticipantsSucceeded>($"On{nameof(AddParticipantsSucceeded)}", typeof(AddParticipantsSucceeded), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(IOperationContext));
+        AddHandlerCallback<THandler, AddParticipantsSucceeded>($"On{nameof(AddParticipantsSucceeded)}", typeof(AddParticipantsSucceeded), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(OperationContext));
         return this;
     }
 
@@ -70,7 +70,7 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
         return this;
     }
 
-    public ICanAddParticipant OnAddParticipantsSucceeded(Func<AddParticipantsSucceeded, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction)
+    public ICanAddParticipant OnAddParticipantsSucceeded(Func<AddParticipantsSucceeded, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction)
     {
         AddDelegateCallback<AddParticipantsSucceeded>(callbackFunction);
         return this;
@@ -79,7 +79,7 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
     public ICanAddParticipant OnAddParticipantsFailed<THandler>()
         where THandler : CallAutomationHandler
     {
-        AddHandlerCallback<THandler, AddParticipantsFailed>($"On{nameof(AddParticipantsFailed)}", typeof(AddParticipantsFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(IOperationContext));
+        AddHandlerCallback<THandler, AddParticipantsFailed>($"On{nameof(AddParticipantsFailed)}", typeof(AddParticipantsFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(OperationContext));
         return this;
     }
 
@@ -89,13 +89,13 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
         return this;
     }
 
-    public ICanAddParticipant OnAddParticipantsFailed(Func<AddParticipantsFailed, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction)
+    public ICanAddParticipant OnAddParticipantsFailed(Func<AddParticipantsFailed, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction)
     {
         AddDelegateCallback<AddParticipantsFailed>(callbackFunction);
         return this;
     }
 
-    public ICanAddParticipant WithContext(IOperationContext context)
+    public ICanAddParticipant WithContext(OperationContext context)
     {
         OperationContext = context;
         return this;
@@ -103,6 +103,8 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackBase, I
 
     public async ValueTask<AddParticipantsResult> ExecuteAsync()
     {
+        OperationContext ??= new OperationContext();
+
         var addParticipantsOptions = new AddParticipantsOptions(_participantsToAdd)
         {
             OperationContext = GetSerializedContext(),

@@ -33,7 +33,7 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
     public IPlayMediaCallback OnPlayCompleted<THandler>()
         where THandler : CallAutomationHandler
     {
-        AddHandlerCallback<THandler, PlayCompleted>($"On{nameof(PlayCompleted)}", typeof(PlayCompleted), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(IOperationContext));
+        AddHandlerCallback<THandler, PlayCompleted>($"On{nameof(PlayCompleted)}", typeof(PlayCompleted), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(OperationContext));
         return this;
     }
 
@@ -43,7 +43,7 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
         return this;
     }
 
-    public IPlayMediaCallback OnPlayCompleted(Func<PlayCompleted, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction)
+    public IPlayMediaCallback OnPlayCompleted(Func<PlayCompleted, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction)
     {
         AddDelegateCallback<PlayCompleted>(callbackFunction);
         return this;
@@ -52,17 +52,17 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
     public IPlayMediaCallback OnPlayFailed<THandler>()
         where THandler : CallAutomationHandler
     {
-        AddHandlerCallback<THandler, PlayFailed>($"On{nameof(PlayFailed)}", typeof(PlayFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(IOperationContext));
+        AddHandlerCallback<THandler, PlayFailed>($"On{nameof(PlayFailed)}", typeof(PlayFailed), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(OperationContext));
         return this;
     }
 
-    public IPlayMediaCallback OnPlayFailed(Func<PlayFailed, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction)
+    public IPlayMediaCallback OnPlayFailed(Func<PlayFailed, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction)
     {
         AddDelegateCallback<PlayFailed>(callbackFunction);
         return this;
     }
 
-    public IPlayMediaCallback WithContext(IOperationContext context)
+    public IPlayMediaCallback WithContext(OperationContext context)
     {
         OperationContext = context;
         return this;
@@ -70,6 +70,8 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
 
     public async ValueTask<Response> ExecuteAsync()
     {
+        OperationContext ??= new OperationContext();
+
         if (_playToParticipants.Any())
         {
             return await _callMedia.PlayAsync(new FileSource(new Uri(_playMediaOptions.FileUrl)), _playToParticipants, new PlayOptions()

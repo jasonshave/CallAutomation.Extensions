@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 using Azure.Communication.CallAutomation;
-using CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions;
 
@@ -21,7 +21,7 @@ public abstract class CallAutomationHandler
         CallConnection callConnection,
         CallMedia callMedia,
         CallRecording callRecording,
-        IOperationContext context) =>
+        OperationContext context) =>
         ValueTask.CompletedTask;
 
     /// <summary>
@@ -37,7 +37,7 @@ public abstract class CallAutomationHandler
         CallConnection callConnection,
         CallMedia callMedia,
         CallRecording callRecording,
-        IOperationContext context) =>
+        OperationContext context) =>
         ValueTask.CompletedTask;
 
     /// <summary>
@@ -53,7 +53,7 @@ public abstract class CallAutomationHandler
         CallConnection callConnection,
         CallMedia callMedia,
         CallRecording callRecording,
-        IOperationContext context) =>
+        OperationContext context) =>
         ValueTask.CompletedTask;
 
     /// <summary>
@@ -69,7 +69,7 @@ public abstract class CallAutomationHandler
         CallConnection callConnection,
         CallMedia callMedia,
         CallRecording callRecording,
-        IOperationContext context) =>
+        OperationContext context) =>
         ValueTask.CompletedTask;
 
     /// <summary>
@@ -85,7 +85,7 @@ public abstract class CallAutomationHandler
         CallConnection callConnection,
         CallMedia callMedia,
         CallRecording callRecording,
-        IOperationContext context) =>
+        OperationContext context) =>
         ValueTask.CompletedTask;
 
     /// <summary>
@@ -101,7 +101,7 @@ public abstract class CallAutomationHandler
         CallConnection callConnection,
         CallMedia callMedia,
         CallRecording callRecording,
-        IOperationContext context) =>
+        OperationContext context) =>
         ValueTask.CompletedTask;
 
     /// <summary>
@@ -117,7 +117,7 @@ public abstract class CallAutomationHandler
         CallConnection callConnection,
         CallMedia callMedia,
         CallRecording callRecording,
-        IOperationContext context) =>
+        OperationContext context) =>
         ValueTask.CompletedTask;
 
     /// <summary>
@@ -134,7 +134,7 @@ public abstract class CallAutomationHandler
         CallConnection callConnection,
         CallMedia callMedia,
         CallRecording callRecording,
-        IOperationContext context) =>
+        OperationContext context) =>
         ValueTask.CompletedTask;
 
     /// <summary>
@@ -153,7 +153,7 @@ public abstract class CallAutomationHandler
         CallMedia callMedia,
         CallRecording callRecording,
         IReadOnlyList<DtmfTone> Tones,
-        IOperationContext context) =>
+        OperationContext context) =>
         ValueTask.CompletedTask;
 
     /// <summary>
@@ -170,7 +170,7 @@ public abstract class CallAutomationHandler
         CallConnection callConnection,
         CallMedia callMedia,
         CallRecording callRecording,
-        IOperationContext context) =>
+        OperationContext context) =>
         ValueTask.CompletedTask;
 
     /// <summary>
@@ -187,7 +187,7 @@ public abstract class CallAutomationHandler
         CallConnection callConnection,
         CallMedia callMedia,
         CallRecording callRecording,
-        IOperationContext context) =>
+        OperationContext context) =>
         ValueTask.CompletedTask;
 
     /// <summary>
@@ -204,6 +204,6 @@ public abstract class CallAutomationHandler
         CallConnection callConnection,
         CallMedia callMedia,
         CallRecording callRecording,
-        IOperationContext context) =>
+        OperationContext context) =>
         ValueTask.CompletedTask;
 }

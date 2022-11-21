@@ -26,7 +26,7 @@ public class GenericTests
                 // with custom context
                 await callConnection.AddParticipant("")
                     .WithOptions(x => x.InvitationTimeoutInSeconds = 1)
-                    .WithContext(new MyCustomOperationContext())
+                    .WithContext(new OperationContext())
                     .OnAddParticipantsSucceeded(() => ValueTask.CompletedTask)
                     .ExecuteAsync();
 
@@ -51,14 +51,5 @@ public class GenericTests
             .From("appId")
             .WithCallbackUri("")
             .ExecuteAsync();
-    }
-
-    public class MyCustomOperationContext : IOperationContext
-    {
-        public string RequestId { get; } = Guid.NewGuid().ToString();
-
-        public string? Payload => null;
-
-        public string? PayloadType => null;
     }
 }

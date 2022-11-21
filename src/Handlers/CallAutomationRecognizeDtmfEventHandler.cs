@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Text.Json;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Extensions;
 using CallAutomation.Extensions.Interfaces;
@@ -29,8 +30,15 @@ public class CallAutomationRecognizeDtmfEventHandler : ICallAutomationRecognizeD
         _logger = logger;
     }
 
-    public async ValueTask Handle(CallAutomationEventBase eventBase, IOperationContext context)
+    public async ValueTask Handle(CallAutomationEventBase eventBase)
     {
+        if (eventBase.OperationContext is null)
+        {
+            throw new ApplicationException(
+                "Unable to determine OperationContext for DTMF handler. This property was not set correctly on the previous action.");
+        }
+
+        OperationContext? context = JsonSerializer.Deserialize<OperationContext>(eventBase.OperationContext);
         var clientElements = new CallAutomationClientElements(_client, eventBase.CallConnectionId);
 
         if (eventBase is RecognizeCompleted recognizeCompleted)

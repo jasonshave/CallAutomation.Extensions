@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using CallAutomation.Extensions.Interfaces;
+using CallAutomation.Extensions.Models;
 using System.Reflection;
 using System.Text.Json;
 
@@ -10,15 +11,16 @@ namespace CallAutomation.Extensions.Services;
 internal abstract class HelperCallbackBase : ICallAutomationHelperCallback
 {
     private readonly Dictionary<(string, Type), List<Delegate>> _callbackDelegates = new();
+
     private readonly Dictionary<(string, Type), List<(MethodInfo, Type)>> _callbackHandlers = new();
 
     public IEnumerable<Type> Types { get; }
 
-    public IOperationContext? OperationContext { get; protected set; }
+    public OperationContext? OperationContext { get; protected set; }
 
-    protected HelperCallbackBase(IEnumerable<Type> types, IOperationContext? context = null)
+    protected HelperCallbackBase(IEnumerable<Type> types, OperationContext? context = null)
     {
-        Types = types.ToList();
+        Types = types;
         OperationContext = context;
         CallbackRegistry.RegisterHelperCallback(this, Types);
     }
@@ -68,10 +70,8 @@ internal abstract class HelperCallbackBase : ICallAutomationHelperCallback
         return handlerTuple;
     }
 
-    protected string? GetSerializedContext()
+    protected string GetSerializedContext()
     {
-        return OperationContext is null
-            ? null
-            : JsonSerializer.Serialize(OperationContext);
+        return JsonSerializer.Serialize(OperationContext);
     }
 }

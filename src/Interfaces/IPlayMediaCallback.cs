@@ -3,6 +3,7 @@
 
 using Azure;
 using Azure.Communication.CallAutomation;
+using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
@@ -25,12 +26,12 @@ public interface IPlayMediaCallback : IExecuteAsync<Response>
 
     /// <summary>
     /// Specifies the callback delegate when the audio file stops playing.
-    /// The <see cref="CallConnected"/> event along with <see cref="CallConnection"/>, <see cref="CallMedia"/>, <see cref="CallRecording"/>, and <see cref="IOperationContext"/> are provided.
+    /// The <see cref="CallConnected"/> event along with <see cref="CallConnection"/>, <see cref="CallMedia"/>, <see cref="CallRecording"/>, and <see cref="OperationContext"/> are provided.
     /// </summary>
     /// <param name="callbackFunction"></param>
     /// <returns></returns>
     IPlayMediaCallback OnPlayCompleted(
-        Func<PlayCompleted, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction);
+        Func<PlayCompleted, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction);
 
     /// <summary>
     /// Specifies the callback delegate when the audio file stops playing.
@@ -54,12 +55,12 @@ public interface IPlayMediaCallback : IExecuteAsync<Response>
     /// <param name="callbackFunction"></param>
     /// <returns></returns>
     IPlayMediaCallback OnPlayFailed(
-        Func<PlayFailed, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction);
+        Func<PlayFailed, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction);
 
     /// <summary>
     /// Sets the custom context.
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    IPlayMediaCallback WithContext(IOperationContext context);
+    IPlayMediaCallback WithContext(OperationContext context);
 }

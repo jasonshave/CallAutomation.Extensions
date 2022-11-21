@@ -21,14 +21,14 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
     private Uri? _callbackUri;
 
     internal CallAutomationAnswerHelper(CallAutomationClient client, IncomingCall incomingCall)
-        : base(_types, new DefaultOperationContext())
+        : base(_types, new OperationContext { RequestId = incomingCall.CorrelationId })
     {
         _client = client;
         _incomingCallContext = incomingCall.IncomingCallContext;
     }
 
     internal CallAutomationAnswerHelper(CallAutomationClient client, CallNotification callNotification)
-        : base(_types)
+        : base(_types, new OperationContext { RequestId = callNotification.CorrelationId })
     {
         _client = client;
         _incomingCallContext = callNotification.IncomingCallContext;
@@ -44,18 +44,18 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
     public IAnswerCallHandling OnCallConnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        AddHandlerCallback<THandler, CallConnected>($"On{nameof(CallConnected)}", typeof(CallConnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(IOperationContext));
+        AddHandlerCallback<THandler, CallConnected>($"On{nameof(CallConnected)}", typeof(CallConnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(OperationContext));
         return this;
     }
 
     public IAnswerCallHandling OnCallDisconnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        AddHandlerCallback<THandler, CallDisconnected>($"On{nameof(CallDisconnected)}", typeof(CallDisconnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(IOperationContext));
+        AddHandlerCallback<THandler, CallDisconnected>($"On{nameof(CallDisconnected)}", typeof(CallDisconnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(OperationContext));
         return this;
     }
 
-    public IAnswerCallHandling OnCallConnected(Func<CallConnected, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction)
+    public IAnswerCallHandling OnCallConnected(Func<CallConnected, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction)
     {
         AddDelegateCallback<CallConnected>(callbackFunction);
         return this;
@@ -73,20 +73,16 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
         return this;
     }
 
-    public IAnswerCallHandling OnCallDisconnected(Func<CallDisconnected, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction)
+    public IAnswerCallHandling OnCallDisconnected(Func<CallDisconnected, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction)
     {
         AddDelegateCallback<CallConnected>(callbackFunction);
         return this;
     }
 
-    public IAnswerCallHandling WithContext(IOperationContext context)
-    {
-        OperationContext = context;
-        return this;
-    }
-
     public async ValueTask<AnswerCallResult> ExecuteAsync()
     {
+        // Can't currently set operation context using WithContext so we'll use the default
+        // and correlate the CallConnected event with a default GUID value.
         Response<AnswerCallResult> result = await _client.AnswerCallAsync(new AnswerCallOptions(_incomingCallContext, _callbackUri));
         return result;
     }

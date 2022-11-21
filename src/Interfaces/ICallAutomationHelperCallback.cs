@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using CallAutomation.Extensions.Models;
 using System.Reflection;
 
 namespace CallAutomation.Extensions.Interfaces;
@@ -9,7 +10,7 @@ internal interface ICallAutomationHelperCallback
 {
     IEnumerable<Type> Types { get; }
 
-    public IOperationContext? OperationContext { get; }
+    public OperationContext OperationContext { get; }
 
     void AddDelegateCallback<T>(Delegate callback);
 

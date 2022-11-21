@@ -9,7 +9,7 @@ namespace CallAutomation.Extensions.Interfaces;
 
 internal interface ICallAutomationEventDispatcher
 {
-    ValueTask DispatchAsync(CallAutomationEventBase @event, Delegate @delegate, CallAutomationClientElements clientElements);
+    ValueTask DispatchAsync(CallAutomationEventBase @event, Delegate @delegate, CallAutomationClientElements clientElements, OperationContext context);
 
-    ValueTask DispatchAsync(CallAutomationEventBase @event, MethodInfo methodInfo, object handlerInstance, CallAutomationClientElements clientElements);
+    ValueTask DispatchAsync(CallAutomationEventBase @event, MethodInfo methodInfo, object handlerInstance, CallAutomationClientElements clientElements, OperationContext context);
 }

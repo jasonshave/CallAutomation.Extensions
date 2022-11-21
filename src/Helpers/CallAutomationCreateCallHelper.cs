@@ -42,14 +42,14 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
     public ICreateCallHandling OnCallConnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        AddHandlerCallback<THandler, CallConnected>($"On{nameof(CallConnected)}", typeof(CallConnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(IOperationContext));
+        AddHandlerCallback<THandler, CallConnected>($"On{nameof(CallConnected)}", typeof(CallConnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(OperationContext));
         return this;
     }
 
     public ICreateCallHandling OnCallDisconnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        AddHandlerCallback<THandler, CallDisconnected>($"On{nameof(CallDisconnected)}", typeof(CallDisconnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(IOperationContext));
+        AddHandlerCallback<THandler, CallDisconnected>($"On{nameof(CallDisconnected)}", typeof(CallDisconnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording), typeof(OperationContext));
         return this;
     }
 
@@ -59,7 +59,7 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
         return this;
     }
 
-    public ICreateCallHandling OnCallConnected(Func<CallConnected, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction)
+    public ICreateCallHandling OnCallConnected(Func<CallConnected, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction)
     {
         AddDelegateCallback<CallConnected>(callbackFunction);
         return this;
@@ -71,13 +71,13 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
         return this;
     }
 
-    public ICreateCallHandling OnCallDisconnected(Func<CallDisconnected, CallConnection, CallMedia, CallRecording, IOperationContext, ValueTask> callbackFunction)
+    public ICreateCallHandling OnCallDisconnected(Func<CallDisconnected, CallConnection, CallMedia, CallRecording, OperationContext, ValueTask> callbackFunction)
     {
         AddDelegateCallback<CallDisconnected>(callbackFunction);
         return this;
     }
 
-    public ICreateCallHandling WithContext(IOperationContext context)
+    public ICreateCallHandling WithContext(OperationContext context)
     {
         OperationContext = context;
         return this;
@@ -85,6 +85,8 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
 
     public async ValueTask<CreateCallResult> ExecuteAsync()
     {
+        OperationContext ??= new OperationContext();
+
         var callSource = new CallSource(_from);
         if (_callTarget.DisplayName is not null)
         {

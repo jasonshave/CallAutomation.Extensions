@@ -26,12 +26,10 @@ internal static class CallbackRegistry
     internal static ICallAutomationHelperCallback? GetHelperCallback(string requestId, Type type, bool remove = default)
     {
         var found = _genericCallbacks.TryGetValue((requestId, type), out var callback);
-        if (found && remove)
-        {
-            _genericCallbacks.TryRemove((requestId, type), out _);
-            return callback;
-        }
 
-        return null;
+        // remove if found or not to eliminate potential memory leak.
+        if (remove) _genericCallbacks.TryRemove((requestId, type), out _);
+
+        return found ? callback : null;
     }
 }
