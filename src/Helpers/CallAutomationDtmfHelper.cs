@@ -108,9 +108,9 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
         return this;
     }
 
-    public IExecuteAsync WithContext(IOperationContext context)
+    public IExecuteAsync WithPayload(IPayload payload)
     {
-        SetContext(context);
+        SetPayload(payload);
         return this;
     }
 

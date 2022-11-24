@@ -2,22 +2,22 @@
 // Licensed under the MIT License.
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICallbackContext<T> : IExecuteAsync<T>
+public interface ICallbackPayload<T> : IExecuteAsync<T>
 {
     /// <summary>
     /// Setting custom context.
     /// </summary>
     /// <param name="context"></param>
     /// <returns><see cref="IExecuteAsync"/></returns>
-    IExecuteAsync<T> WithContext(IOperationContext context);
+    IExecuteAsync<T> WithPayload(IPayload payload);
 }
 
-public interface ICallbackContext : IExecuteAsync
+public interface ICallbackPayLoad : IExecuteAsync
 {
     /// <summary>
     /// Setting custom context.
     /// </summary>
     /// <param name="context"></param>
     /// <returns><see cref="IExecuteAsync"/></returns>
-    IExecuteAsync WithContext(IOperationContext context);
+    IExecuteAsync WithPayload(IPayload payload);
 }

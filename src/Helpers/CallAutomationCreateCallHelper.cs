@@ -90,9 +90,9 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackWithContext
         return this;
     }
 
-    public IExecuteAsync<CreateCallResult> WithContext(IOperationContext context)
+    public IExecuteAsync<CreateCallResult> WithPayload(IPayload payload)
     {
-        SetContext(context);
+        SetPayload(payload);
         return this;
     }
 

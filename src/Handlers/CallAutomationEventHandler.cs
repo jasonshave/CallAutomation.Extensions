@@ -28,6 +28,7 @@ internal sealed class CallAutomationEventHandler : BaseEventHandler, ICallAutoma
 
     public async ValueTask Handle(CallAutomationEventBase eventBase, string? requestId)
     {
+        if (string.IsNullOrEmpty(requestId)) return;
         var clientElements = new CallAutomationClientElements(_client, eventBase.CallConnectionId);
 
         var delegates = _callbackHandler.GetDelegateCallbacks(requestId, eventBase.GetType());

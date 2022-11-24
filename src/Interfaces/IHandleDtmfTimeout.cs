@@ -3,6 +3,6 @@
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IHandleDtmfTimeout : ICallbackContext
+public interface IHandleDtmfTimeout : ICallbackPayLoad
 {
 }

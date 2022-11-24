@@ -9,7 +9,7 @@ public interface ICanAddParticipantWithHandler : IWithCallbackHandler<ICanAddPar
 {
 }
 
-public interface ICanAddParticipant : ICallbackContext<AddParticipantsResult>
+public interface ICanAddParticipant : ICallbackPayload<AddParticipantsResult>
 {
     ICanAddParticipant AddParticipant(string rawId);
 

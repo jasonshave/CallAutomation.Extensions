@@ -101,9 +101,9 @@ internal sealed class CallAutomationAddParticipantHelper : HelperCallbackWithCon
         return this;
     }
 
-    public IExecuteAsync<AddParticipantsResult> WithContext(IOperationContext context)
+    public IExecuteAsync<AddParticipantsResult> WithPayload(IPayload payload)
     {
-        SetContext(context);
+        SetPayload(payload);
         return this;
     }
 

@@ -68,9 +68,9 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackWithContext, IPla
         return this;
     }
 
-    public IExecuteAsync WithContext(IOperationContext context)
+    public IExecuteAsync WithPayload(IPayload payload)
     {
-        SetContext(context);
+        SetPayload(payload);
         return this;
     }
 
