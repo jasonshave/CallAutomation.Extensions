@@ -9,40 +9,29 @@ using Microsoft.Extensions.Logging;
 
 namespace CallAutomation.Extensions.Handlers;
 
-internal sealed class CallAutomationEventHandler : ICallAutomationEventHandler
+internal sealed class CallAutomationEventHandler : BaseEventHandler, ICallAutomationEventHandler
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly ICallAutomationEventDispatcher _dispatcher;
-    private readonly CallAutomationClient _client;
     private readonly ILogger<CallAutomationEventHandler> _logger;
 
     public CallAutomationEventHandler(
         IServiceProvider serviceProvider,
         ICallAutomationEventDispatcher dispatcher,
+        ICallbacksHandler callbackHandler,
         CallAutomationClient client,
         ILogger<CallAutomationEventHandler> logger)
+        : base(serviceProvider, callbackHandler, client)
     {
-        _serviceProvider = serviceProvider;
         _dispatcher = dispatcher;
-        _client = client;
         _logger = logger;
     }
 
     public async ValueTask Handle(CallAutomationEventBase eventBase, string? requestId)
     {
+        if (string.IsNullOrEmpty(requestId)) return;
         var clientElements = new CallAutomationClientElements(_client, eventBase.CallConnectionId);
 
-        // use the event type to retrieve the correct callback
-        var callAutomationHelperCallback = CallbackRegistry.GetHelperCallback(requestId, eventBase.GetType(), true);
-
-        if (callAutomationHelperCallback is null)
-        {
-            _logger.LogDebug("No callbacks found for request {requestId}", requestId);
-            return;
-        }
-
-        // dispatch delegate callbacks
-        var delegates = callAutomationHelperCallback.HelperCallbacks.GetDelegateCallbacks(eventBase.GetType());
+        var delegates = _callbackHandler.GetDelegateCallbacks(requestId, eventBase.GetType());
         foreach (var @delegate in delegates)
         {
             _logger.LogInformation("Found callback delegate for request {requestId} and event {event}", requestId, eventBase.GetType());
@@ -50,15 +39,15 @@ internal sealed class CallAutomationEventHandler : ICallAutomationEventHandler
         }
 
         // dispatch handler callbacks
-        var handlerTuples = callAutomationHelperCallback.HelperCallbacks.GetHandlers(eventBase.GetType());
+        var handlerTuples = _callbackHandler.GetHandlers(requestId, eventBase.GetType());
         foreach (var handlerTuple in handlerTuples)
         {
-            var handler = _serviceProvider.GetService(handlerTuple.Item2);
-
+            var handler = GetHandler(handlerTuple.HandlerName);
             if (handler is null) return;
 
             _logger.LogInformation("Found callback handler for request {requestId} and event {event}", requestId, eventBase.GetType());
-            await _dispatcher.DispatchAsync(eventBase, handlerTuple.Item1, handler, clientElements);
+
+            await _dispatcher.DispatchAsync(eventBase, handler, handlerTuple.MethodName, clientElements);
         }
     }
 }

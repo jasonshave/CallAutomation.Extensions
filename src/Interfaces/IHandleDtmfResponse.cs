@@ -5,7 +5,11 @@ using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IHandleDtmfResponse : ICallbackContext
+public interface IHandleDtmfResponseWithHandler : IWithCallbackHandler<IHandleDtmfResponse>, IHandleDtmfResponse
+{
+}
+
+public interface IHandleDtmfResponse : ICallbackPayLoad
 {
     /// <summary>
     /// Specifies the callback delegate when the requested <see cref="IDtmfTone"/> is received.

@@ -8,7 +8,9 @@ using CallAutomation.Extensions.Interfaces;
 
 namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationRedirectHelper : IRedirectCall
+internal sealed class CallAutomationRedirectHelper :
+    IRedirectCall,
+    IExecuteAsync
 {
     private readonly CallAutomationClient _client;
     private readonly IncomingCall _incomingCall;
@@ -20,7 +22,7 @@ internal sealed class CallAutomationRedirectHelper : IRedirectCall
         _incomingCall = incomingCall;
     }
 
-    public ICanExecuteAsync ToParticipant(string rawId)
+    public IExecuteAsync ToParticipant(string rawId)
     {
         _participant = CommunicationIdentifier.FromRawId(rawId);
         return this;

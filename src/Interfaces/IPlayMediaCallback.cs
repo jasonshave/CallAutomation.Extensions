@@ -4,8 +4,11 @@
 using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
+public interface IPlayMediaCallbackWithHandler : IWithCallbackHandler<IPlayMediaCallback>, IPlayMediaCallback
+{
+}
 
-public interface IPlayMediaCallback : ICallbackContext
+public interface IPlayMediaCallback : ICallbackPayLoad
 {
     /// <summary>
     /// Targets a specific participant on the call to hear the audio file.

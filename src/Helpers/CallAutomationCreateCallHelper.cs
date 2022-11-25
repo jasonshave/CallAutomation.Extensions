@@ -11,7 +11,7 @@ using CallAutomation.Extensions.Services;
 namespace CallAutomation.Extensions.Helpers;
 
 internal sealed class CallAutomationCreateCallHelper : HelperCallbackWithContext,
-    ICreateCallFrom,
+    ICreateCallFromWithHandler,
     ICreateCallWithCallbackUri,
     ICreateCallHandling
 {
@@ -29,12 +29,11 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackWithContext
         _destinations.Add(to.ConvertToCommunicationIdentifier());
     }
 
-    //Hossein:should be removed as the option is needed
-    //public ICreateCallWithCallbackUri From(string id)
-    //{
-    //    _from = id;
-    //    return this;
-    //}
+    public ICreateCallFrom WithCallbackHandler(ICallbacksHandler handler)
+    {
+        CallbackHandler = handler;
+        return this;
+    }
 
     public ICreateCallWithCallbackUri From(string id, Action<CallFromOptions> options)
     {
@@ -56,44 +55,44 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackWithContext
     public ICreateCallHandling OnCallConnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, CallConnected>($"On{nameof(CallConnected)}", typeof(CallConnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        CallbackHandler.AddHandlerCallback<THandler, CallConnected>(RequestId, $"On{nameof(CallConnected)}");
         return this;
     }
 
     public ICreateCallHandling OnCallDisconnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, CallDisconnected>($"On{nameof(CallDisconnected)}", typeof(CallDisconnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        CallbackHandler.AddHandlerCallback<THandler, CallDisconnected>(RequestId, $"On{nameof(CallDisconnected)}");
         return this;
     }
 
     public ICreateCallHandling OnCallConnected(Func<ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallConnected>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<CallConnected>(RequestId, callbackFunction);
         return this;
     }
 
     public ICreateCallHandling OnCallConnected(Func<CallConnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallConnected>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<CallConnected>(RequestId, callbackFunction);
         return this;
     }
 
     public ICreateCallHandling OnCallDisconnected(Func<ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallDisconnected>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<CallDisconnected>(RequestId, callbackFunction);
         return this;
     }
 
     public ICreateCallHandling OnCallDisconnected(Func<CallDisconnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallDisconnected>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<CallDisconnected>(RequestId, callbackFunction);
         return this;
     }
 
-    public IExecuteAsync<CreateCallResult> WithContext(IOperationContext context)
+    public IExecuteAsync<CreateCallResult> WithPayload(IPayload payload)
     {
-        SetContext(context);
+        SetPayload(payload);
         return this;
     }
 

@@ -5,7 +5,7 @@ using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICreateCallHandling : ICallbackContext<CreateCallResult>
+public interface ICreateCallHandling : ICallbackPayload<CreateCallResult>
 {
     /// <summary>
     /// Specifies the handler to invoke when a call is connected.
