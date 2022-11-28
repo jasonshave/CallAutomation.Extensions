@@ -7,11 +7,9 @@ using System.Text.Json.Serialization;
 
 namespace CallAutomation.Extensions.Models
 {
-    public class OperationContext
+    public class OperationContext : IOperationContext
     {
-        [JsonConverter(typeof(OperationContextJsonConverter))]
-        public IPayload? Payload { get; set; }
-
-        public string? RequestId { get;  set; }
+        [JsonInclude]
+        public string? RequestId { get; internal set; }
     }
 }

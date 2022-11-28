@@ -4,7 +4,6 @@
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
-using CallAutomation.Extensions.Services;
 using Microsoft.Extensions.Logging;
 
 namespace CallAutomation.Extensions.Handlers;
@@ -26,28 +25,28 @@ internal sealed class CallAutomationEventHandler : BaseEventHandler, ICallAutoma
         _logger = logger;
     }
 
-    public async ValueTask Handle(CallAutomationEventBase eventBase, string? requestId)
+    public async ValueTask Handle(CallAutomationEventBase eventBase, IOperationContext? operationContext, string? id)
     {
-        if (string.IsNullOrEmpty(requestId)) return;
+        if (string.IsNullOrEmpty(id)) return;
         var clientElements = new CallAutomationClientElements(_client, eventBase.CallConnectionId);
 
-        var delegates = _callbackHandler.GetDelegateCallbacks(requestId, eventBase.GetType());
+        var delegates = _callbackHandler.GetDelegateCallbacks(id, eventBase.GetType());
         foreach (var @delegate in delegates)
         {
-            _logger.LogInformation("Found callback delegate for request {requestId} and event {event}", requestId, eventBase.GetType());
+            _logger.LogInformation("Found callback delegate for request {requestId} and event {event}", id, eventBase.GetType());
             await _dispatcher.DispatchAsync(eventBase, @delegate, clientElements);
         }
 
         // dispatch handler callbacks
-        var handlerTuples = _callbackHandler.GetHandlers(requestId, eventBase.GetType());
+        var handlerTuples = _callbackHandler.GetHandlers(id, eventBase.GetType());
         foreach (var handlerTuple in handlerTuples)
         {
             var handler = GetHandler(handlerTuple.HandlerName);
             if (handler is null) return;
 
-            _logger.LogInformation("Found callback handler for request {requestId} and event {event}", requestId, eventBase.GetType());
+            _logger.LogInformation("Found callback handler for request {requestId} and event {event}", id, eventBase.GetType());
 
-            await _dispatcher.DispatchAsync(eventBase, handler, handlerTuple.MethodName, clientElements);
+            await _dispatcher.DispatchAsync(eventBase, operationContext, handler, handlerTuple.MethodName, clientElements);
         }
     }
 }
