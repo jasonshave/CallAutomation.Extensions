@@ -9,7 +9,7 @@ namespace CallAutomation.Extensions.Services;
 
 internal abstract class HelperCallbackWithContext : HelperCallbackBase
 {
-    protected string JSONContext => JsonSerializer.Serialize((object)Context);
+    protected string JSONContext => JsonSerializer.Serialize(Context);
     private OperationContext Context { get; set; }
 
     protected HelperCallbackWithContext(string requestId, IEnumerable<Type> types)
@@ -18,8 +18,9 @@ internal abstract class HelperCallbackWithContext : HelperCallbackBase
         Context = new OperationContext { RequestId = requestId };
     }
 
-    public void SetPayload(IPayload payload)
+    public void SetContext(OperationContext context)
     {
-        Context.Payload = payload;
+        context.RequestId = this.Context.RequestId;
+        this.Context = context;
     }
 }

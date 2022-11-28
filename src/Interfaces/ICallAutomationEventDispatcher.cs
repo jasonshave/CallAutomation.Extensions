@@ -11,5 +11,6 @@ internal interface ICallAutomationEventDispatcher
 {
     ValueTask DispatchAsync(CallAutomationEventBase @event, Delegate @delegate, CallAutomationClientElements clientElements);
 
-    ValueTask DispatchAsync(CallAutomationEventBase @event, CallAutomationHandler handlerInstance, string methodName, CallAutomationClientElements clientElements);
+    ValueTask DispatchAsync<T>(CallAutomationEventBase @event, T operationContext, CallAutomationHandler handlerInstance, string methodName, CallAutomationClientElements clientElements)
+        where T : OperationContext;
 }

@@ -28,26 +28,29 @@ internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublish
 
     public async ValueTask PublishAsync(CloudEvent[] cloudEvents)
     {
-        string? RequestIDFrom(string operationContext) =>
-            (operationContext is null)
-            ? null
-            : (JsonSerializer.Deserialize<OperationContext>(operationContext)?.RequestId ?? operationContext);
+        //string? RequestIDFrom(string operationContext) =>
+        //    (operationContext is null)
+        //    ? null
+        //    : (JsonSerializer.Deserialize<OperationContext>(operationContext)?.RequestId ?? operationContext);
 
         foreach (var cloudEvent in cloudEvents)
         {
             CallAutomationEventBase callAutomationEventBase = CallAutomationEventParser.Parse(cloudEvent);
+            OperationContext? operationContext = callAutomationEventBase.OperationContext is null
+                ? null
+                : JsonSerializer.Deserialize<OperationContext>(callAutomationEventBase.OperationContext);
 
             if (callAutomationEventBase is CallConnected or CallDisconnected)
             {
                 if (callAutomationEventBase.OperationContext is null)
                 {
                     // OperationContext will be null for inbound calls
-                    await _callAutomationEventHandler.Handle(callAutomationEventBase, callAutomationEventBase.CorrelationId);
+                    await _callAutomationEventHandler.Handle(callAutomationEventBase, operationContext, callAutomationEventBase.CorrelationId);
                 }
                 else
                 {
                     // outbound calls won't have a correlation ID so we have to use the operation context.
-                    await _callAutomationEventHandler.Handle(callAutomationEventBase, RequestIDFrom(callAutomationEventBase.OperationContext));
+                    await _callAutomationEventHandler.Handle(callAutomationEventBase, operationContext, operationContext?.RequestId);
                 }
 
                 return;
@@ -55,11 +58,11 @@ internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublish
 
             if (callAutomationEventBase is not RecognizeCompleted or RecognizeFailed)
             {
-                await _callAutomationEventHandler.Handle(callAutomationEventBase, RequestIDFrom(callAutomationEventBase.OperationContext));
+                await _callAutomationEventHandler.Handle(callAutomationEventBase, operationContext, operationContext?.RequestId);
                 return;
             }
 
-            await _callAutomationRecognizeDtmfHandler.Handle(callAutomationEventBase, RequestIDFrom(callAutomationEventBase.OperationContext));
+            await _callAutomationRecognizeDtmfHandler.Handle(callAutomationEventBase, operationContext?.RequestId);
         }
     }
 }
