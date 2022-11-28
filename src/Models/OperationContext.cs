@@ -7,8 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace CallAutomation.Extensions.Models
 {
-    [JsonConverter(typeof(OperationContextJsonConverter))]
-    public class OperationContext
+    public class OperationContext : IOperationContext
     {
         [JsonInclude]
         public string? RequestId { get; internal set; }

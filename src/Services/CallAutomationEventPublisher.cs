@@ -3,6 +3,7 @@
 
 using Azure.Communication.CallAutomation;
 using Azure.Messaging;
+using CallAutomation.Extensions.Converters;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
 using Microsoft.Extensions.Logging;
@@ -36,9 +37,15 @@ internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublish
         foreach (var cloudEvent in cloudEvents)
         {
             CallAutomationEventBase callAutomationEventBase = CallAutomationEventParser.Parse(cloudEvent);
-            OperationContext? operationContext = callAutomationEventBase.OperationContext is null
+            IOperationContext? operationContext = callAutomationEventBase.OperationContext is null
                 ? null
-                : JsonSerializer.Deserialize<OperationContext>(callAutomationEventBase.OperationContext);
+                : JsonSerializer.Deserialize<IOperationContext>(callAutomationEventBase.OperationContext, new JsonSerializerOptions()
+                {
+                    Converters =
+                    {
+                        new OperationContextJsonConverter()
+                    }
+                });
 
             if (callAutomationEventBase is CallConnected or CallDisconnected)
             {

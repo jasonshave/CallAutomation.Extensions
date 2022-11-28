@@ -4,7 +4,6 @@
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
-using CallAutomation.Extensions.Services;
 using Microsoft.Extensions.Logging;
 
 namespace CallAutomation.Extensions.Handlers;
@@ -26,8 +25,7 @@ internal sealed class CallAutomationEventHandler : BaseEventHandler, ICallAutoma
         _logger = logger;
     }
 
-    public async ValueTask Handle<T>(CallAutomationEventBase eventBase, T operationContext, string? id)
-        where T : OperationContext
+    public async ValueTask Handle(CallAutomationEventBase eventBase, IOperationContext? operationContext, string? id)
     {
         if (string.IsNullOrEmpty(id)) return;
         var clientElements = new CallAutomationClientElements(_client, eventBase.CallConnectionId);

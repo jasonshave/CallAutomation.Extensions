@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 using Azure.Communication.CallAutomation;
-using CallAutomation.Extensions.Models;
+using CallAutomation.Extensions.Interfaces;
 
 namespace CallAutomation.Extensions;
 
@@ -16,8 +16,7 @@ public abstract class CallAutomationHandler
     /// <param name="callMedia"></param>
     /// <param name="callRecording"></param>
     /// <returns></returns>
-    public virtual ValueTask OnCallConnected<T>(CallConnected @event, T operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) 
-        where T : OperationContext => ValueTask.CompletedTask;
+    public virtual ValueTask OnCallConnected(CallConnected @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 
     /// <summary>
     /// Executed when an existing call leg controlled by Call Automation is disconnected.

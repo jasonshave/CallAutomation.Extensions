@@ -8,13 +8,13 @@ using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Converters;
 
-public class OperationContextJsonConverter : JsonConverter<OperationContext>
+internal class OperationContextJsonConverter : JsonConverter<IOperationContext>
 {
     private Dictionary<string, Type> _types;
 
     public OperationContextJsonConverter()
     {
-        var type = typeof(OperationContext);
+        var type = typeof(IOperationContext);
         _types = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(s => s.GetTypes())
             .Where(p => type.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract)
@@ -28,7 +28,7 @@ public class OperationContextJsonConverter : JsonConverter<OperationContext>
     /// <param name="objectType">Holds any class type.</param>
     /// <param name="existingValue">contains reference of a control/object.</param>
     /// <param name="serializer">JsonSerializer</param>
-    public override OperationContext Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override IOperationContext Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         //var values = JsonSerializer.Deserialize<Dictionary<string, object>>(
         //    JsonDocument.ParseValue(ref reader), options);
@@ -37,7 +37,7 @@ public class OperationContextJsonConverter : JsonConverter<OperationContext>
             throw new JsonException();
         }
 
-        OperationContext result = null;
+        IOperationContext result = null;
         using (var jsonDocument = JsonDocument.ParseValue(ref reader))
         {
             if (!jsonDocument.RootElement.TryGetProperty("$Type", out var typeProperty))
@@ -56,7 +56,7 @@ public class OperationContextJsonConverter : JsonConverter<OperationContext>
             }
 
             //var jsonObject = jsonDocument.RootElement.GetRawText();
-            result = (OperationContext)JsonSerializer.Deserialize(typeValue.ToString(), type, options);
+            result = (IOperationContext)JsonSerializer.Deserialize(typeValue.ToString(), type, options);
         }
 
 
@@ -69,7 +69,7 @@ public class OperationContextJsonConverter : JsonConverter<OperationContext>
     /// <param name="writer">JsaonWriter.</param>
     /// <param name="value">contains reference of a BaseModel.</param>
     /// <param name="serializer">JsonSerializer</param>
-    public override void Write(Utf8JsonWriter writer, OperationContext value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, IOperationContext value, JsonSerializerOptions options)
     {
         //var values = new Dictionary<string, object>
         //{
