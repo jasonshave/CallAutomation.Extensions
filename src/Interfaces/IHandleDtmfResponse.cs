@@ -9,7 +9,7 @@ public interface IHandleDtmfResponseWithHandler : IWithCallbackHandler<IHandleDt
 {
 }
 
-public interface IHandleDtmfResponse : ICallbackPayLoad
+public interface IHandleDtmfResponse : ICallbackContext
 {
     /// <summary>
     /// Specifies the callback delegate when the requested <see cref="IDtmfTone"/> is received.

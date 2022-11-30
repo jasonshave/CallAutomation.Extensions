@@ -128,4 +128,14 @@ public abstract class CallAutomationHandler
     /// <param name="callRecording"></param>
     /// <returns></returns>
     public virtual ValueTask OnPromptFailed(RecognizeFailed @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+
+    /// <summary>
+    /// Executed when the call recording state changed.
+    /// </summary>
+    /// <param name="event"></param>
+    /// <param name="callConnection"></param>
+    /// <param name="callMedia"></param>
+    /// <param name="callRecording"></param>
+    /// <returns></returns>
+    public virtual ValueTask OnRecordingStateChanged(RecordingStateChanged @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 }

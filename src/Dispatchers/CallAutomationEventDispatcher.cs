@@ -23,15 +23,6 @@ internal sealed class CallAutomationEventDispatcher : ICallAutomationEventDispat
 
     public async ValueTask DispatchAsync(CallAutomationEventBase @event, IOperationContext? operationContext, CallAutomationHandler handlerInstance, string methodName, CallAutomationClientElements clientElements)
     {
-        //switch (@event)
-        //{
-        //    case CallConnected cc:
-        //        await handlerInstance.OnCallConnected(cc, operationContext, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording);
-        //        return;
-        //    default:
-        //        break;
-        //}
-        
         var methodInfo = handlerInstance.GetType().GetMethod(methodName);
         var task = (ValueTask)methodInfo.Invoke(handlerInstance, new object[] { @event, operationContext, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording });
         await task.ConfigureAwait(false);

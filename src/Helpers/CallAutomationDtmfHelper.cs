@@ -17,7 +17,6 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
     ICanChooseRecognizeOptions,
     IHandleDtmfResponseWithHandler
 {
-    private static readonly IEnumerable<Type> _types = new[] { typeof(RecognizeFailed), typeof(RecognizeCompleted), typeof(SilenceTimeout) };
     private readonly CallMedia _callMedia;
     private readonly int _numTones;
 
@@ -26,7 +25,7 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
     private RecognizeOptions _recognizeOptions;
 
     internal CallAutomationDtmfHelper(CallMedia callMedia, string requestId)
-        : base(requestId, _types)
+        : base(requestId)
     {
         _callMedia = callMedia;
         _numTones = 1;

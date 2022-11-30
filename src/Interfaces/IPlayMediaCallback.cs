@@ -8,7 +8,7 @@ public interface IPlayMediaCallbackWithHandler : IWithCallbackHandler<IPlayMedia
 {
 }
 
-public interface IPlayMediaCallback : ICallbackPayLoad
+public interface IPlayMediaCallback : ICallbackContext
 {
     /// <summary>
     /// Targets a specific participant on the call to hear the audio file.

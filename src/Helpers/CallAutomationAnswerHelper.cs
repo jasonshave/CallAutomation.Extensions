@@ -13,13 +13,12 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
     IAnswerWithCallbackUriWithHandler,
     IAnswerCallHandling
 {
-    private static readonly IEnumerable<Type> _types = new[] { typeof(CallConnected), typeof(CallDisconnected) };
     private readonly CallAutomationClient _client;
     private readonly IncomingCall _incomingCall;
     private Uri _callbackUri;
 
     internal CallAutomationAnswerHelper(CallAutomationClient client, IncomingCall incomingCall, string requestId)
-        : base(requestId, _types)
+        : base(requestId)
     {
         _client = client;
         _incomingCall = incomingCall;

@@ -4,7 +4,7 @@ using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICallbackPayload<T> : IExecuteAsync<T>
+public interface ICallbackContext<T> : IExecuteAsync<T>
 {
     /// <summary>
     /// Setting custom context.
@@ -14,7 +14,7 @@ public interface ICallbackPayload<T> : IExecuteAsync<T>
     IExecuteAsync<T> WithContext(OperationContext context);
 }
 
-public interface ICallbackPayLoad : IExecuteAsync
+public interface ICallbackContext : IExecuteAsync
 {
     /// <summary>
     /// Setting custom context.

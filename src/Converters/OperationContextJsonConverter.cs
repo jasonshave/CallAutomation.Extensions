@@ -71,22 +71,10 @@ internal class OperationContextJsonConverter : JsonConverter<IOperationContext>
     /// <param name="serializer">JsonSerializer</param>
     public override void Write(Utf8JsonWriter writer, IOperationContext value, JsonSerializerOptions options)
     {
-        //var values = new Dictionary<string, object>
-        //{
-        //    { nameof(value.RequestId), value.RequestId }
-        //};
-        //if(value.Payload != null)
-        //{
-        //    values[nameof(value.Payload)] = value.Payload;
-        //    values[$"{nameof(value.Payload)}Type"] = value.Payload.GetType().FullName;
-        //}
-
         writer.WriteStartObject();
         writer.WriteString("$Type", value.GetType().FullName);
         writer.WritePropertyName("Value");
         JsonSerializer.Serialize(writer, value, value.GetType());
         writer.WriteEndObject();
-
-        //JsonSerializer.Serialize(writer, values, options);
     }
 }

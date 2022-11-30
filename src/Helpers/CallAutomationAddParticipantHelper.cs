@@ -13,21 +13,20 @@ namespace CallAutomation.Extensions.Helpers;
 /// <inheritdoc />
 internal sealed class CallAutomationAddParticipantHelper : HelperCallbackWithContext, ICanAddParticipantWithHandler
 {
-    private static readonly IEnumerable<Type> _types = new[] { typeof(AddParticipantsSucceeded), typeof(AddParticipantsFailed) };
     private readonly CallConnection _connection;
     private readonly List<CommunicationIdentifier> _participantsToAdd = new();
     private ParticipantOptions? _addParticipantsOptions;
     private PstnParticipantOptions? _pstnParticipantOptions;
 
     internal CallAutomationAddParticipantHelper(CallConnection connection, CommunicationIdentifier firstUserToAdd, string requestId)
-        : base(requestId, _types)
+        : base(requestId)
     {
         _connection = connection;
         _participantsToAdd.Add(firstUserToAdd);
     }
 
     internal CallAutomationAddParticipantHelper(CallConnection connection, CommunicationIdentifier firstUserToAdd, PstnParticipantOptions pstnParticipantOptions, string requestId)
-        : base(requestId, _types)
+        : base(requestId)
     {
         _connection = connection;
         _participantsToAdd.Add(firstUserToAdd);

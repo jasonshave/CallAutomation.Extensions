@@ -19,8 +19,8 @@ internal abstract class HelperCallbackWithContext : HelperCallbackBase
     });
     private IOperationContext Context { get; set; }
 
-    protected HelperCallbackWithContext(string requestId, IEnumerable<Type> types)
-        : base(requestId, types)
+    protected HelperCallbackWithContext(string requestId)
+        : base(requestId)
     {
         Context = new OperationContext { RequestId = requestId };
     }
