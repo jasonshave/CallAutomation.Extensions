@@ -30,8 +30,6 @@ internal class OperationContextJsonConverter : JsonConverter<IOperationContext>
     /// <param name="serializer">JsonSerializer</param>
     public override IOperationContext Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        //var values = JsonSerializer.Deserialize<Dictionary<string, object>>(
-        //    JsonDocument.ParseValue(ref reader), options);
         if (reader.TokenType != JsonTokenType.StartObject)
         {
             throw new JsonException();
@@ -55,7 +53,6 @@ internal class OperationContextJsonConverter : JsonConverter<IOperationContext>
                 throw new JsonException();
             }
 
-            //var jsonObject = jsonDocument.RootElement.GetRawText();
             result = (IOperationContext)JsonSerializer.Deserialize(typeValue.ToString(), type, options);
         }
 

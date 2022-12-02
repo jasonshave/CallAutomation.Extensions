@@ -8,6 +8,7 @@ namespace CallAutomation.Extensions.Interfaces;
 public interface ICanRemoveParticipantWithHandler : IWithCallbackHandler<ICanRemoveParticipant>, ICanRemoveParticipant
 {
 }
+
 public interface ICanRemoveParticipant : ICallbackContext
 {
     ICanRemoveParticipant RemoveParticipants(CommunicationIdentifier[] participantsToRemove);
