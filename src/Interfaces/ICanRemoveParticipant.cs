@@ -5,11 +5,12 @@ using Azure.Communication;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICanRemoveParticipant
+public interface ICanRemoveParticipantWithHandler : IWithCallbackHandler<ICanRemoveParticipant>, ICanRemoveParticipant
+{
+}
+public interface ICanRemoveParticipant : ICallbackContext
 {
     ICanRemoveParticipant RemoveParticipants(CommunicationIdentifier[] participantsToRemove);
 
     ICanRemoveParticipant RemoveParticipant(string rawId);
-
-    ValueTask ExecuteAsync();
 }

@@ -43,7 +43,7 @@ public static class CallConnectionExtensions
     /// <param name="connection"></param>
     /// <param name="rawId"></param>
     /// <returns></returns>
-    public static ICanRemoveParticipant RemoveParticipant(this CallConnection connection, string rawId)
+    public static ICanRemoveParticipantWithHandler RemoveParticipant(this CallConnection connection, string rawId)
     {
         var helper = new CallAutomationRemoveParticipantHelper(connection, CommunicationIdentifier.FromRawId(rawId), Guid.NewGuid().ToString());
         return helper;
