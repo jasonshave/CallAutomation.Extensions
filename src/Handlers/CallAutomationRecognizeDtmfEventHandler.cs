@@ -27,57 +27,74 @@ public class CallAutomationRecognizeDtmfEventHandler : BaseEventHandler, ICallAu
         _logger = logger;
     }
 
-    public async ValueTask Handle(CallAutomationEventBase eventBase, string? requestId)
+    public async ValueTask Handle(CallAutomationEventBase eventBase, IOperationContext? operationContext, string? requestId)
     {
         var clientElements = new CallAutomationClientElements(_client, eventBase.CallConnectionId);
+        var isHandled = false;
 
         if (eventBase is RecognizeCompleted recognizeCompleted)
         {
             var tone = recognizeCompleted.CollectTonesResult.Tones.FirstOrDefault();
 
-            // need to determine if one or more tones are collected as we need to get a single
-            // delegate for a single tone or get a single delegate for multiple tones
-            if (recognizeCompleted.CollectTonesResult.Tones.Count is 1)
+            var callBasedOn = async (Type type) =>
             {
                 // dispatch delegate callbacks
-                var delegates = _callbackHandler.GetDelegateCallbacks(requestId, tone.Convert().GetType());
+                var delegates = _callbackHandler.GetDelegateCallbacks(requestId, type);
                 foreach (var @delegate in delegates)
                 {
+                    isHandled = true;
                     _logger.LogInformation("Found callback delegate for request {requestId}, with {numTones} DTMF tone(s), and event {event}", requestId, recognizeCompleted.CollectTonesResult.Tones.Count, eventBase.GetType().Name);
                     await _dispatcher.DispatchAsync(recognizeCompleted, @delegate, clientElements, recognizeCompleted.CollectTonesResult.Tones);
                 }
 
-                var handlerTuples = _callbackHandler.GetHandlers(requestId, tone.Convert().GetType());
+                var handlerTuples = _callbackHandler.GetHandlers(requestId, type);
                 foreach (var handlerTuple in handlerTuples)
                 {
                     var handler = GetHandler(handlerTuple.HandlerName);
                     if (handler is null) return;
 
-                    _logger.LogInformation("Found callback handler for request {requestId} and event {event}", requestId, eventBase.GetType());
-                    await _dispatcher.DispatchAsync(recognizeCompleted, handler, handlerTuple.MethodName, clientElements, recognizeCompleted.CollectTonesResult.Tones);
+                    isHandled = true;
+                    _logger.LogInformation("Found callback handler for request {requestId} and event {event}", requestId, eventBase.GetType().Name);
+                    await _dispatcher.DispatchAsync(recognizeCompleted, operationContext, handler, handlerTuple.MethodName, clientElements, recognizeCompleted.CollectTonesResult.Tones);
                 }
-            }
+            };
+
+            // need to determine if one or more tones are collected as we need to get a single
+            // delegate for a single tone or get a single delegate for multiple tones
+            if (recognizeCompleted.CollectTonesResult.Tones.Count is 1)
+                await callBasedOn(tone.Convert().GetType());
+
+            if (!isHandled)
+                await callBasedOn(eventBase.GetType());
         }
-
-        if (eventBase is RecognizeFailed recognizeFailed)
+        else if (eventBase is RecognizeFailed recognizeFailed)
         {
-            // dispatch delegate callbacks
-            var delegates = _callbackHandler.GetDelegateCallbacks(requestId, recognizeFailed.ReasonCode.Convert().GetType());
-            foreach (var @delegate in delegates)
+            var callBasedOn = async (Type type) =>
             {
-                _logger.LogInformation("Found callback delegate for request {requestId}, and event {event}", requestId, eventBase.GetType().Name);
-                await _dispatcher.DispatchAsync(recognizeFailed, @delegate, clientElements);
-            }
+                // dispatch delegate callbacks
+                var delegates = _callbackHandler.GetDelegateCallbacks(requestId, type);
+                foreach (var @delegate in delegates)
+                {
+                    isHandled = true;
+                    _logger.LogInformation("Found callback delegate for request {requestId}, and event {event}", requestId, eventBase.GetType().Name);
+                    await _dispatcher.DispatchAsync(recognizeFailed, @delegate, clientElements);
+                }
 
-            var handlerTuples = _callbackHandler.GetHandlers(requestId, recognizeFailed.ReasonCode.Convert().GetType());
-            foreach (var handlerTuple in handlerTuples)
-            {
-                var handler = GetHandler(handlerTuple.HandlerName);
-                if (handler is null) return;
+                var handlerTuples = _callbackHandler.GetHandlers(requestId, type);
+                foreach (var handlerTuple in handlerTuples)
+                {
+                    var handler = GetHandler(handlerTuple.HandlerName);
+                    if (handler is null) return;
 
-                _logger.LogInformation("Found callback handler for request {requestId} and event {event}", requestId, eventBase.GetType());
-                await _dispatcher.DispatchAsync(recognizeFailed, handler, handlerTuple.MethodName, clientElements);
-            }
+                    isHandled = true;
+                    _logger.LogInformation("Found callback handler for request {requestId} and event {event}", requestId, eventBase.GetType().Name);
+                    await _dispatcher.DispatchAsync(recognizeFailed, operationContext, handler, handlerTuple.MethodName, clientElements);
+                }
+            };
+
+            await callBasedOn(recognizeFailed.ReasonCode.Convert().GetType());
+            if (!isHandled)
+                await callBasedOn(eventBase.GetType());
         }
     }
 }

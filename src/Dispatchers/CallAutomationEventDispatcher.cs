@@ -27,10 +27,4 @@ internal sealed class CallAutomationEventDispatcher : ICallAutomationEventDispat
         var task = (ValueTask)methodInfo.Invoke(handlerInstance, new object[] { @event, operationContext, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording });
         await task.ConfigureAwait(false);
     }
-
-    public void Dispatch<T>(CallAutomationEventBase @event, T operationContext, Action<CallAutomationEventBase, T, CallConnection, CallMedia, CallRecording> callbackAction, CallAutomationClientElements clientElements)
-        where T : OperationContext
-    {
-        callbackAction(@event, operationContext, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording);
-    }
 }

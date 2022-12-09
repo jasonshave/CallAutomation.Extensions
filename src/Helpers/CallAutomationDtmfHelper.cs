@@ -18,7 +18,6 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
     IHandleDtmfResponseWithHandler
 {
     private readonly CallMedia _callMedia;
-    private readonly int _numTones;
 
     private Uri _fileUri;
     private CommunicationIdentifier _recognizeInputFromParticipant;
@@ -28,7 +27,6 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
         : base(requestId)
     {
         _callMedia = callMedia;
-        _numTones = 1;
     }
 
     public ICanRecognizeDtmfOptions WithPrompt(string fileUri)
@@ -40,6 +38,13 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
     public ICanChooseRecognizeOptions FromParticipant(string id)
     {
         _recognizeInputFromParticipant = id.ConvertToCommunicationIdentifier();
+        return this;
+    }
+    public IHandleDtmfResponseWithHandler WithOptions(Action<RecognizeOptions> options)
+    {
+        var recognizeOptions = new RecognizeOptions();
+        options(recognizeOptions);
+        _recognizeOptions = recognizeOptions;
         return this;
     }
 
@@ -71,18 +76,16 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
         return this;
     }
 
-    public IHandleDtmfResponse OnPress<TTone>(Action callback)
-        where TTone : IDtmfTone
+    public IHandleDtmfResponse OnRecognizeCompleted<THandler>()
+        where THandler : CallAutomationHandler
     {
-        CallbackHandler.AddDelegateCallback<TTone>(RequestId, callback);
+        CallbackHandler.AddHandlerCallback<THandler, RecognizeCompleted>(RequestId, $"On{nameof(RecognizeCompleted)}");
         return this;
     }
 
-    public IHandleDtmfResponseWithHandler WithOptions(Action<RecognizeOptions> options)
+    public IHandleDtmfResponse OnRecognizeCompleted(Func<ValueTask> callback)
     {
-        var recognizeOptions = new RecognizeOptions();
-        options(recognizeOptions);
-        _recognizeOptions = recognizeOptions;
+        CallbackHandler.AddDelegateCallback<RecognizeCompleted>(RequestId, callback);
         return this;
     }
 
@@ -101,9 +104,16 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
         return this;
     }
 
-    public IHandleDtmfTimeout OnInputTimeout(Func<ValueTask> callback)
+    public IHandleDtmfTimeout OnRecognizeFailed(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback)
     {
         CallbackHandler.AddDelegateCallback<RecognizeFailed>(RequestId, callback);
+        return this;
+    }
+
+    public IHandleDtmfTimeout OnRecognizeFailed<THandler>()
+            where THandler : CallAutomationHandler
+    {
+        CallbackHandler.AddHandlerCallback<THandler, RecognizeFailed>(RequestId, $"On{nameof(RecognizeFailed)}");
         return this;
     }
 
@@ -116,19 +126,17 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
     public async ValueTask ExecuteAsync()
     {
         // invoke recognize API
-        var recognizeOptions = new CallMediaRecognizeDtmfOptions(_recognizeInputFromParticipant, _numTones)
+        var recognizeOptions = new CallMediaRecognizeDtmfOptions(
+            _recognizeInputFromParticipant,
+            _recognizeOptions.MaxToneCount)
         {
             OperationContext = JSONContext,
             Prompt = new FileSource(_fileUri),
             InterruptCallMediaOperation = _recognizeOptions.AllowInterruptExistingMediaOperation,
             InterruptPrompt = _recognizeOptions.AllowInterruptPrompt,
+            InterToneTimeout = TimeSpan.FromSeconds(_recognizeOptions.WaitBetweenTonesInSeconds),
+            InitialSilenceTimeout = TimeSpan.FromSeconds(_recognizeOptions.WaitForResponseInSeconds),
         };
-
-        if (_recognizeOptions.WaitBetweenTonesInSeconds < 0)
-            recognizeOptions.InterToneTimeout = TimeSpan.FromSeconds(_recognizeOptions.WaitBetweenTonesInSeconds);
-
-        if (_recognizeOptions.WaitForResponseInSeconds < 0)
-            recognizeOptions.InitialSilenceTimeout = TimeSpan.FromSeconds(_recognizeOptions.WaitForResponseInSeconds);
 
         await _callMedia.StartRecognizingAsync(recognizeOptions);
     }

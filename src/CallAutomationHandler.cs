@@ -100,6 +100,16 @@ public abstract class CallAutomationHandler
     public virtual ValueTask OnRecognizeCompleted(RecognizeCompleted @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording, IReadOnlyList<DtmfTone> Tones) => ValueTask.CompletedTask;
 
     /// <summary>
+    /// A generic callback that is executed when the recognition failed.
+    /// </summary>
+    /// <param name="event"></param>
+    /// <param name="callConnection"></param>
+    /// <param name="callMedia"></param>
+    /// <param name="callRecording"></param>
+    /// <returns></returns>
+    public virtual ValueTask OnRecognizeFailed(RecognizeFailed @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+
+    /// <summary>
     /// Executed when the collection of DTMF tones fails due to lack of input.
     /// </summary>
     /// <param name="event"></param>

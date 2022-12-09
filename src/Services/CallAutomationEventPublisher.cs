@@ -44,7 +44,7 @@ internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublish
 
             if (callAutomationEventBase is RecognizeCompleted or RecognizeFailed)
             {
-                await _callAutomationRecognizeDtmfHandler.Handle(callAutomationEventBase, operationContext?.RequestId);
+                await _callAutomationRecognizeDtmfHandler.Handle(callAutomationEventBase, operationContext, operationContext?.RequestId);
                 return;
             }
 

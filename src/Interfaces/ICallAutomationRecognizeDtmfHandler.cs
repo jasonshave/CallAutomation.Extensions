@@ -7,5 +7,5 @@ namespace CallAutomation.Extensions.Interfaces;
 
 public interface ICallAutomationRecognizeDtmfHandler
 {
-    ValueTask Handle(CallAutomationEventBase eventBase, string? requestId);
+    ValueTask Handle(CallAutomationEventBase eventBase, IOperationContext? operationContext, string? requestId);
 }
