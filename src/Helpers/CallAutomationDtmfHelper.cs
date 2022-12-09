@@ -40,6 +40,7 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
         _recognizeInputFromParticipant = id.ConvertToCommunicationIdentifier();
         return this;
     }
+
     public IHandleDtmfResponseWithHandler WithOptions(Action<RecognizeOptions> options)
     {
         var recognizeOptions = new RecognizeOptions();
