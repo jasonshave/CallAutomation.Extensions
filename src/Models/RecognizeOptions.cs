@@ -5,11 +5,13 @@ namespace CallAutomation.Extensions.Models;
 
 public sealed class RecognizeOptions
 {
-    public int WaitForResponseInSeconds { get; set; }
+    public int MaxToneCount { get; set; } = 1;
 
-    public int WaitBetweenTonesInSeconds { get; set; }
+    public int WaitForResponseInSeconds { get; set; } = 5;
 
-    public bool AllowInterruptPrompt { get; set; }
+    public int WaitBetweenTonesInSeconds { get; set; } = 2;
 
-    public bool AllowInterruptExistingMediaOperation { get; set; }
+    public bool AllowInterruptPrompt { get; set; } = false;
+
+    public bool AllowInterruptExistingMediaOperation { get; set; } = false;
 }

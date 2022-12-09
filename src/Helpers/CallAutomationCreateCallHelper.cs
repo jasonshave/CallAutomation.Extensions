@@ -10,12 +10,11 @@ using CallAutomation.Extensions.Services;
 
 namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
-    ICreateCallFrom,
+internal sealed class CallAutomationCreateCallHelper : HelperCallbackWithContext,
+    ICreateCallFromWithHandler,
     ICreateCallWithCallbackUri,
     ICreateCallHandling
 {
-    private static readonly IEnumerable<Type> _types = new[] { typeof(CallConnected), typeof(CallDisconnected) };
     private readonly CallAutomationClient _client;
     private readonly List<CommunicationIdentifier> _destinations = new();
     private string _from;
@@ -23,15 +22,15 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
     private Uri _callbackUri;
 
     internal CallAutomationCreateCallHelper(CallAutomationClient client, string to, string requestId)
-        : base(requestId, _types)
+        : base(requestId)
     {
         _client = client;
         _destinations.Add(to.ConvertToCommunicationIdentifier());
     }
 
-    public ICreateCallWithCallbackUri From(string id)
+    public ICreateCallFrom WithCallbackHandler(ICallbacksHandler handler)
     {
-        _from = id;
+        CallbackHandler = handler;
         return this;
     }
 
@@ -55,38 +54,44 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
     public ICreateCallHandling OnCallConnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, CallConnected>($"On{nameof(CallConnected)}", typeof(CallConnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        CallbackHandler.AddHandlerCallback<THandler, CallConnected>(RequestId, $"On{nameof(CallConnected)}");
         return this;
     }
 
     public ICreateCallHandling OnCallDisconnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, CallDisconnected>($"On{nameof(CallDisconnected)}", typeof(CallConnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        CallbackHandler.AddHandlerCallback<THandler, CallDisconnected>(RequestId, $"On{nameof(CallDisconnected)}");
         return this;
     }
 
     public ICreateCallHandling OnCallConnected(Func<ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallConnected>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<CallConnected>(RequestId, callbackFunction);
         return this;
     }
 
     public ICreateCallHandling OnCallConnected(Func<CallConnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallConnected>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<CallConnected>(RequestId, callbackFunction);
         return this;
     }
 
     public ICreateCallHandling OnCallDisconnected(Func<ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallDisconnected>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<CallDisconnected>(RequestId, callbackFunction);
         return this;
     }
 
     public ICreateCallHandling OnCallDisconnected(Func<CallDisconnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallDisconnected>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<CallDisconnected>(RequestId, callbackFunction);
+        return this;
+    }
+
+    public IExecuteAsync<CreateCallResult> WithContext(OperationContext context)
+    {
+        SetContext(context);
         return this;
     }
 
@@ -105,7 +110,7 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
 
         var createCallOptions = new CreateCallOptions(callSource, _destinations, _callbackUri)
         {
-            OperationContext = RequestId,
+            OperationContext = JSONContext,
         };
 
         var result = await _client.CreateCallAsync(createCallOptions);

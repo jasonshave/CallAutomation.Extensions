@@ -10,19 +10,24 @@ using CallAutomation.Extensions.Services;
 namespace CallAutomation.Extensions.Helpers;
 
 internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
-    IAnswerWithCallbackUri,
+    IAnswerWithCallbackUriWithHandler,
     IAnswerCallHandling
 {
-    private static readonly IEnumerable<Type> _types = new[] { typeof(CallConnected), typeof(CallDisconnected) };
     private readonly CallAutomationClient _client;
     private readonly IncomingCall _incomingCall;
     private Uri _callbackUri;
 
     internal CallAutomationAnswerHelper(CallAutomationClient client, IncomingCall incomingCall, string requestId)
-        : base(requestId, _types)
+        : base(requestId)
     {
         _client = client;
         _incomingCall = incomingCall;
+    }
+
+    public IAnswerWithCallbackUri WithCallbackHandler(ICallbacksHandler handler)
+    {
+        CallbackHandler = handler;
+        return this;
     }
 
     public IAnswerCallHandling WithCallbackUri(string callbackUri)
@@ -34,38 +39,38 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
     public IAnswerCallHandling OnCallConnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, CallConnected>($"On{nameof(CallConnected)}", typeof(CallConnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        CallbackHandler.AddHandlerCallback<THandler, CallConnected>(RequestId, $"On{nameof(CallConnected)}");
         return this;
     }
 
     public IAnswerCallHandling OnCallDisconnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        HelperCallbacks.AddHandlerCallback<THandler, CallDisconnected>($"On{nameof(CallDisconnected)}", typeof(CallDisconnected), typeof(CallConnection), typeof(CallMedia), typeof(CallRecording));
+        CallbackHandler.AddHandlerCallback<THandler, CallDisconnected>(RequestId, $"On{nameof(CallDisconnected)}");
         return this;
     }
 
     public IAnswerCallHandling OnCallConnected(Func<CallConnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallConnected>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<CallConnected>(RequestId, callbackFunction);
         return this;
     }
 
     public IAnswerCallHandling OnCallConnected(Func<ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallConnected>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<CallConnected>(RequestId, callbackFunction);
         return this;
     }
 
     public IAnswerCallHandling OnCallDisconnected(Func<ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallDisconnected>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<CallDisconnected>(RequestId, callbackFunction);
         return this;
     }
 
     public IAnswerCallHandling OnCallDisconnected(Func<CallDisconnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        HelperCallbacks.AddDelegateCallback<CallConnected>(callbackFunction);
+        CallbackHandler.AddDelegateCallback<CallConnected>(RequestId, callbackFunction);
         return this;
     }
 

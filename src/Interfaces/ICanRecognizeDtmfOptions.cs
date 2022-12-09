@@ -12,5 +12,5 @@ public interface ICanRecognizeDtmfOptions
     /// </summary>
     /// <param name="options"></param>
     /// <returns></returns>
-    IHandleDtmfResponse WithOptions(Action<RecognizeOptions> options);
+    IHandleDtmfResponseWithHandler WithOptions(Action<RecognizeOptions> options);
 }

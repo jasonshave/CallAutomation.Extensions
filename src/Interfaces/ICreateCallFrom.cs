@@ -5,15 +5,12 @@ using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
+public interface ICreateCallFromWithHandler : IWithCallbackHandler<ICreateCallFrom>, ICreateCallFrom
+{
+}
+
 public interface ICreateCallFrom
 {
-    /// <summary>
-    /// Defines which identity to use as the source of the call.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    ICreateCallWithCallbackUri From(string id);
-
     /// <summary>
     /// Defines which identity to use as the source of the call while offering a delegate to change options using <see cref="CallFromOptions"/>
     /// </summary>

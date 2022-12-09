@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Azure.Communication.CallAutomation;
+using CallAutomation.Extensions.Interfaces;
 
 namespace CallAutomation.Extensions;
 
@@ -15,7 +16,7 @@ public abstract class CallAutomationHandler
     /// <param name="callMedia"></param>
     /// <param name="callRecording"></param>
     /// <returns></returns>
-    public virtual ValueTask OnCallConnected(CallConnected @event, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+    public virtual ValueTask OnCallConnected(CallConnected @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 
     /// <summary>
     /// Executed when an existing call leg controlled by Call Automation is disconnected.
@@ -25,7 +26,7 @@ public abstract class CallAutomationHandler
     /// <param name="callMedia"></param>
     /// <param name="callRecording"></param>
     /// <returns></returns>
-    public virtual ValueTask OnCallDisconnected(CallDisconnected @event, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+    public virtual ValueTask OnCallDisconnected(CallDisconnected @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 
     /// <summary>
     /// Executed when a participant is requested to be added to a call.
@@ -35,7 +36,7 @@ public abstract class CallAutomationHandler
     /// <param name="callMedia"></param>
     /// <param name="callRecording"></param>
     /// <returns></returns>
-    public virtual ValueTask OnAddParticipantsSucceeded(AddParticipantsSucceeded @event, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+    public virtual ValueTask OnAddParticipantsSucceeded(AddParticipantsSucceeded @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 
     /// <summary>
     /// Executed when unable to add a participant to a call upon request.
@@ -45,7 +46,7 @@ public abstract class CallAutomationHandler
     /// <param name="callMedia"></param>
     /// <param name="callRecording"></param>
     /// <returns></returns>
-    public virtual ValueTask OnAddParticipantsFailed(AddParticipantsFailed @event, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+    public virtual ValueTask OnAddParticipantsFailed(AddParticipantsFailed @event, IOperationContext operationContext,  CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 
     /// <summary>
     /// Executed when a request to transfer the call succeeds.
@@ -55,7 +56,7 @@ public abstract class CallAutomationHandler
     /// <param name="callMedia"></param>
     /// <param name="callRecording"></param>
     /// <returns></returns>
-    public virtual ValueTask OnCallTransferAccepted(CallTransferAccepted @event, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+    public virtual ValueTask OnCallTransferAccepted(CallTransferAccepted @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 
     /// <summary>
     /// Executed when a request to transfer the call fails.
@@ -65,7 +66,7 @@ public abstract class CallAutomationHandler
     /// <param name="callMedia"></param>
     /// <param name="callRecording"></param>
     /// <returns></returns>
-    public virtual ValueTask OnCallTransferFailed(CallTransferFailed @event, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+    public virtual ValueTask OnCallTransferFailed(CallTransferFailed @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 
     /// <summary>
     /// Executed when an action to play audio succeeds.
@@ -75,7 +76,7 @@ public abstract class CallAutomationHandler
     /// <param name="callMedia"></param>
     /// <param name="callRecording"></param>
     /// <returns></returns>
-    public virtual ValueTask OnPlayCompleted(PlayCompleted @event, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+    public virtual ValueTask OnPlayCompleted(PlayCompleted @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 
     /// <summary>
     /// Executed when an action to play audio fails.
@@ -85,7 +86,7 @@ public abstract class CallAutomationHandler
     /// <param name="callMedia"></param>
     /// <param name="callRecording"></param>
     /// <returns></returns>
-    public virtual ValueTask OnPlayFailed(PlayFailed @event, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+    public virtual ValueTask OnPlayFailed(PlayFailed @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 
     /// <summary>
     /// Executed when the collection of DTMF tones is successful.
@@ -96,7 +97,17 @@ public abstract class CallAutomationHandler
     /// <param name="callRecording"></param>
     /// <param name="Tones"></param>
     /// <returns></returns>
-    public virtual ValueTask OnRecognizeCompleted(RecognizeCompleted @event, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording, IReadOnlyList<DtmfTone> Tones) => ValueTask.CompletedTask;
+    public virtual ValueTask OnRecognizeCompleted(RecognizeCompleted @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording, IReadOnlyList<DtmfTone> Tones) => ValueTask.CompletedTask;
+
+    /// <summary>
+    /// A generic callback that is executed when the recognition failed.
+    /// </summary>
+    /// <param name="event"></param>
+    /// <param name="callConnection"></param>
+    /// <param name="callMedia"></param>
+    /// <param name="callRecording"></param>
+    /// <returns></returns>
+    public virtual ValueTask OnRecognizeFailed(RecognizeFailed @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 
     /// <summary>
     /// Executed when the collection of DTMF tones fails due to lack of input.
@@ -106,7 +117,7 @@ public abstract class CallAutomationHandler
     /// <param name="callMedia"></param>
     /// <param name="callRecording"></param>
     /// <returns></returns>
-    public virtual ValueTask OnSilenceTimeout(RecognizeFailed @event, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+    public virtual ValueTask OnSilenceTimeout(RecognizeFailed @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 
     /// <summary>
     /// Executed when the timer expires between collecting multiple DTMF tones.
@@ -116,7 +127,7 @@ public abstract class CallAutomationHandler
     /// <param name="callMedia"></param>
     /// <param name="callRecording"></param>
     /// <returns></returns>
-    public virtual ValueTask OnInterToneTimeout(RecognizeFailed @event, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+    public virtual ValueTask OnInterToneTimeout(RecognizeFailed @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 
     /// <summary>
     /// Executed when the recognize DTMF API cannot play the prompt file.
@@ -126,5 +137,15 @@ public abstract class CallAutomationHandler
     /// <param name="callMedia"></param>
     /// <param name="callRecording"></param>
     /// <returns></returns>
-    public virtual ValueTask OnPromptFailed(RecognizeFailed @event, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+    public virtual ValueTask OnPromptFailed(RecognizeFailed @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+
+    /// <summary>
+    /// Executed when the call recording state changed.
+    /// </summary>
+    /// <param name="event"></param>
+    /// <param name="callConnection"></param>
+    /// <param name="callMedia"></param>
+    /// <param name="callRecording"></param>
+    /// <returns></returns>
+    public virtual ValueTask OnRecordingStateChanged(RecordingStateChanged @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 }

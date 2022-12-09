@@ -2,6 +2,9 @@
 // Licensed under the MIT License.
 
 namespace CallAutomation.Extensions.Interfaces;
+public interface IAnswerWithCallbackUriWithHandler : IWithCallbackHandler<IAnswerWithCallbackUri>, IAnswerWithCallbackUri
+{
+}
 
 public interface IAnswerWithCallbackUri
 {
