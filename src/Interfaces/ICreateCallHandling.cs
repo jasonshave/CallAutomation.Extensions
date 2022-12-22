@@ -1,12 +1,15 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure;
 using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
 
 public interface ICreateCallHandling
 {
+    ICreateCallHandling WithInboundMediaStreaming(string streamingUri);
+
     /// <summary>
     /// Specifies the handler to invoke when a call is connected.
     /// </summary>
@@ -57,5 +60,5 @@ public interface ICreateCallHandling
     /// Executes the create call process.
     /// </summary>
     /// <returns><see cref="CreateCallResult"/></returns>
-    ValueTask<CreateCallResult> ExecuteAsync();
+    ValueTask<Response<CreateCallResult>> ExecuteAsync();
 }

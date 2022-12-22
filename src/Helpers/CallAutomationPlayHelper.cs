@@ -14,13 +14,21 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
     private static IEnumerable<Type> _types = new[] { typeof(PlayCompleted), typeof(PlayFailed) };
     private readonly CallMedia _callMedia;
     private readonly List<CommunicationIdentifier> _playToParticipants = new();
-    private readonly PlayMediaOptions _playMediaOptions;
+    private readonly PlayMediaOptions? _playMediaOptions;
+    private readonly string? _textToSpeak;
 
     internal CallAutomationPlayHelper(CallMedia callMedia, PlayMediaOptions playMediaOptions, string requestId)
         : base(requestId, _types)
     {
         _callMedia = callMedia;
         _playMediaOptions = playMediaOptions;
+    }
+
+    internal CallAutomationPlayHelper(CallMedia callMedia, string textToSpeak, string requestId)
+        : base(requestId, _types)
+    {
+        _callMedia = callMedia;
+        _textToSpeak = textToSpeak;
     }
 
     public IPlayMediaCallback ToParticipant(string rawId)
@@ -63,29 +71,30 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaC
 
     public async ValueTask ExecuteAsync()
     {
+        PlaySource? playSource = null;
+        PlayOptions playOptions = new ()
+        {
+            OperationContext = RequestId
+        };
+
+        if (_playMediaOptions is not null)
+        {
+            playSource = new FileSource(new Uri(_playMediaOptions.FileUrl));
+            playOptions.Loop = _playMediaOptions.Loop;
+        }
+
+        if (_textToSpeak is not null)
+        {
+            playSource = new TextSource(_textToSpeak);
+        }
+
         if (_playToParticipants.Any())
         {
-            await _callMedia.PlayAsync(new FileSource(new Uri(_playMediaOptions.FileUrl))
-            {
-                // todo: need to verify how this works
-                PlaySourceId = RequestId,
-            }, _playToParticipants, new PlayOptions()
-            {
-                OperationContext = RequestId,
-                Loop = _playMediaOptions.Loop,
-            });
+            await _callMedia.PlayAsync(playSource, _playToParticipants, playOptions);
         }
         else
         {
-            await _callMedia.PlayToAllAsync(new FileSource(new Uri(_playMediaOptions.FileUrl))
-            {
-                // todo: need to verify how this works
-                PlaySourceId = RequestId,
-            }, new PlayOptions()
-            {
-                OperationContext = RequestId,
-                Loop = _playMediaOptions.Loop,
-            });
+            await _callMedia.PlayToAllAsync(playSource, playOptions);
         }
     }
 }

@@ -12,9 +12,12 @@ namespace CallAutomation.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static CallAutomationConfigurationBuilder AddCallAutomationClient(this IServiceCollection services, string connectionString)
+    public static CallAutomationConfigurationBuilder AddCallAutomationClient(this IServiceCollection services, string connectionString, string? endpointOverride = null)
     {
-        services.AddSingleton(new CallAutomationClient(connectionString));
+        services.AddSingleton(endpointOverride is not null
+            ? new CallAutomationClient(new Uri(endpointOverride), connectionString)
+            : new CallAutomationClient(connectionString));
+
         return new CallAutomationConfigurationBuilder(services);
     }
 

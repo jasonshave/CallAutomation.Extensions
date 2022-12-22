@@ -7,6 +7,8 @@ namespace CallAutomation.Extensions.Interfaces;
 
 public interface IAnswerCallHandling
 {
+    IAnswerCallHandling WithInboundMediaStreaming(string streamingUri);
+
     /// <summary>
     /// Specifies the handler to invoke when a call is connected.
     /// </summary>

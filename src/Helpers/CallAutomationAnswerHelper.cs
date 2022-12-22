@@ -18,6 +18,7 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
     private readonly string? _incomingCallContext;
 
     private Uri? _callbackUri;
+    private MediaStreamingOptions? _mediaStreamingOptions;
 
     /// <summary>
     /// Used to handle Event Grid data directly
@@ -49,6 +50,13 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
     public IAnswerCallHandling WithCallbackUri(string callbackUri)
     {
         _callbackUri = new Uri(callbackUri);
+        return this;
+    }
+
+    public IAnswerCallHandling WithInboundMediaStreaming(string streamingUri)
+    {
+        _mediaStreamingOptions = new MediaStreamingOptions(new Uri(streamingUri), MediaStreamingTransport.Websocket,
+            MediaStreamingContent.Audio, MediaStreamingAudioChannel.Mixed);
         return this;
     }
 
@@ -92,7 +100,13 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
 
     public async ValueTask<AnswerCallResult> ExecuteAsync()
     {
-        Response<AnswerCallResult> result = await _client.AnswerCallAsync(new AnswerCallOptions(_incomingCallContext, _callbackUri));
+        var answerCallOptions = new AnswerCallOptions(_incomingCallContext, _callbackUri);
+        if (_mediaStreamingOptions is not null)
+        {
+            answerCallOptions.MediaStreamingOptions = _mediaStreamingOptions;
+        }
+
+        Response<AnswerCallResult> result = await _client.AnswerCallAsync(answerCallOptions);
         return result;
     }
 }

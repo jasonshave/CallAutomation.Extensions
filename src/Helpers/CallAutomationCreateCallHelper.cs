@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure;
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Extensions;
@@ -21,6 +22,7 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
     private string _from;
     private CallFromOptions? _callFromOptions;
     private Uri _callbackUri;
+    private MediaStreamingOptions? _mediaStreamingOptions;
 
     internal CallAutomationCreateCallHelper(CallAutomationClient client, string to, string requestId)
         : base(requestId, _types)
@@ -49,6 +51,13 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
     public ICreateCallHandling WithCallbackUri(string callbackUri)
     {
         _callbackUri = new Uri(callbackUri);
+        return this;
+    }
+
+    public ICreateCallHandling WithInboundMediaStreaming(string streamingUri)
+    {
+        _mediaStreamingOptions = new MediaStreamingOptions(new Uri(streamingUri), MediaStreamingTransport.Websocket,
+            MediaStreamingContent.Audio, MediaStreamingAudioChannel.Mixed);
         return this;
     }
 
@@ -90,7 +99,7 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
         return this;
     }
 
-    public async ValueTask<CreateCallResult> ExecuteAsync()
+    public async ValueTask<Response<CreateCallResult>> ExecuteAsync()
     {
         var callSource = new CallSource(new CommunicationUserIdentifier(_callFromOptions.ApplicationId));
         if (_callFromOptions is not null)
@@ -107,6 +116,9 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
         {
             OperationContext = RequestId,
         };
+
+        if (_mediaStreamingOptions is not null)
+            createCallOptions.MediaStreamingOptions = _mediaStreamingOptions;
 
         var result = await _client.CreateCallAsync(createCallOptions);
         return result;

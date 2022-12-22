@@ -23,6 +23,11 @@ public static class CallMediaExtensions
         return new CallAutomationPlayHelper(callMedia, playOptions, Guid.NewGuid().ToString());
     }
 
+    public static IPlayMediaCallback Speak(this CallMedia callMedia, string textToSpeak)
+    {
+        return new CallAutomationPlayHelper(callMedia, textToSpeak, Guid.NewGuid().ToString());
+    }
+
     /// <summary>
     /// Initiates the Recognize API.
     /// </summary>
