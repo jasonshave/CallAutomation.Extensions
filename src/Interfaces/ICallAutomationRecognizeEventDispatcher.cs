@@ -3,7 +3,6 @@
 
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Models;
-using System.Reflection;
 
 namespace CallAutomation.Extensions.Interfaces;
 

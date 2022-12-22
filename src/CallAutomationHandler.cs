@@ -46,7 +46,7 @@ public abstract class CallAutomationHandler
     /// <param name="callMedia"></param>
     /// <param name="callRecording"></param>
     /// <returns></returns>
-    public virtual ValueTask OnAddParticipantsFailed(AddParticipantsFailed @event, IOperationContext operationContext,  CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
+    public virtual ValueTask OnAddParticipantsFailed(AddParticipantsFailed @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording) => ValueTask.CompletedTask;
 
     /// <summary>
     /// Executed when a request to transfer the call succeeds.

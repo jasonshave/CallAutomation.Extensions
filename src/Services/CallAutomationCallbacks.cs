@@ -1,10 +1,8 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Collections.Concurrent;
-using System.Reflection;
-using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
+using System.Collections.Concurrent;
 
 namespace CallAutomation.Extensions.Services;
 
@@ -23,7 +21,7 @@ internal class CallAutomationCallbacks : ICallbacksHandler
         }
 
         // new map
-        if(!_callbackDelegates.TryAdd((requestId, typeof(T).Name), new List<Delegate> { callback }))
+        if (!_callbackDelegates.TryAdd((requestId, typeof(T).Name), new List<Delegate> { callback }))
         {
             throw new ApplicationException(
                 $"Unable to add delegate for {typeof(T).Name} for request ID: {requestId}");

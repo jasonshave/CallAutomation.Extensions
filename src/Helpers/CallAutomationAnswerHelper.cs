@@ -14,14 +14,30 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
     IAnswerCallHandling
 {
     private readonly CallAutomationClient _client;
-    private readonly IncomingCall _incomingCall;
+    private readonly string? _incomingCallContext;
+
     private Uri _callbackUri;
+    private MediaStreamingOptions? _mediaStreamingOptions;
 
     internal CallAutomationAnswerHelper(CallAutomationClient client, IncomingCall incomingCall, string requestId)
         : base(requestId)
     {
         _client = client;
-        _incomingCall = incomingCall;
+        _incomingCallContext = incomingCall.IncomingCallContext;
+    }
+
+    /// <summary>
+    /// Used to handle <see cref="CallNotification"/> payload from the Call Notification Service
+    /// </summary>
+    /// <param name="client"></param>
+    /// <param name="callNotification"></param>
+    /// <param name="requestId"></param>
+    internal CallAutomationAnswerHelper(CallAutomationClient client, CallNotification callNotification, string requestId)
+        : base(requestId)
+    {
+        _client = client;
+        _incomingCallContext = callNotification.IncomingCallContext;
+        _callbackUri = new Uri(callNotification.MidCallEventsUri);
     }
 
     public IAnswerWithCallbackUri WithCallbackHandler(ICallbacksHandler handler)
@@ -33,6 +49,13 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
     public IAnswerCallHandling WithCallbackUri(string callbackUri)
     {
         _callbackUri = new Uri(callbackUri);
+        return this;
+    }
+
+    public IAnswerCallHandling WithInboundMediaStreaming(string streamingUri)
+    {
+        _mediaStreamingOptions = new MediaStreamingOptions(new Uri(streamingUri), MediaStreamingTransport.Websocket,
+            MediaStreamingContent.Audio, MediaStreamingAudioChannel.Mixed);
         return this;
     }
 
@@ -74,9 +97,15 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase,
         return this;
     }
 
-    public async ValueTask<AnswerCallResult> ExecuteAsync()
+    public async ValueTask<Response<AnswerCallResult>> ExecuteAsync()
     {
-        Response<AnswerCallResult> result = await _client.AnswerCallAsync(new AnswerCallOptions(_incomingCall.IncomingCallContext, _callbackUri));
+        var answerCallOptions = new AnswerCallOptions(_incomingCallContext, _callbackUri);
+        if (_mediaStreamingOptions is not null)
+        {
+            answerCallOptions.MediaStreamingOptions = _mediaStreamingOptions;
+        }
+
+        var result = await _client.AnswerCallAsync(answerCallOptions);
         return result;
     }
 }

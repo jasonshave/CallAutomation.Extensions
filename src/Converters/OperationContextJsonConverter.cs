@@ -1,10 +1,9 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using CallAutomation.Extensions.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using CallAutomation.Extensions.Interfaces;
-using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Converters;
 

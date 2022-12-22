@@ -5,7 +5,6 @@ using Azure.Communication.CallAutomation;
 using Azure.Messaging;
 using CallAutomation.Extensions.Converters;
 using CallAutomation.Extensions.Interfaces;
-using CallAutomation.Extensions.Models;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
