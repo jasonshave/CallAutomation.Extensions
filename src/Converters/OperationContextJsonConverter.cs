@@ -9,7 +9,7 @@ namespace CallAutomation.Extensions.Converters;
 
 internal class OperationContextJsonConverter : JsonConverter<IOperationContext>
 {
-    private Dictionary<string, Type> _types;
+    private readonly Dictionary<string, Type> _types;
 
     public OperationContextJsonConverter()
     {
@@ -35,25 +35,24 @@ internal class OperationContextJsonConverter : JsonConverter<IOperationContext>
         }
 
         IOperationContext result = null;
-        using (var jsonDocument = JsonDocument.ParseValue(ref reader))
+        using var jsonDocument = JsonDocument.ParseValue(ref reader);
+
+        if (!jsonDocument.RootElement.TryGetProperty("$Type", out var typeProperty))
         {
-            if (!jsonDocument.RootElement.TryGetProperty("$Type", out var typeProperty))
-            {
-                throw new JsonException();
-            }
-
-            if (!_types.TryGetValue(typeProperty.GetString(), out var type))
-            {
-                throw new JsonException($"Type not found \"{typeProperty}\"");
-            }
-
-            if (!jsonDocument.RootElement.TryGetProperty("Value", out var typeValue))
-            {
-                throw new JsonException();
-            }
-
-            result = (IOperationContext)JsonSerializer.Deserialize(typeValue.ToString(), type, options);
+            throw new JsonException();
         }
+
+        if (!_types.TryGetValue(typeProperty.GetString(), out var type))
+        {
+            throw new JsonException($"Type not found \"{typeProperty}\"");
+        }
+
+        if (!jsonDocument.RootElement.TryGetProperty("Value", out var typeValue))
+        {
+            throw new JsonException();
+        }
+
+        result = (IOperationContext)JsonSerializer.Deserialize(typeValue.ToString(), type, options);
 
 
         return result;
