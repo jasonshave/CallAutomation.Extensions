@@ -40,7 +40,7 @@ namespace CallAutomation.Extensions
         /// <param name="client"></param>
         /// <param name="callNotification"></param>
         /// <returns></returns>
-        public static IAnswerCallHandling Answer(this CallAutomationClient client, CallNotification callNotification)
+        public static IAnswerWithCallbackUriWithHandler Answer(this CallAutomationClient client, CallNotification callNotification)
         {
             var helper = new CallAutomationAnswerHelper(client, callNotification, callNotification.CorrelationId);
             return helper;

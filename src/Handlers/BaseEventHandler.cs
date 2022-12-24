@@ -6,13 +6,14 @@ using CallAutomation.Extensions.Interfaces;
 
 namespace CallAutomation.Extensions.Handlers;
 
-public class BaseEventHandler
+public abstract class BaseEventHandler
 {
-    protected readonly IServiceProvider _serviceProvider;
     protected readonly ICallbacksHandler _callbackHandler;
     protected readonly CallAutomationClient _client;
 
-    public BaseEventHandler(
+    private readonly IServiceProvider _serviceProvider;
+
+    protected BaseEventHandler(
         IServiceProvider serviceProvider,
         ICallbacksHandler callbackHandler,
         CallAutomationClient client)
@@ -24,10 +25,9 @@ public class BaseEventHandler
 
     protected CallAutomationHandler? GetHandler(string handlerName)
     {
-        var cahType = typeof(CallAutomationHandler);
         var handlerType = AppDomain.CurrentDomain.GetAssemblies()
             .Select(assembly => assembly.GetType(handlerName))
-            .FirstOrDefault(t => t?.IsSubclassOf(cahType) == true);
+            .FirstOrDefault(t => t?.IsSubclassOf(typeof(CallAutomationHandler)) == true);
         if (handlerType is null) return null;
 
         return (CallAutomationHandler?)_serviceProvider.GetService(handlerType);

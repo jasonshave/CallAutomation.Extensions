@@ -6,4 +6,6 @@ namespace CallAutomation.Extensions.Interfaces;
 public interface ICanChooseRecognizeOptions
 {
     ICanRecognizeDtmfOptions WithPrompt(string fileUri);
+
+    ICanRecognizeDtmfOptions AndSpeak(string textToSpeak);
 }

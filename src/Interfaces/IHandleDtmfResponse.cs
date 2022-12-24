@@ -38,6 +38,14 @@ public interface IHandleDtmfResponse : ICallbackContext
         where TTone : IDtmfTone;
 
     /// <summary>
+    /// Detected stop tone.
+    /// </summary>
+    /// <typeparam name="THandler"></typeparam>
+    /// <returns></returns>
+    IHandleDtmfResponse OnStopToneDetected<THandler>()
+        where THandler : CallAutomationHandler;
+
+    /// <summary>
     /// Specifies the handler to invoke when more than one tone is received.
     /// </summary>
     /// <typeparam name="THandler"></typeparam>

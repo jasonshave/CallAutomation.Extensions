@@ -100,6 +100,18 @@ public abstract class CallAutomationHandler
     public virtual ValueTask OnRecognizeCompleted(RecognizeCompleted @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording, IReadOnlyList<DtmfTone> Tones) => ValueTask.CompletedTask;
 
     /// <summary>
+    /// Detected stop tone.
+    /// </summary>
+    /// <param name="event"></param>
+    /// <param name="operationContext"></param>
+    /// <param name="callConnection"></param>
+    /// <param name="callMedia"></param>
+    /// <param name="callRecording"></param>
+    /// <param name="Tones"></param>
+    /// <returns></returns>
+    public virtual ValueTask OnStopToneDetected(RecognizeCompleted @event, IOperationContext operationContext, CallConnection callConnection, CallMedia callMedia, CallRecording callRecording, IReadOnlyList<DtmfTone> Tones) => ValueTask.CompletedTask;
+
+    /// <summary>
     /// A generic callback that is executed when the recognition failed.
     /// </summary>
     /// <param name="event"></param>

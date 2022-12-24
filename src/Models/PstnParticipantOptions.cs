@@ -6,4 +6,7 @@ namespace CallAutomation.Extensions.Models;
 public sealed class PstnParticipantOptions
 {
     public string SourceCallerIdNumber { get; set; }
+
+    // not supported yet
+    // public string SourceCallerIdName { get; set; }
 }

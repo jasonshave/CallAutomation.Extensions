@@ -19,9 +19,10 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
 {
     private readonly CallMedia _callMedia;
 
-    private Uri _fileUri;
+    private Uri? _fileUri;
     private CommunicationIdentifier _recognizeInputFromParticipant;
     private RecognizeOptions _recognizeOptions;
+    private string? _textToSpeak;
 
     internal CallAutomationDtmfHelper(CallMedia callMedia, string requestId)
         : base(requestId)
@@ -32,6 +33,12 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
     public ICanRecognizeDtmfOptions WithPrompt(string fileUri)
     {
         _fileUri = new Uri(fileUri);
+        return this;
+    }
+
+    public ICanRecognizeDtmfOptions AndSpeak(string textToSpeak)
+    {
+        _textToSpeak = textToSpeak;
         return this;
     }
 
@@ -90,6 +97,13 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
         return this;
     }
 
+    public IHandleDtmfResponse OnStopToneDetected<THandler>()
+        where THandler : CallAutomationHandler
+    {
+        CallbackHandler.AddHandlerCallback<THandler, RecognizeCompleted>(RequestId, $"On{nameof(RecognizeCompleted)}");
+        return this;
+    }
+
     public IHandleDtmfTimeout OnFail<TRecognizeFail>(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback)
         where TRecognizeFail : IRecognizeDtmfFailed
     {
@@ -127,16 +141,29 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackWithContext,
     public async ValueTask ExecuteAsync()
     {
         // invoke recognize API
+        PlaySource playSource = default;
+
+        if (_fileUri is not null)
+        {
+            playSource = new FileSource(_fileUri);
+        }
+
+        if (_textToSpeak is not null)
+        {
+            playSource = new TextSource(_textToSpeak);
+        }
+
         var recognizeOptions = new CallMediaRecognizeDtmfOptions(
             _recognizeInputFromParticipant,
             _recognizeOptions.MaxToneCount)
         {
             OperationContext = JSONContext,
-            Prompt = new FileSource(_fileUri),
+            Prompt = playSource,
             InterruptCallMediaOperation = _recognizeOptions.AllowInterruptExistingMediaOperation,
             InterruptPrompt = _recognizeOptions.AllowInterruptPrompt,
             InterToneTimeout = TimeSpan.FromSeconds(_recognizeOptions.WaitBetweenTonesInSeconds),
             InitialSilenceTimeout = TimeSpan.FromSeconds(_recognizeOptions.WaitForResponseInSeconds),
+            StopTones = _recognizeOptions.StopTones
         };
 
         await _callMedia.StartRecognizingAsync(recognizeOptions);
