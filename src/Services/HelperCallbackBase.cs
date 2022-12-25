@@ -7,13 +7,18 @@ namespace CallAutomation.Extensions.Services;
 
 internal abstract class HelperCallbackBase : ICallAutomationHelperCallback
 {
-    public ICallbacksHandler CallbackHandler { get; protected set; }
+    public IEnumerable<Type> Types { get; }
+
+    public CallAutomationCallbacks HelperCallbacks { get; }
 
     protected string RequestId { get; }
 
-    protected HelperCallbackBase(string requestId)
+    protected HelperCallbackBase(string requestId, IEnumerable<Type> types)
     {
-        CallbackHandler = new CallAutomationCallbacks();
+        HelperCallbacks = new CallAutomationCallbacks(requestId);
         RequestId = requestId;
+        Types = types.ToList();
+
+        CallbackRegistry.RegisterHelperCallback(this);
     }
 }

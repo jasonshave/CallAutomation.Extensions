@@ -1,12 +1,11 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
-using Azure;
 using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICreateCallHandling : ICallbackContext<Response<CreateCallResult>>
+public interface ICreateCallHandling
 {
     /// <summary>
     /// Adds inbound media streaming support over websocket to the streaming URI provided.

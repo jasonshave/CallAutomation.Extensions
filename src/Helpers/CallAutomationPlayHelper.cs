@@ -9,31 +9,26 @@ using CallAutomation.Extensions.Services;
 
 namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationPlayHelper : HelperCallbackWithContext, IPlayMediaCallbackWithHandler
+internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaCallback
 {
+    private static IEnumerable<Type> _types = new[] { typeof(PlayCompleted), typeof(PlayFailed) };
     private readonly CallMedia _callMedia;
     private readonly List<CommunicationIdentifier> _playToParticipants = new();
     private readonly PlayMediaOptions _playMediaOptions;
     private readonly string? _textToSpeak;
 
     internal CallAutomationPlayHelper(CallMedia callMedia, PlayMediaOptions playMediaOptions, string requestId)
-        : base(requestId)
+        : base(requestId, _types)
     {
         _callMedia = callMedia;
         _playMediaOptions = playMediaOptions;
     }
 
     internal CallAutomationPlayHelper(CallMedia callMedia, string textToSpeak, string requestId)
-        : base(requestId)
+        : base(requestId, _types)
     {
         _callMedia = callMedia;
         _textToSpeak = textToSpeak;
-    }
-
-    public IPlayMediaCallback WithCallbackHandler(ICallbacksHandler handler)
-    {
-        CallbackHandler = handler;
-        return this;
     }
 
     public IPlayMediaCallback ToParticipant(string rawId)
@@ -45,38 +40,32 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackWithContext, IPla
     public IPlayMediaCallback OnPlayCompleted<THandler>()
         where THandler : CallAutomationHandler
     {
-        CallbackHandler.AddHandlerCallback<THandler, PlayCompleted>(RequestId, $"On{nameof(PlayCompleted)}");
+        HelperCallbacks.AddHandlerCallback<THandler, PlayCompleted>(RequestId, $"On{nameof(PlayCompleted)}");
         return this;
     }
 
     public IPlayMediaCallback OnPlayCompleted(Func<ValueTask> callbackFunction)
     {
-        CallbackHandler.AddDelegateCallback<PlayCompleted>(RequestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<PlayCompleted>(RequestId, callbackFunction);
         return this;
     }
 
     public IPlayMediaCallback OnPlayCompleted(Func<PlayCompleted, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        CallbackHandler.AddDelegateCallback<PlayCompleted>(RequestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<PlayCompleted>(RequestId, callbackFunction);
         return this;
     }
 
     public IPlayMediaCallback OnPlayFailed<THandler>()
         where THandler : CallAutomationHandler
     {
-        CallbackHandler.AddHandlerCallback<THandler, PlayFailed>(RequestId, $"On{nameof(PlayFailed)}");
+        HelperCallbacks.AddHandlerCallback<THandler, PlayFailed>(RequestId, $"On{nameof(PlayFailed)}");
         return this;
     }
 
     public IPlayMediaCallback OnPlayFailed(Func<PlayFailed, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        CallbackHandler.AddDelegateCallback<PlayFailed>(RequestId, callbackFunction);
-        return this;
-    }
-
-    public IExecuteAsync WithContext(OperationContext context)
-    {
-        SetContext(context);
+        HelperCallbacks.AddDelegateCallback<PlayFailed>(RequestId, callbackFunction);
         return this;
     }
 

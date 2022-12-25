@@ -1,27 +1,33 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
-using CallAutomation.Extensions.Interfaces;
 using System.Collections.Concurrent;
 
 namespace CallAutomation.Extensions.Services;
 
-internal class CallAutomationCallbacks : ICallbacksHandler
+internal class CallAutomationCallbacks
 {
-    private readonly ConcurrentDictionary<(string RequestId, string EventName), List<Delegate>> _callbackDelegates = new();
+    private readonly ConcurrentDictionary<(string RequestId, Type Type), List<Delegate>> _callbackDelegates = new();
     private readonly ConcurrentDictionary<(string RequestId, string EventName), List<(string HandlerName, string MethodName)>> _callbackHandlers = new();
+
+    public string RequestId { get; }
+
+    public CallAutomationCallbacks(string requestId)
+    {
+        RequestId = requestId;
+    }
 
     public void AddDelegateCallback<T>(string requestId, Delegate callback)
     {
-        if (_callbackDelegates.ContainsKey((requestId, typeof(T).Name)))
+        if (_callbackDelegates.ContainsKey((requestId, typeof(T))))
         {
             // add map
-            _callbackDelegates[(requestId, typeof(T).Name)].Add(callback);
+            _callbackDelegates[(requestId, typeof(T))].Add(callback);
             return;
         }
 
         // new map
-        if (!_callbackDelegates.TryAdd((requestId, typeof(T).Name), new List<Delegate> { callback }))
+        if (!_callbackDelegates.TryAdd((requestId, typeof(T)), new List<Delegate> { callback }))
         {
             throw new ApplicationException(
                 $"Unable to add delegate for {typeof(T).Name} for request ID: {requestId}");
@@ -44,17 +50,21 @@ internal class CallAutomationCallbacks : ICallbacksHandler
         }
     }
 
-    public IEnumerable<Delegate> GetDelegateCallbacks(string requestId, Type type)
+    public IEnumerable<Delegate> GetDelegateCallbacks(string requestId, Type type, bool remove = default)
     {
-        _callbackDelegates.TryGetValue((requestId, type.Name), out var callbacks);
+        _callbackDelegates.TryGetValue((requestId, type), out var callbacks);
         if (callbacks is null) return Enumerable.Empty<Delegate>();
+        if (remove) _callbackDelegates.TryRemove((requestId, type), out _);
 
         return callbacks;
     }
 
-    public IEnumerable<(string HandlerName, string MethodName)> GetHandlers(string requestId, Type type)
+    public IEnumerable<(string HandlerName, string MethodName)> GetHandlers(string requestId, Type type, bool remove = default)
     {
         _callbackHandlers.TryRemove((requestId, type.Name), out var handlerTuple);
-        return handlerTuple ?? Enumerable.Empty<(string HandlerName, string MethodName)>();
+        if (handlerTuple is null) return Enumerable.Empty<(string HandlerName, string MethodName)>();
+        if (remove) _callbackHandlers.TryRemove((requestId, type.Name), out _);
+
+        return handlerTuple;
     }
 }

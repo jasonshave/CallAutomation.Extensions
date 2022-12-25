@@ -5,6 +5,7 @@ using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Extensions;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
+using CallAutomation.Extensions.Services;
 using Microsoft.Extensions.Logging;
 
 namespace CallAutomation.Extensions.Handlers;
@@ -17,19 +18,20 @@ public class CallAutomationRecognizeDtmfEventHandler : BaseEventHandler, ICallAu
     public CallAutomationRecognizeDtmfEventHandler(
         IServiceProvider serviceProvider,
         ICallAutomationRecognizeEventDispatcher dispatcher,
-        ICallbacksHandler callbackHandler,
         CallAutomationClient client,
         ILogger<CallAutomationRecognizeDtmfEventHandler> logger)
-        : base(serviceProvider, callbackHandler, client)
+        : base(serviceProvider, client)
     {
         _dispatcher = dispatcher;
         _logger = logger;
     }
 
-    public async ValueTask Handle(CallAutomationEventBase eventBase, IOperationContext? operationContext, string? requestId)
+    public async ValueTask Handle(CallAutomationEventBase eventBase, string? requestId)
     {
         var clientElements = new CallAutomationClientElements(_client, eventBase.CallConnectionId);
         var isHandled = false;
+
+        var callAutomationHelperCallback = CallbackRegistry.GetHelperCallback(requestId, typeof(RecognizeCompleted), true);
 
         if (eventBase is RecognizeCompleted recognizeCompleted)
         {
@@ -38,15 +40,15 @@ public class CallAutomationRecognizeDtmfEventHandler : BaseEventHandler, ICallAu
             var callBasedOn = async (Type type) =>
             {
                 // dispatch delegate callbacks
-                var delegates = _callbackHandler.GetDelegateCallbacks(requestId, type);
+                var delegates = callAutomationHelperCallback.HelperCallbacks.GetDelegateCallbacks(requestId, type);
                 foreach (var @delegate in delegates)
                 {
                     isHandled = true;
                     _logger.LogInformation("Found callback delegate for request {requestId}, with {numTones} DTMF tone(s), and event {event}", requestId, recognizeCompleted.CollectTonesResult.Tones.Count, eventBase.GetType().Name);
-                    await _dispatcher.DispatchAsync(recognizeCompleted, @delegate, clientElements, recognizeCompleted.CollectTonesResult.Tones);
+                    await _dispatcher.DispatchDelegateAsync(recognizeCompleted, @delegate, clientElements, recognizeCompleted.CollectTonesResult.Tones);
                 }
 
-                var handlerTuples = _callbackHandler.GetHandlers(requestId, type);
+                var handlerTuples = callAutomationHelperCallback.HelperCallbacks.GetHandlers(requestId, type);
                 foreach (var handlerTuple in handlerTuples)
                 {
                     var handler = GetHandler(handlerTuple.HandlerName);
@@ -54,7 +56,7 @@ public class CallAutomationRecognizeDtmfEventHandler : BaseEventHandler, ICallAu
 
                     isHandled = true;
                     _logger.LogInformation("Found callback handler for request {requestId} and event {event}", requestId, eventBase.GetType().Name);
-                    await _dispatcher.DispatchAsync(recognizeCompleted, operationContext, handler, handlerTuple.MethodName, clientElements, recognizeCompleted.CollectTonesResult.Tones);
+                    await _dispatcher.DispatchHandlerAsync(recognizeCompleted, handler, handlerTuple.MethodName, clientElements, recognizeCompleted.CollectTonesResult.Tones);
                 }
             };
 
@@ -71,15 +73,15 @@ public class CallAutomationRecognizeDtmfEventHandler : BaseEventHandler, ICallAu
             var callBasedOn = async (Type type) =>
             {
                 // dispatch delegate callbacks
-                var delegates = _callbackHandler.GetDelegateCallbacks(requestId, type);
+                var delegates = callAutomationHelperCallback.HelperCallbacks.GetDelegateCallbacks(requestId, type);
                 foreach (var @delegate in delegates)
                 {
                     isHandled = true;
                     _logger.LogInformation("Found callback delegate for request {requestId}, and event {event}", requestId, eventBase.GetType().Name);
-                    await _dispatcher.DispatchAsync(recognizeFailed, @delegate, clientElements);
+                    await _dispatcher.DispatchDelegateAsync(recognizeFailed, @delegate, clientElements);
                 }
 
-                var handlerTuples = _callbackHandler.GetHandlers(requestId, type);
+                var handlerTuples = callAutomationHelperCallback.HelperCallbacks.GetHandlers(requestId, type);
                 foreach (var handlerTuple in handlerTuples)
                 {
                     var handler = GetHandler(handlerTuple.HandlerName);
@@ -87,7 +89,7 @@ public class CallAutomationRecognizeDtmfEventHandler : BaseEventHandler, ICallAu
 
                     isHandled = true;
                     _logger.LogInformation("Found callback handler for request {requestId} and event {event}", requestId, eventBase.GetType().Name);
-                    await _dispatcher.DispatchAsync(recognizeFailed, operationContext, handler, handlerTuple.MethodName, clientElements);
+                    await _dispatcher.DispatchHandlerAsync(recognizeFailed, handler, handlerTuple.MethodName, clientElements);
                 }
             };
 

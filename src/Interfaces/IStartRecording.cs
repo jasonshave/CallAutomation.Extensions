@@ -5,14 +5,14 @@ using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IStartRecordingCallback : IExecuteAsync<RecordingStateResult>
+public interface IStartRecording
 {
     /// <summary>
     /// Specifies the handler to invoke when the recording state changed
     /// </summary>
     /// <typeparam name="THandler"></typeparam>
     /// <returns></returns>
-    IStartRecordingCallback OnRecordingStateChanged<THandler>()
+    IStartRecording OnRecordingStateChanged<THandler>()
         where THandler : CallAutomationHandler;
 
     /// <summary>
@@ -21,7 +21,7 @@ public interface IStartRecordingCallback : IExecuteAsync<RecordingStateResult>
     /// </summary>
     /// <param name="callbackFunction"></param>
     /// <returns></returns>
-    IStartRecordingCallback OnRecordingStateChanged(
+    IStartRecording OnRecordingStateChanged(
         Func<RecordingStateChanged, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction);
 
     /// <summary>
@@ -30,5 +30,7 @@ public interface IStartRecordingCallback : IExecuteAsync<RecordingStateResult>
     /// </summary>
     /// <param name="callbackFunction"></param>
     /// <returns></returns>
-    IStartRecordingCallback OnRecordingStateChanged(Func<ValueTask> callbackFunction);
+    IStartRecording OnRecordingStateChanged(Func<ValueTask> callbackFunction);
+
+    ValueTask<RecordingStateResult> ExecuteAsync();
 }

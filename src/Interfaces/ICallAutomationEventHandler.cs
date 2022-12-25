@@ -7,5 +7,5 @@ namespace CallAutomation.Extensions.Interfaces;
 
 internal interface ICallAutomationEventHandler
 {
-    ValueTask Handle(CallAutomationEventBase eventBase, IOperationContext? operationContext, string? id);
+    ValueTask Handle(CallAutomationEventBase eventBase, string? requestId);
 }

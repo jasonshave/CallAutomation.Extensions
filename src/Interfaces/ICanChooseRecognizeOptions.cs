@@ -7,5 +7,5 @@ public interface ICanChooseRecognizeOptions
 {
     ICanRecognizeDtmfOptions WithPrompt(string fileUri);
 
-    ICanRecognizeDtmfOptions AndSpeak(string textToSpeak);
+    ICanRecognizeDtmfOptions WithSpeech(string textToSpeak);
 }

@@ -21,15 +21,13 @@ public static class ServiceCollectionExtensions
         return new CallAutomationConfigurationBuilder(services);
     }
 
-    public static CallAutomationConfigurationBuilder AddCallAutomationEventHandling(
-        this CallAutomationConfigurationBuilder builder)
+    public static CallAutomationConfigurationBuilder AddCallAutomationEventHandling(this CallAutomationConfigurationBuilder builder)
     {
         builder.Services.AddSingleton<ICallAutomationEventPublisher, CallAutomationEventPublisher>();
         builder.Services.AddSingleton<ICallAutomationEventHandler, CallAutomationEventHandler>();
         builder.Services.AddSingleton<ICallAutomationEventDispatcher, CallAutomationEventDispatcher>();
         builder.Services.AddSingleton<ICallAutomationRecognizeEventDispatcher, CallAutomationRecognizeEventDispatcher>();
         builder.Services.AddSingleton<ICallAutomationRecognizeDtmfHandler, CallAutomationRecognizeDtmfEventHandler>();
-        builder.Services.AddSingleton<ICallbacksHandler, CallAutomationCallbacks>();
         return builder;
     }
 }

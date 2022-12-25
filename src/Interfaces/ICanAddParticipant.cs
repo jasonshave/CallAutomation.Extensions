@@ -1,15 +1,13 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
-public interface ICanAddParticipantWithHandler : IWithCallbackHandler<ICanAddParticipant>, ICanAddParticipant
-{
-}
 
-public interface ICanAddParticipant : ICallbackContext<AddParticipantsResult>
+public interface ICanAddParticipant
 {
     ICanAddParticipant AddParticipant(string rawId);
 
@@ -34,4 +32,6 @@ public interface ICanAddParticipant : ICallbackContext<AddParticipantsResult>
 
     ICanAddParticipant OnAddParticipantsFailed(
         Func<AddParticipantsFailed, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction);
+
+    ValueTask<Response<AddParticipantsResult>> ExecuteAsync();
 }

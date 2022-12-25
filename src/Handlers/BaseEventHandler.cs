@@ -2,24 +2,20 @@
 // Licensed under the MIT License.
 
 using Azure.Communication.CallAutomation;
-using CallAutomation.Extensions.Interfaces;
 
 namespace CallAutomation.Extensions.Handlers;
 
 public abstract class BaseEventHandler
 {
-    protected readonly ICallbacksHandler _callbackHandler;
     protected readonly CallAutomationClient _client;
 
     private readonly IServiceProvider _serviceProvider;
 
     protected BaseEventHandler(
         IServiceProvider serviceProvider,
-        ICallbacksHandler callbackHandler,
         CallAutomationClient client)
     {
         _serviceProvider = serviceProvider;
-        _callbackHandler = callbackHandler;
         _client = client;
     }
 

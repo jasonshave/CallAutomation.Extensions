@@ -15,7 +15,7 @@ namespace CallAutomation.Extensions
         /// </summary>
         /// <param name="client"></param>
         /// <param name="id"></param>
-        public static ICreateCallFromWithHandler Call(this CallAutomationClient client, string id)
+        public static ICreateCallFrom Call(this CallAutomationClient client, string id)
         {
             var helper =
                 new CallAutomationCreateCallHelper(client, id, Guid.NewGuid().ToString());
@@ -28,7 +28,7 @@ namespace CallAutomation.Extensions
         /// <param name="client"></param>
         /// <param name="incomingCall"></param>
         /// <returns></returns>
-        public static IAnswerWithCallbackUriWithHandler Answer(this CallAutomationClient client, IncomingCall incomingCall)
+        public static IAnswerWithCallbackUri Answer(this CallAutomationClient client, IncomingCall incomingCall)
         {
             var helper = new CallAutomationAnswerHelper(client, incomingCall, incomingCall.CorrelationId);
             return helper;
@@ -40,7 +40,7 @@ namespace CallAutomation.Extensions
         /// <param name="client"></param>
         /// <param name="callNotification"></param>
         /// <returns></returns>
-        public static IAnswerWithCallbackUriWithHandler Answer(this CallAutomationClient client, CallNotification callNotification)
+        public static IAnswerWithCallbackUri Answer(this CallAutomationClient client, CallNotification callNotification)
         {
             var helper = new CallAutomationAnswerHelper(client, callNotification, callNotification.CorrelationId);
             return helper;

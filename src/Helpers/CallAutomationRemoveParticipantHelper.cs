@@ -4,34 +4,24 @@
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
-using CallAutomation.Extensions.Models;
-using CallAutomation.Extensions.Services;
 
 namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationRemoveParticipantHelper : HelperCallbackWithContext, ICanRemoveParticipantWithHandler
+internal sealed class CallAutomationRemoveParticipantHelper : ICanRemoveParticipant
 {
     private readonly CallConnection _connection;
     private readonly List<CommunicationIdentifier> _identitiesToRemove = new();
 
     internal CallAutomationRemoveParticipantHelper(CallConnection connection, CommunicationIdentifier id, string requestId)
-        : base(requestId)
     {
         _connection = connection;
         _identitiesToRemove.Add(id);
     }
 
     internal CallAutomationRemoveParticipantHelper(CallConnection connection, CommunicationIdentifier[] firstCollectionToRemove, string requestId)
-        : base(requestId)
     {
         _connection = connection;
         _identitiesToRemove.AddRange(firstCollectionToRemove);
-    }
-
-    public ICanRemoveParticipant WithCallbackHandler(ICallbacksHandler handler)
-    {
-        CallbackHandler = handler;
-        return this;
     }
 
     public ICanRemoveParticipant RemoveParticipant(string rawId)
@@ -44,12 +34,6 @@ internal sealed class CallAutomationRemoveParticipantHelper : HelperCallbackWith
     public ICanRemoveParticipant RemoveParticipants(CommunicationIdentifier[] participantsToRemove)
     {
         _identitiesToRemove.AddRange(participantsToRemove);
-        return this;
-    }
-
-    public IExecuteAsync WithContext(OperationContext context)
-    {
-        SetContext(context);
         return this;
     }
 

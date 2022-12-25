@@ -16,7 +16,7 @@ public static class CallConnectionExtensions
     /// </summary>
     /// <param name="connection"></param>
     /// <param name="rawId"></param>
-    public static ICanAddParticipantWithHandler AddParticipant(this CallConnection connection, string rawId)
+    public static ICanAddParticipant AddParticipant(this CallConnection connection, string rawId)
     {
         var helper = new CallAutomationAddParticipantHelper(connection, CommunicationIdentifier.FromRawId(rawId), Guid.NewGuid().ToString());
         return helper;
@@ -29,7 +29,7 @@ public static class CallConnectionExtensions
     /// <param name="rawId"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static ICanAddParticipantWithHandler AddParticipant(this CallConnection connection, string rawId, Action<PstnParticipantOptions> options)
+    public static ICanAddParticipant AddParticipant(this CallConnection connection, string rawId, Action<PstnParticipantOptions> options)
     {
         var pstnParticipantOptions = new PstnParticipantOptions();
         options(pstnParticipantOptions);
@@ -43,7 +43,7 @@ public static class CallConnectionExtensions
     /// <param name="connection"></param>
     /// <param name="rawId"></param>
     /// <returns></returns>
-    public static ICanRemoveParticipantWithHandler RemoveParticipant(this CallConnection connection, string rawId)
+    public static ICanRemoveParticipant RemoveParticipant(this CallConnection connection, string rawId)
     {
         var helper = new CallAutomationRemoveParticipantHelper(connection, CommunicationIdentifier.FromRawId(rawId), Guid.NewGuid().ToString());
         return helper;
