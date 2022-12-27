@@ -38,7 +38,7 @@ internal sealed class CallAutomationEventHandler : BaseEventHandler, ICallAutoma
             return;
         }
 
-        var delegates = callAutomationHelperCallback.HelperCallbacks.GetDelegateCallbacks(requestId, callAutomationHelperCallback.GetType());
+        var delegates = callAutomationHelperCallback.HelperCallbacks.GetDelegateCallbacks(requestId, eventBase.GetType());
         foreach (var @delegate in delegates)
         {
             _logger.LogInformation("Found callback delegate for request {requestId} and event {event}", requestId, eventBase.GetType());
@@ -49,7 +49,7 @@ internal sealed class CallAutomationEventHandler : BaseEventHandler, ICallAutoma
         var handlerTuples = callAutomationHelperCallback.HelperCallbacks.GetHandlers(requestId, eventBase.GetType());
         foreach (var handlerTuple in handlerTuples)
         {
-            var handler = GetHandler(handlerTuple.HandlerName);
+            var handler = GetHandler(handlerTuple.HandlerType);
             if (handler is null) return;
 
             _logger.LogInformation("Found callback handler for request {requestId} and event {event}", requestId, eventBase.GetType());

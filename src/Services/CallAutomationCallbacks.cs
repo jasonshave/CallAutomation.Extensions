@@ -8,7 +8,7 @@ namespace CallAutomation.Extensions.Services;
 internal class CallAutomationCallbacks
 {
     private readonly ConcurrentDictionary<(string RequestId, Type Type), List<Delegate>> _callbackDelegates = new();
-    private readonly ConcurrentDictionary<(string RequestId, string EventName), List<(string HandlerName, string MethodName)>> _callbackHandlers = new();
+    private readonly ConcurrentDictionary<(string RequestId, string EventName), List<(Type HandlerType, string MethodName)>> _callbackHandlers = new();
 
     public string RequestId { get; }
 
@@ -39,11 +39,11 @@ internal class CallAutomationCallbacks
     {
         if (_callbackHandlers.ContainsKey((requestId, typeof(T).Name)))
         {
-            _callbackHandlers[(requestId, typeof(T).Name)].Add((typeof(THandler).FullName, methodName));
+            _callbackHandlers[(requestId, typeof(T).Name)].Add((typeof(THandler), methodName));
             return;
         }
 
-        if (!_callbackHandlers.TryAdd((requestId, typeof(T).Name), new List<(string HandlerName, string MethodName)> { (typeof(THandler).FullName, methodName) }))
+        if (!_callbackHandlers.TryAdd((requestId, typeof(T).Name), new List<(Type HandlerType, string MethodName)> { (typeof(THandler), methodName) }))
         {
             throw new ApplicationException(
                 $"Unable to add callback for {typeof(T).Name} for request ID: {requestId}");
@@ -59,10 +59,10 @@ internal class CallAutomationCallbacks
         return callbacks;
     }
 
-    public IEnumerable<(string HandlerName, string MethodName)> GetHandlers(string requestId, Type type, bool remove = default)
+    public IEnumerable<(Type HandlerType, string MethodName)> GetHandlers(string requestId, Type type, bool remove = default)
     {
         _callbackHandlers.TryRemove((requestId, type.Name), out var handlerTuple);
-        if (handlerTuple is null) return Enumerable.Empty<(string HandlerName, string MethodName)>();
+        if (handlerTuple is null) return Enumerable.Empty<(Type HandlerType, string MethodName)>();
         if (remove) _callbackHandlers.TryRemove((requestId, type.Name), out _);
 
         return handlerTuple;

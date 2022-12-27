@@ -19,13 +19,13 @@ public abstract class BaseEventHandler
         _client = client;
     }
 
-    protected CallAutomationHandler? GetHandler(string handlerName)
+    protected object? GetHandler(Type handlerType)
     {
-        var handlerType = AppDomain.CurrentDomain.GetAssemblies()
-            .Select(assembly => assembly.GetType(handlerName))
-            .FirstOrDefault(t => t?.IsSubclassOf(typeof(CallAutomationHandler)) == true);
-        if (handlerType is null) return null;
+        //var handlerType = AppDomain.CurrentDomain.GetAssemblies()
+        //    .Select(assembly => assembly.GetType(handlerName))
+        //    .FirstOrDefault(t => t?.IsSubclassOf(typeof(CallAutomationHandler)) == true);
+        //if (handlerType is null) return null;
 
-        return (CallAutomationHandler?)_serviceProvider.GetService(handlerType);
+        return _serviceProvider.GetService(handlerType);
     }
 }

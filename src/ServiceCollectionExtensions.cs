@@ -7,6 +7,7 @@ using CallAutomation.Extensions.Handlers;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Services;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace CallAutomation.Extensions;
 
@@ -28,6 +29,23 @@ public static class ServiceCollectionExtensions
         builder.Services.AddSingleton<ICallAutomationEventDispatcher, CallAutomationEventDispatcher>();
         builder.Services.AddSingleton<ICallAutomationRecognizeEventDispatcher, CallAutomationRecognizeEventDispatcher>();
         builder.Services.AddSingleton<ICallAutomationRecognizeDtmfHandler, CallAutomationRecognizeDtmfEventHandler>();
+        return builder;
+    }
+
+    public static CallAutomationConfigurationBuilder AddAutomaticHandlerDiscovery(this CallAutomationConfigurationBuilder builder, Assembly callingAssembly, ServiceLifetime lifetime = ServiceLifetime.Singleton)
+    {
+        var types = callingAssembly.GetTypes();
+
+        // Find all the types that implement the CallAutomationHandler class
+        var handlerTypes = from t in types
+                           where t.IsClass && t.IsSubclassOf(typeof(CallAutomationHandler))
+                           select t;
+
+        foreach (var handlerType in handlerTypes)
+        {
+            builder.Services.Add(new ServiceDescriptor(handlerType, handlerType, lifetime));
+        }
+
         return builder;
     }
 }

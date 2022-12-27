@@ -29,6 +29,7 @@ internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublish
         foreach (var cloudEvent in cloudEvents)
         {
             CallAutomationEventBase callAutomationEventBase = CallAutomationEventParser.Parse(cloudEvent);
+            _logger.LogDebug("Received event: {eventName}", callAutomationEventBase.GetType().Name);
 
             if (callAutomationEventBase is CallConnected or CallDisconnected)
             {

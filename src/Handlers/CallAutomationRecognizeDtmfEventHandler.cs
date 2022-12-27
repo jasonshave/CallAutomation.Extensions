@@ -51,7 +51,7 @@ public class CallAutomationRecognizeDtmfEventHandler : BaseEventHandler, ICallAu
                 var handlerTuples = callAutomationHelperCallback.HelperCallbacks.GetHandlers(requestId, type);
                 foreach (var handlerTuple in handlerTuples)
                 {
-                    var handler = GetHandler(handlerTuple.HandlerName);
+                    var handler = GetHandler(handlerTuple.HandlerType);
                     if (handler is null) return;
 
                     isHandled = true;
@@ -84,7 +84,7 @@ public class CallAutomationRecognizeDtmfEventHandler : BaseEventHandler, ICallAu
                 var handlerTuples = callAutomationHelperCallback.HelperCallbacks.GetHandlers(requestId, type);
                 foreach (var handlerTuple in handlerTuples)
                 {
-                    var handler = GetHandler(handlerTuple.HandlerName);
+                    var handler = GetHandler(handlerTuple.HandlerType);
                     if (handler is null) return;
 
                     isHandled = true;

@@ -18,18 +18,18 @@ internal sealed class CallAutomationRecognizeEventDispatcher : ICallAutomationRe
     }
 
     public async ValueTask DispatchDelegateAsync(RecognizeCompleted @event, Delegate callbackFunction, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone> tones) =>
-        await DispatchDelegateCallbackAsync(@event, callbackFunction, clientElements, tones, _logger);
+        await DispatchToDelegateAsync(@event, callbackFunction, clientElements, tones, _logger);
 
-    public async ValueTask DispatchHandlerAsync(RecognizeCompleted @event, CallAutomationHandler handlerInstance, string methodName, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone> tones) =>
+    public async ValueTask DispatchHandlerAsync(RecognizeCompleted @event, object handlerInstance, string methodName, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone> tones) =>
         await DispatchToHandlerAsync(@event, handlerInstance, methodName, clientElements, tones);
 
     public async ValueTask DispatchDelegateAsync(RecognizeFailed @event, Delegate callbackFunction, CallAutomationClientElements clientElements) =>
-        await DispatchDelegateCallbackAsync(@event, callbackFunction, clientElements, null, _logger);
+        await DispatchToDelegateAsync(@event, callbackFunction, clientElements, null, _logger);
 
-    public async ValueTask DispatchHandlerAsync(RecognizeFailed @event, CallAutomationHandler handlerInstance, string methodName, CallAutomationClientElements clientElements) =>
+    public async ValueTask DispatchHandlerAsync(RecognizeFailed @event, object handlerInstance, string methodName, CallAutomationClientElements clientElements) =>
         await DispatchToHandlerAsync(@event, handlerInstance, methodName, clientElements, null);
 
-    private static async ValueTask DispatchToHandlerAsync(CallAutomationEventBase eventBase, CallAutomationHandler handlerInstance, string methodName, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone>? tones)
+    private static async ValueTask DispatchToHandlerAsync(CallAutomationEventBase eventBase, object handlerInstance, string methodName, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone>? tones)
     {
         var methodInfo = handlerInstance.GetType().GetMethod(methodName);
         ValueTask task;
@@ -45,7 +45,7 @@ internal sealed class CallAutomationRecognizeEventDispatcher : ICallAutomationRe
         await task.ConfigureAwait(false);
     }
 
-    private static async ValueTask DispatchDelegateCallbackAsync(CallAutomationEventBase eventBase, Delegate callbackFunction, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone>? tones, ILogger logger)
+    private static async ValueTask DispatchToDelegateAsync(CallAutomationEventBase eventBase, Delegate callbackFunction, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone>? tones, ILogger logger)
     {
         logger.LogDebug($"Found {callbackFunction.Method.GetParameters().Count()} parameters in delegate callback for method {callbackFunction.Method.Name}.");
         if (!callbackFunction.Method.GetParameters().Any())
@@ -54,6 +54,16 @@ internal sealed class CallAutomationRecognizeEventDispatcher : ICallAutomationRe
             return;
         }
 
-        await ((ValueTask)callbackFunction.DynamicInvoke(eventBase, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording)).ConfigureAwait(false);
+        ValueTask task;
+        if (tones is null)
+        {
+            task = (ValueTask)callbackFunction.DynamicInvoke(eventBase, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording);
+        }
+        else
+        {
+            task = (ValueTask)callbackFunction.DynamicInvoke(eventBase, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording, tones);
+        }
+
+        await task.ConfigureAwait(false);
     }
 }

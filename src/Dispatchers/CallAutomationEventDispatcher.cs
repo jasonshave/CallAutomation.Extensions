@@ -29,7 +29,7 @@ internal sealed class CallAutomationEventDispatcher : ICallAutomationEventDispat
         await ((ValueTask)callbackFunction.DynamicInvoke(@event, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording)).ConfigureAwait(false);
     }
 
-    public async ValueTask DispatchHandlerAsync(CallAutomationEventBase @event, CallAutomationHandler handlerInstance, string methodName, CallAutomationClientElements clientElements)
+    public async ValueTask DispatchHandlerAsync(CallAutomationEventBase @event, object handlerInstance, string methodName, CallAutomationClientElements clientElements)
     {
         var methodInfo = handlerInstance.GetType().GetMethod(methodName);
         var task = (ValueTask)methodInfo.Invoke(handlerInstance, new object[] { @event, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording });
