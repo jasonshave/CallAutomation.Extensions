@@ -11,21 +11,20 @@ namespace CallAutomation.Extensions.Helpers;
 
 internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaCallback
 {
-    private static IEnumerable<Type> _types = new[] { typeof(PlayCompleted), typeof(PlayFailed) };
     private readonly CallMedia _callMedia;
     private readonly List<CommunicationIdentifier> _playToParticipants = new();
     private readonly PlayMediaOptions _playMediaOptions;
     private readonly string? _textToSpeak;
 
     internal CallAutomationPlayHelper(CallMedia callMedia, PlayMediaOptions playMediaOptions, string requestId)
-        : base(requestId, _types)
+        : base(requestId)
     {
         _callMedia = callMedia;
         _playMediaOptions = playMediaOptions;
     }
 
     internal CallAutomationPlayHelper(CallMedia callMedia, string textToSpeak, string requestId)
-        : base(requestId, _types)
+        : base(requestId)
     {
         _callMedia = callMedia;
         _textToSpeak = textToSpeak;

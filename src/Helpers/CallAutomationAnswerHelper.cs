@@ -11,7 +11,6 @@ namespace CallAutomation.Extensions.Helpers;
 
 internal sealed class CallAutomationAnswerHelper : HelperCallbackBase, IAnswerWithCallbackUri, IAnswerCallHandling
 {
-    private static readonly IEnumerable<Type> _types = new[] { typeof(CallConnected), typeof(CallDisconnected) };
     private readonly CallAutomationClient _client;
     private readonly string? _incomingCallContext;
 
@@ -19,7 +18,7 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase, IAnswerWi
     private MediaStreamingOptions? _mediaStreamingOptions;
 
     internal CallAutomationAnswerHelper(CallAutomationClient client, IncomingCall incomingCall, string requestId)
-        : base(requestId, _types)
+        : base(requestId)
     {
         _client = client;
         _incomingCallContext = incomingCall.IncomingCallContext;
@@ -32,7 +31,7 @@ internal sealed class CallAutomationAnswerHelper : HelperCallbackBase, IAnswerWi
     /// <param name="callNotification"></param>
     /// <param name="requestId"></param>
     internal CallAutomationAnswerHelper(CallAutomationClient client, CallNotification callNotification, string requestId)
-        : base(requestId, _types)
+        : base(requestId)
     {
         _client = client;
         _incomingCallContext = callNotification.IncomingCallContext;

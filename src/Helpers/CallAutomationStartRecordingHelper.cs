@@ -10,12 +10,11 @@ namespace CallAutomation.Extensions.Helpers;
 
 internal sealed class CallAutomationStartRecordingHelper : HelperCallbackBase, IStartRecording
 {
-    private static readonly IEnumerable<Type> _types = new[] { typeof(RecordingStateChanged), typeof(SilenceTimeout) };
     private readonly CallRecording _callRecording;
     private readonly StartRecordingOptions _startRecordingOptions;
 
     internal CallAutomationStartRecordingHelper(CallRecording callRecording, StartRecordingOptions startRecordingOptions, string requestId)
-        : base(requestId, _types)
+        : base(requestId)
     {
         _callRecording = callRecording;
         _startRecordingOptions = startRecordingOptions;

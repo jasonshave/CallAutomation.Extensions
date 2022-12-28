@@ -17,7 +17,6 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
     IHandleDtmfResponse,
     IHandleDtmfTimeout
 {
-    private static readonly IEnumerable<Type> _types = new[] { typeof(RecognizeFailed), typeof(RecognizeCompleted), typeof(SilenceTimeout) };
     private readonly CallMedia _callMedia;
 
     private Uri? _fileUri;
@@ -26,7 +25,7 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
     private string? _textToSpeak;
 
     internal CallAutomationDtmfHelper(CallMedia callMedia, string requestId)
-        : base(requestId, _types)
+        : base(requestId)
     {
         _callMedia = callMedia;
     }

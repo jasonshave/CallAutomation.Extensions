@@ -16,7 +16,6 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
     ICreateCallWithCallbackUri,
     ICreateCallHandling
 {
-    private static readonly IEnumerable<Type> _types = new[] { typeof(CallConnected), typeof(CallDisconnected) };
     private readonly CallAutomationClient _client;
     private readonly List<CommunicationIdentifier> _destinations = new();
     private string _from;
@@ -25,7 +24,7 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
     private MediaStreamingOptions? _mediaStreamingOptions;
 
     internal CallAutomationCreateCallHelper(CallAutomationClient client, string to, string requestId)
-        : base(requestId, _types)
+        : base(requestId)
     {
         _client = client;
         _destinations.Add(to.ConvertToCommunicationIdentifier());
