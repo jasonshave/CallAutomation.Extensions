@@ -50,6 +50,13 @@ public interface IHandleDtmfResponse
         where THandler : CallAutomationHandler;
 
     /// <summary>
+    /// Specifies the callback when recognition completes successfully.
+    /// </summary>
+    /// <param name="callback"></param>
+    /// <returns></returns>
+    public IHandleDtmfResponse OnRecognizeCompleted(Func<RecognizeCompleted, CallConnection, CallMedia, CallRecording, IReadOnlyList<DtmfTone>, ValueTask> callback);
+
+    /// <summary>
     /// Specifies the callback delegate when more than one tone is received.
     /// </summary>
     /// <param name="callback"></param>

@@ -78,6 +78,12 @@ internal sealed class CallAutomationDtmfHelper : HelperCallbackBase,
         return this;
     }
 
+    public IHandleDtmfResponse OnRecognizeCompleted(Func<RecognizeCompleted, CallConnection, CallMedia, CallRecording, IReadOnlyList<DtmfTone>, ValueTask> callback)
+    {
+        HelperCallbacks.AddDelegateCallback<RecognizeCompleted>(RequestId, callback);
+        return this;
+    }
+
     public IHandleDtmfResponse OnRecognizeCompleted<THandler>()
         where THandler : CallAutomationHandler
     {
