@@ -3,13 +3,12 @@
 
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Models;
-using System.Reflection;
 
 namespace CallAutomation.Extensions.Interfaces;
 
 internal interface ICallAutomationEventDispatcher
 {
-    ValueTask DispatchAsync(CallAutomationEventBase @event, Delegate @delegate, CallAutomationClientElements clientElements);
+    ValueTask DispatchDelegateAsync(CallAutomationEventBase @event, Delegate callbackFunction, CallAutomationClientElements clientElements);
 
-    ValueTask DispatchAsync(CallAutomationEventBase @event, IOperationContext? operationContext, CallAutomationHandler handlerInstance, string methodName, CallAutomationClientElements clientElements);
+    ValueTask DispatchHandlerAsync(CallAutomationEventBase @event, object handlerInstance, string methodName, CallAutomationClientElements clientElements);
 }

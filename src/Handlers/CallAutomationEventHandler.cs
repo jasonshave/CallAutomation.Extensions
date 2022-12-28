@@ -4,6 +4,7 @@
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
+using CallAutomation.Extensions.Services;
 using Microsoft.Extensions.Logging;
 
 namespace CallAutomation.Extensions.Handlers;
@@ -16,37 +17,44 @@ internal sealed class CallAutomationEventHandler : BaseEventHandler, ICallAutoma
     public CallAutomationEventHandler(
         IServiceProvider serviceProvider,
         ICallAutomationEventDispatcher dispatcher,
-        ICallbacksHandler callbackHandler,
         CallAutomationClient client,
         ILogger<CallAutomationEventHandler> logger)
-        : base(serviceProvider, callbackHandler, client)
+        : base(serviceProvider, client)
     {
         _dispatcher = dispatcher;
         _logger = logger;
     }
 
-    public async ValueTask Handle(CallAutomationEventBase eventBase, IOperationContext? operationContext, string? id)
+    public async ValueTask Handle(CallAutomationEventBase eventBase, string? requestId)
     {
-        if (string.IsNullOrEmpty(id)) return;
+        if (string.IsNullOrEmpty(requestId)) return;
         var clientElements = new CallAutomationClientElements(_client, eventBase.CallConnectionId);
 
-        var delegates = _callbackHandler.GetDelegateCallbacks(id, eventBase.GetType());
+        var callAutomationHelperCallback = CallbackRegistry.GetHelperCallback(requestId, eventBase.GetType(), true);
+
+        if (callAutomationHelperCallback is null)
+        {
+            _logger.LogDebug("No callbacks found for request {requestId}", requestId);
+            return;
+        }
+
+        var delegates = callAutomationHelperCallback.HelperCallbacks.GetDelegateCallbacks(requestId, eventBase.GetType());
         foreach (var @delegate in delegates)
         {
-            _logger.LogInformation("Found callback delegate for request {requestId} and event {event}", id, eventBase.GetType());
-            await _dispatcher.DispatchAsync(eventBase, @delegate, clientElements);
+            _logger.LogInformation("Found callback delegate for request {requestId} and event {event}", requestId, eventBase.GetType());
+            await _dispatcher.DispatchDelegateAsync(eventBase, @delegate, clientElements);
         }
 
         // dispatch handler callbacks
-        var handlerTuples = _callbackHandler.GetHandlers(id, eventBase.GetType());
+        var handlerTuples = callAutomationHelperCallback.HelperCallbacks.GetHandlers(requestId, eventBase.GetType());
         foreach (var handlerTuple in handlerTuples)
         {
-            var handler = GetHandler(handlerTuple.HandlerName);
+            var handler = GetHandler(handlerTuple.HandlerType);
             if (handler is null) return;
 
-            _logger.LogInformation("Found callback handler for request {requestId} and event {event}", id, eventBase.GetType());
+            _logger.LogInformation("Found callback handler for request {requestId} and event {event}", requestId, eventBase.GetType());
 
-            await _dispatcher.DispatchAsync(eventBase, operationContext, handler, handlerTuple.MethodName, clientElements);
+            await _dispatcher.DispatchHandlerAsync(eventBase, handler, handlerTuple.MethodName, clientElements);
         }
     }
 }

@@ -3,17 +3,16 @@
 
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Models;
-using System.Reflection;
 
 namespace CallAutomation.Extensions.Interfaces;
 
 public interface ICallAutomationRecognizeEventDispatcher
 {
-    ValueTask DispatchAsync(RecognizeCompleted @event, Delegate callbackFunction, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone> tones);
+    ValueTask DispatchDelegateAsync(RecognizeCompleted @event, Delegate callbackFunction, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone> tones);
 
-    ValueTask DispatchAsync(RecognizeCompleted @event, IOperationContext? operationContext, CallAutomationHandler handlerInstance, string methodName, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone> tones);
+    ValueTask DispatchHandlerAsync(RecognizeCompleted @event, object handlerInstance, string methodName, CallAutomationClientElements clientElements, IReadOnlyList<DtmfTone> tones);
 
-    ValueTask DispatchAsync(RecognizeFailed @event, Delegate callbackFunction, CallAutomationClientElements clientElements);
+    ValueTask DispatchDelegateAsync(RecognizeFailed @event, Delegate callbackFunction, CallAutomationClientElements clientElements);
 
-    ValueTask DispatchAsync(RecognizeFailed @event, IOperationContext? operationContext, CallAutomationHandler handlerInstance, string methodName, CallAutomationClientElements clientElements);
+    ValueTask DispatchHandlerAsync(RecognizeFailed @event, object handlerInstance, string methodName, CallAutomationClientElements clientElements);
 }

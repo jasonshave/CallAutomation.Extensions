@@ -16,11 +16,16 @@ public static class CallMediaExtensions
     /// <param name="callMedia"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static IPlayMediaCallbackWithHandler Play(this CallMedia callMedia, Action<PlayMediaOptions> options)
+    public static IPlayMediaCallback Play(this CallMedia callMedia, Action<PlayMediaOptions> options)
     {
         var playOptions = new PlayMediaOptions();
         options(playOptions);
         return new CallAutomationPlayHelper(callMedia, playOptions, Guid.NewGuid().ToString());
+    }
+
+    public static IPlayMediaCallback Speak(this CallMedia callMedia, string textToSpeak)
+    {
+        return new CallAutomationPlayHelper(callMedia, textToSpeak, Guid.NewGuid().ToString());
     }
 
     /// <summary>

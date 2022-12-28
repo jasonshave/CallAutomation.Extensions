@@ -5,11 +5,7 @@ using Azure.Communication.CallAutomation;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface IHandleDtmfResponseWithHandler : IWithCallbackHandler<IHandleDtmfResponse>, IHandleDtmfResponse
-{
-}
-
-public interface IHandleDtmfResponse : ICallbackContext
+public interface IHandleDtmfResponse
 {
     /// <summary>
     /// Specifies the callback delegate when the requested <see cref="IDtmfTone"/> is received.
@@ -38,12 +34,27 @@ public interface IHandleDtmfResponse : ICallbackContext
         where TTone : IDtmfTone;
 
     /// <summary>
+    /// Detected stop tone.
+    /// </summary>
+    /// <typeparam name="THandler"></typeparam>
+    /// <returns></returns>
+    IHandleDtmfResponse OnStopToneDetected<THandler>()
+        where THandler : CallAutomationHandler;
+
+    /// <summary>
     /// Specifies the handler to invoke when more than one tone is received.
     /// </summary>
     /// <typeparam name="THandler"></typeparam>
     /// <returns></returns>
     IHandleDtmfResponse OnRecognizeCompleted<THandler>()
         where THandler : CallAutomationHandler;
+
+    /// <summary>
+    /// Specifies the callback when recognition completes successfully.
+    /// </summary>
+    /// <param name="callback"></param>
+    /// <returns></returns>
+    public IHandleDtmfResponse OnRecognizeCompleted(Func<RecognizeCompleted, CallConnection, CallMedia, CallRecording, IReadOnlyList<DtmfTone>, ValueTask> callback);
 
     /// <summary>
     /// Specifies the callback delegate when more than one tone is received.
@@ -64,20 +75,31 @@ public interface IHandleDtmfResponse : ICallbackContext
     /// </summary>
     /// <typeparam name="TRecognizeFail"></typeparam>
     /// <typeparam name="THandler"></typeparam>
-    IHandleDtmfTimeout OnFail<TRecognizeFail, THandler>()
+    IHandleDtmfResponse OnFail<TRecognizeFail, THandler>()
         where TRecognizeFail : IRecognizeDtmfFailed
         where THandler : CallAutomationHandler;
 
     /// <summary>
     /// Specifies the callback delegate when the collection of DTMF fails.
     /// </summary>
+    /// <typeparam name="TRecognizeFail"></typeparam>
     /// <param name="callback"></param>
-    IHandleDtmfTimeout OnRecognizeFailed(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback);
+    /// <returns></returns>
+    IHandleDtmfResponse OnFail<TRecognizeFail>(Func<ValueTask> callback)
+        where TRecognizeFail : IRecognizeDtmfFailed;
+
+    /// <summary>
+    /// Specifies the callback delegate when the collection of DTMF fails.
+    /// </summary>
+    /// <param name="callback"></param>
+    IHandleDtmfResponse OnRecognizeFailed(Func<RecognizeFailed, CallConnection, CallMedia, CallRecording, ValueTask> callback);
 
     /// <summary>
     /// Specifies the callback delegate when the collection of DTMF fails.
     /// </summary>
     /// <typeparam name="THandler"></typeparam>
-    IHandleDtmfTimeout OnRecognizeFailed<THandler>()
+    IHandleDtmfResponse OnRecognizeFailed<THandler>()
         where THandler : CallAutomationHandler;
+
+    ValueTask ExecuteAsync();
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure.Communication.CallAutomation;
+
 namespace CallAutomation.Extensions.Models;
 
 public sealed class RecognizeOptions
@@ -11,7 +13,9 @@ public sealed class RecognizeOptions
 
     public int WaitBetweenTonesInSeconds { get; set; } = 2;
 
-    public bool AllowInterruptPrompt { get; set; } = false;
+    public bool AllowInterruptPrompt { get; set; }
 
-    public bool AllowInterruptExistingMediaOperation { get; set; } = false;
+    public bool AllowInterruptExistingMediaOperation { get; set; }
+
+    public List<DtmfTone> StopTones { get; } = new();
 }

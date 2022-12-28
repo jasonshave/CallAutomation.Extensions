@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure;
 using Azure.Communication;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Extensions;
@@ -10,8 +11,8 @@ using CallAutomation.Extensions.Services;
 
 namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationCreateCallHelper : HelperCallbackWithContext,
-    ICreateCallFromWithHandler,
+internal sealed class CallAutomationCreateCallHelper : HelperCallbackBase,
+    ICreateCallFrom,
     ICreateCallWithCallbackUri,
     ICreateCallHandling
 {
@@ -20,18 +21,13 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackWithContext
     private string _from;
     private CallFromOptions? _callFromOptions;
     private Uri _callbackUri;
+    private MediaStreamingOptions? _mediaStreamingOptions;
 
     internal CallAutomationCreateCallHelper(CallAutomationClient client, string to, string requestId)
         : base(requestId)
     {
         _client = client;
         _destinations.Add(to.ConvertToCommunicationIdentifier());
-    }
-
-    public ICreateCallFrom WithCallbackHandler(ICallbacksHandler handler)
-    {
-        CallbackHandler = handler;
-        return this;
     }
 
     public ICreateCallWithCallbackUri From(string id, Action<CallFromOptions> options)
@@ -51,51 +47,52 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackWithContext
         return this;
     }
 
+    public ICreateCallHandling WithInboundMediaStreaming(string streamingUri)
+    {
+        _mediaStreamingOptions = new MediaStreamingOptions(new Uri(streamingUri), MediaStreamingTransport.Websocket,
+            MediaStreamingContent.Audio, MediaStreamingAudioChannel.Mixed);
+        return this;
+    }
+
     public ICreateCallHandling OnCallConnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        CallbackHandler.AddHandlerCallback<THandler, CallConnected>(RequestId, $"On{nameof(CallConnected)}");
+        HelperCallbacks.AddHandlerCallback<THandler, CallConnected>(RequestId, $"On{nameof(CallConnected)}");
         return this;
     }
 
     public ICreateCallHandling OnCallDisconnected<THandler>()
         where THandler : CallAutomationHandler
     {
-        CallbackHandler.AddHandlerCallback<THandler, CallDisconnected>(RequestId, $"On{nameof(CallDisconnected)}");
+        HelperCallbacks.AddHandlerCallback<THandler, CallDisconnected>(RequestId, $"On{nameof(CallDisconnected)}");
         return this;
     }
 
     public ICreateCallHandling OnCallConnected(Func<ValueTask> callbackFunction)
     {
-        CallbackHandler.AddDelegateCallback<CallConnected>(RequestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<CallConnected>(RequestId, callbackFunction);
         return this;
     }
 
     public ICreateCallHandling OnCallConnected(Func<CallConnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        CallbackHandler.AddDelegateCallback<CallConnected>(RequestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<CallConnected>(RequestId, callbackFunction);
         return this;
     }
 
     public ICreateCallHandling OnCallDisconnected(Func<ValueTask> callbackFunction)
     {
-        CallbackHandler.AddDelegateCallback<CallDisconnected>(RequestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<CallDisconnected>(RequestId, callbackFunction);
         return this;
     }
 
     public ICreateCallHandling OnCallDisconnected(Func<CallDisconnected, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        CallbackHandler.AddDelegateCallback<CallDisconnected>(RequestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<CallDisconnected>(RequestId, callbackFunction);
         return this;
     }
 
-    public IExecuteAsync<CreateCallResult> WithContext(OperationContext context)
-    {
-        SetContext(context);
-        return this;
-    }
-
-    public async ValueTask<CreateCallResult> ExecuteAsync()
+    public async ValueTask<Response<CreateCallResult>> ExecuteAsync()
     {
         var callSource = new CallSource(new CommunicationUserIdentifier(_callFromOptions.ApplicationId));
         if (_callFromOptions is not null)
@@ -110,8 +107,11 @@ internal sealed class CallAutomationCreateCallHelper : HelperCallbackWithContext
 
         var createCallOptions = new CreateCallOptions(callSource, _destinations, _callbackUri)
         {
-            OperationContext = JSONContext,
+            OperationContext = RequestId,
         };
+
+        if (_mediaStreamingOptions is not null)
+            createCallOptions.MediaStreamingOptions = _mediaStreamingOptions;
 
         var result = await _client.CreateCallAsync(createCallOptions);
         return result;

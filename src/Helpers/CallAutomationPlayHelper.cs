@@ -6,15 +6,15 @@ using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
 using CallAutomation.Extensions.Services;
-using System.Text.Json;
 
 namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationPlayHelper : HelperCallbackWithContext, IPlayMediaCallbackWithHandler
+internal sealed class CallAutomationPlayHelper : HelperCallbackBase, IPlayMediaCallback
 {
     private readonly CallMedia _callMedia;
     private readonly List<CommunicationIdentifier> _playToParticipants = new();
     private readonly PlayMediaOptions _playMediaOptions;
+    private readonly string? _textToSpeak;
 
     internal CallAutomationPlayHelper(CallMedia callMedia, PlayMediaOptions playMediaOptions, string requestId)
         : base(requestId)
@@ -23,10 +23,11 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackWithContext, IPla
         _playMediaOptions = playMediaOptions;
     }
 
-    public IPlayMediaCallback WithCallbackHandler(ICallbacksHandler handler)
+    internal CallAutomationPlayHelper(CallMedia callMedia, string textToSpeak, string requestId)
+        : base(requestId)
     {
-        CallbackHandler = handler;
-        return this;
+        _callMedia = callMedia;
+        _textToSpeak = textToSpeak;
     }
 
     public IPlayMediaCallback ToParticipant(string rawId)
@@ -38,66 +39,61 @@ internal sealed class CallAutomationPlayHelper : HelperCallbackWithContext, IPla
     public IPlayMediaCallback OnPlayCompleted<THandler>()
         where THandler : CallAutomationHandler
     {
-        CallbackHandler.AddHandlerCallback<THandler, PlayCompleted>(RequestId, $"On{nameof(PlayCompleted)}");
+        HelperCallbacks.AddHandlerCallback<THandler, PlayCompleted>(RequestId, $"On{nameof(PlayCompleted)}");
         return this;
     }
 
     public IPlayMediaCallback OnPlayCompleted(Func<ValueTask> callbackFunction)
     {
-        CallbackHandler.AddDelegateCallback<PlayCompleted>(RequestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<PlayCompleted>(RequestId, callbackFunction);
         return this;
     }
 
     public IPlayMediaCallback OnPlayCompleted(Func<PlayCompleted, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        CallbackHandler.AddDelegateCallback<PlayCompleted>(RequestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<PlayCompleted>(RequestId, callbackFunction);
         return this;
     }
 
     public IPlayMediaCallback OnPlayFailed<THandler>()
         where THandler : CallAutomationHandler
     {
-        CallbackHandler.AddHandlerCallback<THandler, PlayFailed>(RequestId, $"On{nameof(PlayFailed)}");
+        HelperCallbacks.AddHandlerCallback<THandler, PlayFailed>(RequestId, $"On{nameof(PlayFailed)}");
         return this;
     }
 
     public IPlayMediaCallback OnPlayFailed(Func<PlayFailed, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        CallbackHandler.AddDelegateCallback<PlayFailed>(RequestId, callbackFunction);
-        return this;
-    }
-
-    public IExecuteAsync WithContext(OperationContext context)
-    {
-        SetContext(context);
+        HelperCallbacks.AddDelegateCallback<PlayFailed>(RequestId, callbackFunction);
         return this;
     }
 
     public async ValueTask ExecuteAsync()
     {
+        PlaySource? playSource = null;
+        PlayOptions playOptions = new()
+        {
+            OperationContext = RequestId
+        };
+
+        if (_playMediaOptions is not null)
+        {
+            playSource = new FileSource(new Uri(_playMediaOptions.FileUrl));
+            playOptions.Loop = _playMediaOptions.Loop;
+        }
+
+        if (_textToSpeak is not null)
+        {
+            playSource = new TextSource(_textToSpeak);
+        }
+
         if (_playToParticipants.Any())
         {
-            await _callMedia.PlayAsync(new FileSource(new Uri(_playMediaOptions.FileUrl))
-            {
-                // todo: need to verify how this works
-                PlaySourceId = RequestId,
-            }, _playToParticipants, new PlayOptions()
-            {
-                OperationContext = JSONContext,
-                Loop = _playMediaOptions.Loop,
-            });
+            await _callMedia.PlayAsync(playSource, _playToParticipants, playOptions);
         }
         else
         {
-            await _callMedia.PlayToAllAsync(new FileSource(new Uri(_playMediaOptions.FileUrl))
-            {
-                // todo: need to verify how this works
-                PlaySourceId = RequestId,
-            }, new PlayOptions()
-            {
-                OperationContext = JSONContext,
-                Loop = _playMediaOptions.Loop,
-            });
+            await _callMedia.PlayToAllAsync(playSource, playOptions);
         }
     }
 }

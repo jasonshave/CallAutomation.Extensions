@@ -1,16 +1,13 @@
 ﻿// Copyright (c) 2022 Jason Shave. All rights reserved.
 // Licensed under the MIT License.
 
-using Azure.Communication;
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
-using CallAutomation.Extensions.Models;
 using CallAutomation.Extensions.Services;
-using System.Text.Json;
 
 namespace CallAutomation.Extensions.Helpers;
 
-internal sealed class CallAutomationStartRecordingHelper : HelperCallbackBase, IStartRecordingCallbackkWithHandler
+internal sealed class CallAutomationStartRecordingHelper : HelperCallbackBase, IStartRecording
 {
     private readonly CallRecording _callRecording;
     private readonly StartRecordingOptions _startRecordingOptions;
@@ -22,28 +19,22 @@ internal sealed class CallAutomationStartRecordingHelper : HelperCallbackBase, I
         _startRecordingOptions = startRecordingOptions;
     }
 
-    public IStartRecordingCallback WithCallbackHandler(ICallbacksHandler handler)
-    {
-        CallbackHandler = handler;
-        return this;
-    }
-
-    public IStartRecordingCallback OnRecordingStateChanged<THandler>()
+    public IStartRecording OnRecordingStateChanged<THandler>()
         where THandler : CallAutomationHandler
     {
-        CallbackHandler.AddHandlerCallback<THandler, RecordingStateChanged>(RequestId, $"On{nameof(RecordingStateChanged)}");
+        HelperCallbacks.AddHandlerCallback<THandler, RecordingStateChanged>(RequestId, $"On{nameof(RecordingStateChanged)}");
         return this;
     }
 
-    public IStartRecordingCallback OnRecordingStateChanged(Func<ValueTask> callbackFunction)
+    public IStartRecording OnRecordingStateChanged(Func<ValueTask> callbackFunction)
     {
-        CallbackHandler.AddDelegateCallback<RecordingStateChanged>(RequestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<RecordingStateChanged>(RequestId, callbackFunction);
         return this;
     }
 
-    public IStartRecordingCallback OnRecordingStateChanged(Func<RecordingStateChanged, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
+    public IStartRecording OnRecordingStateChanged(Func<RecordingStateChanged, CallConnection, CallMedia, CallRecording, ValueTask> callbackFunction)
     {
-        CallbackHandler.AddDelegateCallback<RecordingStateChanged>(RequestId, callbackFunction);
+        HelperCallbacks.AddDelegateCallback<RecordingStateChanged>(RequestId, callbackFunction);
         return this;
     }
 

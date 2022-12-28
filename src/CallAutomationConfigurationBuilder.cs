@@ -9,5 +9,9 @@ public sealed class CallAutomationConfigurationBuilder
 {
     public IServiceCollection Services { get; }
 
-    public CallAutomationConfigurationBuilder(IServiceCollection services) => Services = services;
+
+    public CallAutomationConfigurationBuilder(IServiceCollection services)
+    {
+        Services = services;
+    }
 }

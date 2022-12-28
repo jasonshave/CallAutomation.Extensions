@@ -3,11 +3,8 @@
 
 using Azure.Communication.CallAutomation;
 using Azure.Messaging;
-using CallAutomation.Extensions.Converters;
 using CallAutomation.Extensions.Interfaces;
-using CallAutomation.Extensions.Models;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace CallAutomation.Extensions.Services;
 
@@ -32,32 +29,33 @@ internal sealed class CallAutomationEventPublisher : ICallAutomationEventPublish
         foreach (var cloudEvent in cloudEvents)
         {
             CallAutomationEventBase callAutomationEventBase = CallAutomationEventParser.Parse(cloudEvent);
-            IOperationContext? operationContext = callAutomationEventBase.OperationContext is null
-                ? null
-                : JsonSerializer.Deserialize<IOperationContext>(callAutomationEventBase.OperationContext, new JsonSerializerOptions()
-                {
-                    Converters =
-                    {
-                        new OperationContextJsonConverter()
-                    }
-                });
+            _logger.LogDebug("Received event: {eventName}", callAutomationEventBase.GetType().Name);
 
-            if (callAutomationEventBase is RecognizeCompleted or RecognizeFailed)
+            if (callAutomationEventBase is CallConnected or CallDisconnected)
             {
-                await _callAutomationRecognizeDtmfHandler.Handle(callAutomationEventBase, operationContext, operationContext?.RequestId);
+                if (callAutomationEventBase.OperationContext is null)
+                {
+                    // OperationContext will be null for inbound calls
+                    await _callAutomationEventHandler.Handle(callAutomationEventBase, callAutomationEventBase.CorrelationId);
+                }
+                else
+                {
+                    // outbound calls won't have a correlation ID so we have to use the operation context.
+                    await _callAutomationEventHandler.Handle(callAutomationEventBase, callAutomationEventBase.OperationContext);
+                }
+
                 return;
             }
 
-            if (callAutomationEventBase.OperationContext is null)
+            // handle recognition events
+            if (callAutomationEventBase is RecognizeCompleted or RecognizeFailed)
             {
-                // OperationContext will be null for inbound calls and Recording Status changes
-                await _callAutomationEventHandler.Handle(callAutomationEventBase, operationContext, callAutomationEventBase.CorrelationId);
+                await _callAutomationRecognizeDtmfHandler.Handle(callAutomationEventBase, callAutomationEventBase.OperationContext);
+                return;
             }
-            else
-            {
-                // outbound calls won't have a correlation ID so we have to use the operation context.
-                await _callAutomationEventHandler.Handle(callAutomationEventBase, operationContext, operationContext?.RequestId);
-            }
+
+            // handle all other events
+            await _callAutomationEventHandler.Handle(callAutomationEventBase, callAutomationEventBase.OperationContext);
         }
     }
 }

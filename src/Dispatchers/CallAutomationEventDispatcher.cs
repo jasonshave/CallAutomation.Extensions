@@ -4,27 +4,35 @@
 using Azure.Communication.CallAutomation;
 using CallAutomation.Extensions.Interfaces;
 using CallAutomation.Extensions.Models;
-using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace CallAutomation.Extensions.Dispatchers;
 
 internal sealed class CallAutomationEventDispatcher : ICallAutomationEventDispatcher
 {
-    public async ValueTask DispatchAsync(CallAutomationEventBase @event, Delegate @delegate, CallAutomationClientElements clientElements)
+    private readonly ILogger<CallAutomationEventDispatcher> _logger;
+
+    public CallAutomationEventDispatcher(ILogger<CallAutomationEventDispatcher> logger)
     {
-        if (!@delegate.Method.GetParameters().Any())
+        _logger = logger;
+    }
+
+    public async ValueTask DispatchDelegateAsync(CallAutomationEventBase @event, Delegate callbackFunction, CallAutomationClientElements clientElements)
+    {
+        _logger.LogDebug($"Found {callbackFunction.Method.GetParameters().Count()} parameters in delegate callback for method {callbackFunction.Method.Name}.");
+        if (!callbackFunction.Method.GetParameters().Any())
         {
-            await ((ValueTask)@delegate.DynamicInvoke()).ConfigureAwait(false);
+            await ((ValueTask)callbackFunction.DynamicInvoke()).ConfigureAwait(false);
             return;
         }
 
-        await ((ValueTask)@delegate.DynamicInvoke(@event, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording)).ConfigureAwait(false);
+        await ((ValueTask)callbackFunction.DynamicInvoke(@event, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording)).ConfigureAwait(false);
     }
 
-    public async ValueTask DispatchAsync(CallAutomationEventBase @event, IOperationContext? operationContext, CallAutomationHandler handlerInstance, string methodName, CallAutomationClientElements clientElements)
+    public async ValueTask DispatchHandlerAsync(CallAutomationEventBase @event, object handlerInstance, string methodName, CallAutomationClientElements clientElements)
     {
         var methodInfo = handlerInstance.GetType().GetMethod(methodName);
-        var task = (ValueTask)methodInfo.Invoke(handlerInstance, new object[] { @event, operationContext, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording });
+        var task = (ValueTask)methodInfo.Invoke(handlerInstance, new object[] { @event, clientElements.CallConnection, clientElements.CallMedia, clientElements.CallRecording });
         await task.ConfigureAwait(false);
     }
 }

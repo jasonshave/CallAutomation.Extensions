@@ -12,9 +12,6 @@ internal static class IdentityExtensions
         if (id.StartsWith("+", StringComparison.OrdinalIgnoreCase))
             return new PhoneNumberIdentifier(id);
 
-        if (id.StartsWith("4:+", StringComparison.OrdinalIgnoreCase))
-            return new PhoneNumberIdentifier(id.Substring("4:".Length));
-
-        return new UnknownIdentifier(id);
+        return CommunicationIdentifier.FromRawId(id);
     }
 }

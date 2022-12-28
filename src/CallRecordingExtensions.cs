@@ -16,7 +16,7 @@ public static class CallRecordingExtensions
     /// <param name="callLocator"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static IStartRecordingCallbackkWithHandler StartRecording(this CallRecording callRecording, string correlationId, CallLocator callLocator, Action<StartRecordingOptions> options)
+    public static IStartRecording StartRecording(this CallRecording callRecording, string correlationId, CallLocator callLocator, Action<StartRecordingOptions> options)
     {
         var recordingOptions = new StartRecordingOptions(callLocator);
         options(recordingOptions);

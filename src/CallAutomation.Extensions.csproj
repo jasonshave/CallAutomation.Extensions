@@ -7,17 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Communication.CallAutomation" Version="1.0.0-beta.1" />
-    <PackageReference Include="Azure.Messaging.EventGrid" Version="4.11.0" />
-    <PackageReference Include="CallAutomation.Contracts" Version="1.0.8" />
+    <PackageReference Include="Azure.Communication.CallAutomation" Version="1.0.0-alpha.20221221.1" />
+    <PackageReference Include="Azure.Messaging.EventGrid" Version="4.12.0" />
+    <PackageReference Include="CallAutomation.Contracts" Version="1.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Features" Version="4.3.1" />
+    <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Features" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +26,9 @@
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="\" />
     <None Include="..\images\icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Converters\" />
   </ItemGroup>
 
 </Project>

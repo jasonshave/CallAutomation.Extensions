@@ -5,10 +5,6 @@ using CallAutomation.Extensions.Models;
 
 namespace CallAutomation.Extensions.Interfaces;
 
-public interface ICreateCallFromWithHandler : IWithCallbackHandler<ICreateCallFrom>, ICreateCallFrom
-{
-}
-
 public interface ICreateCallFrom
 {
     /// <summary>
